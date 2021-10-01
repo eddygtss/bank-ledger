@@ -5,7 +5,7 @@ import {callApi} from "./utils";
 
 const AccountCreate = () => {
     const createAccount = (username, password) => {
-        callApi('account', 'POST', JSON.stringify({ username, password })).then(result => {
+        callApi('create', 'POST', JSON.stringify({ username, password })).then(result => {
             if (result.status === 201) {
                 setMessage('Successfully created account.')
             } else {

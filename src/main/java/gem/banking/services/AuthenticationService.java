@@ -1,6 +1,7 @@
 package gem.banking.services;
 
 import gem.banking.models.Account;
+import gem.banking.models.AccountInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +26,6 @@ public class AuthenticationService {
     @Resource(name="authenticationManager")
     private AuthenticationManager authManager;
 
-
     private final AccountService accountService;
 
     @Autowired
@@ -46,7 +46,7 @@ public class AuthenticationService {
     }
 
     public void createUser(String documentId, String username, String password) throws ExecutionException, InterruptedException {
-        accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)));
+        accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)), new AccountInfo(documentId, "100"));
     }
 
     public void login(HttpServletRequest request, String username, String password) {
