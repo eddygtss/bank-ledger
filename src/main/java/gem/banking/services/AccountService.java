@@ -7,6 +7,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import gem.banking.models.Account;
+import gem.banking.models.AccountInfo;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ExecutionException;
@@ -14,23 +15,26 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class AccountService {
 
-    public static final String COL_NAME="users";
+    public static final String COL_USERS ="users";
+    public static final String COL_BANK_ACCOUNTS ="bank_accounts";
 
-    public String createAccount(Account account) throws ExecutionException, InterruptedException {
+    public String createAccount(Account account, AccountInfo accountInfo) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_NAME).document(account.getDocumentId()).set(account);
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_USERS).document(account.getDocumentId()).set(account);
+        dbFirestore.collection(COL_BANK_ACCOUNTS).document(accountInfo.getDocumentId()).set(accountInfo);
         return "Successfully created account at " + collectionsApiFuture.get().getUpdateTime().toString();
     }
 
     public Account getAccount(String documentId) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference documentReference = dbFirestore.collection(COL_NAME).document(documentId);
+        DocumentReference documentReference = dbFirestore.collection(COL_USERS).document(documentId);
         ApiFuture<DocumentSnapshot> future = documentReference.get();
         DocumentSnapshot document = future.get();
         Account account;
 
         if (document.exists()) {
             account = document.toObject(Account.class);
+//            AccountInfo accountInfo = accounts.get(accountName);
             return account;
         }
         return null;
@@ -38,13 +42,13 @@ public class AccountService {
 
     public String updateAccount(Account account) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_NAME).document(account.getDocumentId()).set(account);
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_USERS).document(account.getDocumentId()).set(account);
         return "Account successfully updated at " + collectionsApiFuture.get().getUpdateTime().toString();
     }
 
     public String deleteAccount(String documentId) {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        ApiFuture<WriteResult> writeResultApiFuture = dbFirestore.collection(COL_NAME).document(documentId).delete();
+        ApiFuture<WriteResult> writeResultApiFuture = dbFirestore.collection(COL_USERS).document(documentId).delete();
         return "Successfully deleted " + documentId;
     }
 }
