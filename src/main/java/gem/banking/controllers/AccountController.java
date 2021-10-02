@@ -29,6 +29,7 @@ public class AccountController {
         this.accountService = accountService;
     }
 
+    // A NEW COMMENT
     // Create new user account API endpoint (POST/Create)
     @PostMapping("/create")
     public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException {
@@ -37,7 +38,7 @@ public class AccountController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // Get Transactions API endpoint (GET/Read)
+//     Get Transactions API endpoint (GET/Read)
 //    @GetMapping("/transactions")
 //    public List<Transaction> retrieveTransactionHistory() throws Exception  {
 //        return accountService.getAccount(authenticationService.getCurrentUser()).getTransactionHistory();
