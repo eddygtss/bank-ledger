@@ -1,35 +1,71 @@
 package gem.banking.controllers;
 
-import gem.banking.models.Account;
-import gem.banking.models.AccountInfo;
-import gem.banking.models.Transaction;
+import gem.banking.models.*;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
+import gem.banking.services.UserService;
+import gem.banking.utililty.JWTUtility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/api/v1")
 @Slf4j
 public class AccountController {
+
     @Autowired
     public AccountService accountService;
+
     @Autowired
     public AuthenticationService authenticationService;
+
+    @Autowired
+    private JWTUtility jwtUtility;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserService userService;
 
     // This controller defines all of our API endpoints for Accounts.
     public AccountController(AccountService accountService){
         this.accountService = accountService;
     }
 
-    // A NEW COMMENT
+    @PostMapping("/authenticate")
+    public JwtResponse authenticate(@RequestBody JwtRequest jwtRequest) throws Exception {
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            jwtRequest.getUsername(),
+                            jwtRequest.getPassword()
+                    )
+            );
+        } catch (AuthenticationException e) {
+            e.printStackTrace();
+        }
+
+        final UserDetails userDetails
+                = userService.loadUserByUsername(jwtRequest.getUsername());
+
+        final String token =
+                jwtUtility.generateToken(userDetails);
+
+        return new JwtResponse(token);
+    }
+
     // Create new user account API endpoint (POST/Create)
     @PostMapping("/create")
     public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException {

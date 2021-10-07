@@ -23,7 +23,7 @@ public class AuthenticationService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Resource(name="authenticationManager")
+    @Autowired
     private AuthenticationManager authManager;
 
     private final AccountService accountService;
@@ -33,17 +33,17 @@ public class AuthenticationService {
         this.accountService = accountService;
     }
 
-    public String getCurrentUser() {
-        String username;
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails)principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        return username;
-    }
+//    public String getCurrentUser() {
+//        String username;
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        if (principal instanceof UserDetails) {
+//            username = ((UserDetails)principal).getUsername();
+//        } else {
+//            username = principal.toString();
+//        }
+//
+//        return username;
+//    }
 
     public void createUser(String documentId, String username, String password) throws ExecutionException, InterruptedException {
         accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)), new AccountInfo(documentId, "100"));
