@@ -3,14 +3,44 @@ import React, { useState } from 'react';
 import {Container, Button, Form, FormGroup, Label, Input, Row, Col, Jumbotron} from 'reactstrap';
 import {callApi} from "./utils";
 
+import ReactNotification from 'react-notifications-component'
+import { store } from 'react-notifications-component';
+import "animate.css"
+import 'react-notifications-component/dist/theme.css'
+
 const AccountCreate = () => {
     const createAccount = (username, password) => {
         callApi('create', 'POST', JSON.stringify({ username, password })).then(result => {
             if (result.status === 201) {
                 setMessage('Successfully created account.')
+                store.addNotification(
+                    {
+                        title:"Account Created",
+                        message:"Successfully created account",
+                        type:"success",
+                        container:"top-right",
+
+                        insert: "top",
+                        dismiss:{
+                            duration: 2000,
+                            showIcon: true
+                        }
+                    });
             } else {
                 result.json().then(data => {
                     setMessage(`Error creating account${data.message ? `: ${data.message}` : ''}`);
+                    store.addNotification(
+                        {
+                            title: "Error",
+                            message: "Account Creation Failed",
+                            type: "danger",
+                            container: "top-right",
+                            insert: "top",
+                            dismiss:{
+                                duration: 2000,
+                                showIcon: true
+                            }
+                        });
                 });
             }
         });
@@ -25,6 +55,7 @@ const AccountCreate = () => {
 
     return (
       <Container>
+          <ReactNotification />
           <Row>
               { message || '\u00A0' }
           </Row>

@@ -4,18 +4,58 @@ import { Container, Button, Form, FormGroup, Label, Input, Row, Col, Jumbotron }
 import { callApi } from "./utils";
 import { LoginContext} from "./loginContext";
 
+
+import ReactNotification from 'react-notifications-component'
+import { store } from 'react-notifications-component';
+import "animate.css"
+import 'react-notifications-component/dist/theme.css'
+
+
 const Login = ({history, setLogin}) => {
+
     const loginContext = useContext(LoginContext);
     const checkCredentials = (username, password) => {
       callApi('login', 'POST', JSON.stringify({ username, password })).then(result => {
         if (result.status === 200) {
           loginContext.setLogin(true);
           history.replace('/transaction-history');
+
+          store.addNotification(
+                {
+                    title:"Congratulations",
+                    message:"Login Successful",
+                    type:"success",
+                    container:"top-right",
+
+                    insert: "top",
+                    dismiss:{
+                        duration: 2000,
+                        showIcon: true
+                    }
+                });
+
+
         } else {
           setMessage('Invalid Login');
+            store.addNotification(
+                {
+                    title: "Error",
+                    message: "Login Failed",
+                    type: "danger",
+                    container: "top-right",
+                    insert: "top",
+                    dismiss:{
+                        duration: 2000,
+                        showIcon: true
+                    }
+                });
+
         }
       });
     };
+
+
+
 
     const [form, setForm] = useState({ username: '', password: '' });
     const [message, setMessage] = useState('');
@@ -26,6 +66,7 @@ const Login = ({history, setLogin}) => {
 
     return (
       <Container>
+          <ReactNotification />
         <Jumbotron>
           <h3>Login</h3>
           <Row>

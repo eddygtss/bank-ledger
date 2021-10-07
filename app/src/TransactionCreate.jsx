@@ -16,13 +16,43 @@ import {
 } from 'reactstrap';
 import {callApi} from "./utils";
 
+import ReactNotification from 'react-notifications-component'
+import { store } from 'react-notifications-component';
+import "animate.css"
+import 'react-notifications-component/dist/theme.css'
+
 const TransactionCreate = () => {
   const createTransaction = (memo, amount, date, transactionType) => {
     callApi('transactions', 'POST', JSON.stringify({memo, amount, date, transactionType})).then(result => {
       if (result.status === 201) {
         setMessage('Transaction created.');
         setForm({memo: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+
+        store.addNotification(
+            {
+              title:"Transaction Created",
+              message:"Transaction was successful",
+              type:"success",
+              container:"top-right",
+              insert: "top",
+              dismiss:{
+                duration: 2000,
+                showIcon: true
+              }
+            });
       } else {
+        store.addNotification(
+            {
+              title:"Transaction Failed",
+              message:"Transaction was Unsuccessful",
+              type:"danger",
+              container:"top-right",
+              insert: "top",
+              dismiss:{
+                duration: 2000,
+                showIcon: true
+              }
+            });
         result.json().then(data => {
           setMessage(`Error creating account${data.message ? `: ${data.message}` : ''}`);
         });
@@ -39,6 +69,7 @@ const TransactionCreate = () => {
 
   return (
     <Container>
+      <ReactNotification />
       <Row>
         {message || '\u00A0'}
       </Row>
