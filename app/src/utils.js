@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:8080/api/v1';
+const apiUrl = 'https://gembanking.com/api';
 
 const formatCurrency = amount => {
   return `$ ${amount.toFixed(2)}`;

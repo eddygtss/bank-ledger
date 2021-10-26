@@ -1,0 +1,56 @@
+
+.contact-wrapper{
+    vertical-align: center;
+}
+@font-face {
+    font-family: Staatliches;
+    src: url("./Staatliches-Regular.ttf");
+}
+.contact-head-line{
+    text-align: center;
+    align-self: center;
+    justify-content: center;
+    font-family: Staatliches;
+
+}
+.contact-body{
+    display: flex;
+    align-content: space-evenly;
+    justify-content: center;
+    position: center;
+    background-color: #0062cc;
+    height: 100%;
+
+
+}
+.contact-card{
+    width: 318px;
+    margin: 20px;
+    resize: both;
+    overflow: auto;
+}
+.contact-card-img{
+    height: auto;
+    width: auto;
+}
+.contact-card-tittle{
+    color: black;
+    font-family: Staatliches;
+}
+.contact-card-body{
+    color: #ffffff;
+    background-color: #87ceeb;
+    justify-content: center;
+    text-align: center;
+}
+
+.contact-card-btn{
+    background-color: #ffffff;
+    color: #87ceeb;
+}
+.contact-bottom-text{
+    padding-top: 20px;
+    padding-right: 75px;
+    padding-left: 75px;
+
+}
