@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -19,7 +18,7 @@ public class AccountInfo {
 
     public AccountInfo(String documentId, double balance, List<Transaction> transactions) {
         this.documentId = documentId;
-        this.accountName = documentId;
+        this.accountName = documentId.substring(5);
         this.balance = balance;
         this.transactionHistory = transactions;
     }
