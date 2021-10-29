@@ -27,14 +27,13 @@ public class AccountService {
 
     public Account getAccount(String documentId) throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
-        DocumentReference documentReference = dbFirestore.collection(COL_USERS).document(documentId);
-        ApiFuture<DocumentSnapshot> future = documentReference.get();
-        DocumentSnapshot document = future.get();
+        DocumentReference userDocumentReference = dbFirestore.collection(COL_USERS).document(documentId);
+        ApiFuture<DocumentSnapshot> userFuture = userDocumentReference.get();
+        DocumentSnapshot userDocument = userFuture.get();
         Account account;
 
-        if (document.exists()) {
-            account = document.toObject(Account.class);
-//            AccountInfo accountInfo = accounts.get(accountName);
+        if (userDocument.exists()) {
+            account = userDocument.toObject(Account.class);
             return account;
         }
         return null;
@@ -50,5 +49,19 @@ public class AccountService {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> writeResultApiFuture = dbFirestore.collection(COL_USERS).document(documentId).delete();
         return "Successfully deleted " + documentId;
+    }
+
+    public AccountInfo getAccountInfo(String documentId) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        DocumentReference bankAccDocumentReference = dbFirestore.collection(COL_BANK_ACCOUNTS).document(documentId);
+        ApiFuture<DocumentSnapshot> bankAccFuture = bankAccDocumentReference.get();
+        DocumentSnapshot bankAccDocument = bankAccFuture.get();
+        AccountInfo accountInfo;
+
+        if (bankAccDocument.exists()) {
+            accountInfo = bankAccDocument.toObject(AccountInfo.class);
+            return accountInfo;
+        }
+        return null;
     }
 }

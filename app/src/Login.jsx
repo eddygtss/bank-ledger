@@ -1,59 +1,59 @@
-import { withRouter } from 'react-router-dom';
-import React, { useState, useContext } from 'react';
-import { Container, Button, Form, FormGroup, Label, Input, Row, Col, Jumbotron } from 'reactstrap';
+import { withRouter } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import {
+    Container,
+    Button,
+    Form,
+    FormGroup,
+    Input,
+    Row,
+    Jumbotron,
+} from "reactstrap";
 import { callApi } from "./utils";
-import { LoginContext} from "./loginContext";
-import ReactNotification from 'react-notifications-component'
-import { store } from 'react-notifications-component';
-import 'animate.css'
-import 'react-notifications-component/dist/theme.css'
 import { LoginContext } from "./loginContext";
+import "./App.css";
 
+import { store } from "react-notifications-component";
+import "animate.css";
+import "react-notifications-component/dist/theme.css";
 
-const Login = ({history, setLogin}) => {
-
+const Login = ({ history, setLogin }) => {
     const loginContext = useContext(LoginContext);
     const checkCredentials = (username, password) => {
-        callApi('login', 'POST', JSON.stringify({ username, password })).then(result => {
-            if (result.status === 200) {
-                loginContext.setLogin(true);
-                history.replace('/transaction-history');
+        callApi("login", "POST", JSON.stringify({ username, password })).then(
+            result => {
+                if (result.status === 200) {
+                    loginContext.setLogin(true);
+                    history.replace("/transaction-history");
 
-                store.addNotification(
-                    {
-                        title:"Congratulations",
-                        message:"Login Successful",
-                        type:"success",
-                        container:"top-right",
+                    store.addNotification({
+                        title: "Congratulations",
+                        message: "Login Successful",
+                        type: "success",
+                        container: "bottom-center",
                         insert: "top",
-                        dismiss:{
+                        dismiss: {
                             duration: 2000,
-                            showIcon: true
-                        }
+                            showIcon: true,
+                        },
                     });
-
-
-            } else {
-                setMessage('Invalid Login');
-                store.addNotification(
-                    {
+                } else {
+                    setMessage("Invalid Login");
+                    store.addNotification({
                         title: "Error",
                         message: "Login Failed",
-                        type: "danger",
-                        container: "top-right",
+                        type: "success",
+                        container: "bottom-center",
                         insert: "top",
-                        dismiss:{
+                        dismiss: {
                             duration: 2000,
-                            showIcon: true
-                        }
+                            showIcon: true,
+                        },
                     });
-
+                }
             }
-        });
+        );
     };
-
-
-
 
     const [form, setForm] = useState({ username: '', password: '' });
     const [message, setMessage] = useState('');
@@ -63,32 +63,45 @@ const Login = ({history, setLogin}) => {
     };
 
     return (
-        <Container>
-            <ReactNotification />
+        <div className="myBackGround">
             <Jumbotron>
-                <h3>Login</h3>
-                <Row>
-                    { message || '\u00A0' }
-                </Row>
-                <Row>
-                    <Col className="col-3" />
-                    <Col className="col-3 col-auto">
-                        <Form>
-                            <FormGroup>
-                                <Label for="username">Username</Label>
-                                <Input type="text" name="username" onChange={e => onChange(e.target.name, e.target.value)}  />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for="password">Password</Label>
-                                <Input type="password" name="password" id="password" onChange={e => onChange(e.target.name, e.target.value)} />
-                            </FormGroup>
-                        </Form>
-                        <Button onClick={() => checkCredentials(form.username, form.password)}>Login</Button>
-                    </Col>
-                </Row>
+                <div className="logo"> GEM BANK</div>
+                {message || "\u00A0"}
+                <Container fluid>
+                    <h3>Welcome Back</h3>
+                    <p>Don't miss your next opportunity.</p>
+                    <Form>
+                        <FormGroup>
+                            <Input
+                                type="text"
+                                name="username"
+                                placeholder="Your Email"
+                                bsSize="lg"
+                                onChange={(e) => onChange(e.target.name, e.target.value)}
+                            />
+                        </FormGroup>
+                        <FormGroup>
+                            <Input
+                                type="password"
+                                name="password"
+                                id="password"
+                                placeholder="Enter Password"
+                                bsSize="lg"
+                                onChange={(e) => onChange(e.target.name, e.target.value)}
+                            />
+                        </FormGroup>
+                        <Row>
+                            <Button
+                                className="SignUpButton"
+                                onClick={() => checkCredentials(form.username, form.password)}
+                            >
+                                Login
+                            </Button>
+                        </Row>
+                    </Form>
+                </Container>
             </Jumbotron>
-
-        </Container>
-    )
+        </div>
+    );
 };
 export default withRouter(Login);

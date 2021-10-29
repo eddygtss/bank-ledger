@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,12 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class AuthenticationService {
     @Autowired
-    PasswordEncoder passwordEncoder;
+    BCryptPasswordEncoder passwordEncoder;
 
-    @Resource(name="authenticationManager")
+    @Autowired
     private AuthenticationManager authManager;
 
+    @Autowired
     private final AccountService accountService;
 
     @Autowired
@@ -46,7 +48,7 @@ public class AuthenticationService {
     }
 
     public void createUser(String documentId, String username, String password) throws ExecutionException, InterruptedException {
-        accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)), new AccountInfo(documentId, "100"));
+        accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)), new AccountInfo(documentId, 100.00));
     }
 
     public void login(HttpServletRequest request, String username, String password) {
