@@ -6,15 +6,18 @@ import com.google.firebase.FirebaseOptions;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 @Service
 public class FirebaseInitialize {
     @PostConstruct
     public void initialize() {
         try {
-            FileInputStream serviceAccount =
-                    new FileInputStream("src/main/resources/gem-bankers-united-firebase.json");
+
+            InputStream serviceAccount =
+                    getClass().getResourceAsStream("/classes/gem-bankers-united-firebase.json");
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))

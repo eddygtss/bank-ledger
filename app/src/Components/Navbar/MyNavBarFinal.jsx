@@ -16,14 +16,14 @@ export const MyNavBarFinal = () => {
     const showRegisterLoginBtn = () => {
         if(!loginContext.isLoggedIn) {
             return (
-                <fragment>
+                <>
                     <DropdownItem tag={RRNavLink} exact to="/account-create" activeClassName="active">
                         Register
                     </DropdownItem>
                     <DropdownItem tag={RRNavLink} exact to="/login" activeClassName="active">
                         Login
                     </DropdownItem>
-                </fragment>
+                </>
             )
         }
     }
