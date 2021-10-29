@@ -45,6 +45,12 @@ public class AccountService {
         return "Account successfully updated at " + collectionsApiFuture.get().getUpdateTime().toString();
     }
 
+    public void updateAccountInfo(AccountInfo account) throws ExecutionException, InterruptedException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        ApiFuture<WriteResult> collectionsApiFuture = dbFirestore.collection(COL_BANK_ACCOUNTS).document(account.getDocumentId()).set(account);
+        collectionsApiFuture.get();
+    }
+
     public String deleteAccount(String documentId) {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> writeResultApiFuture = dbFirestore.collection(COL_USERS).document(documentId).delete();
