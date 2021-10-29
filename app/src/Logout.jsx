@@ -14,9 +14,9 @@ const Logout = ({history}) => {
   });
 
   return (
-    <div>
-      Logout
-    </div>
+      <div>
+        Logout
+      </div>
   )
 };
 export default withRouter(Logout);

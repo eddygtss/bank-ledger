@@ -1,11 +1,18 @@
 package gem.banking.models;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
+import java.io.Serializable;
+import java.util.List;
+
 @Getter @Setter
-public class Account {
+@RequiredArgsConstructor
+public class Account implements Serializable {
+    private static final long serialVersionUID = -1764970284520387975L;
+
     @Id
     private String documentId;
 

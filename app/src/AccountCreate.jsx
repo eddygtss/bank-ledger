@@ -36,7 +36,7 @@ const AccountCreate = () => {
                   <Col className="col-3 col-auto">
                       <Form>
                           <FormGroup>
-                              <Label for="username">Username</Label>
+                              <Label for="username">Email</Label>
                               <Input type="text" name="username" onChange={e => onChange(e.target.name, e.target.value)}  />
                           </FormGroup>
                           <FormGroup>

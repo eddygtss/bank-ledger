@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import { NavLink as RRNavLink, NavLink } from "react-router-dom";
+import { NavLink as RRNavLink} from "react-router-dom";
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown, NavItem } from "reactstrap";
 import "./MyNavBarFinal.css";
 import { LoginContext } from "../../loginContext";
@@ -11,8 +11,32 @@ export const MyNavBarFinal = () => {
     const toggleNav = () => {
         setToggleMenu(!toggleMenu)
     }
-
     const loginContext = useContext(LoginContext);
+
+    const showRegisterLoginBtn = () => {
+        if(!loginContext.isLoggedIn) {
+            return (
+                <>
+                    <DropdownItem tag={RRNavLink} exact to="/account-create" activeClassName="active">
+                        Register
+                    </DropdownItem>
+                    <DropdownItem tag={RRNavLink} exact to="/login" activeClassName="active">
+                        Login
+                    </DropdownItem>
+                </>
+            )
+        }
+    }
+
+    const showLogoutBtn = () => {
+        if(loginContext.isLoggedIn) {
+            return (
+                <DropdownItem tag={RRNavLink} exact to="/logout" activeClassName="active">
+                    Logout
+                </DropdownItem>
+            )
+        }
+    }
 
     return (
         <>
@@ -64,16 +88,8 @@ export const MyNavBarFinal = () => {
                                 </div>
                             </DropdownToggle>
                             <DropdownMenu right>
-                                <DropdownItem tag={RRNavLink} exact to="/account-create" activeClassName="active">
-                                    Register
-                                </DropdownItem>
-                                <DropdownItem divider/>
-                                <DropdownItem tag={RRNavLink} exact to="/login" activeClassName="active">
-                                    Login
-                                </DropdownItem>
-                                <DropdownItem tag={RRNavLink} exact to="/logout" activeClassName="active">
-                                    Logout
-                                </DropdownItem>
+                                {showRegisterLoginBtn()}
+                                {showLogoutBtn()}
                             </DropdownMenu>
                         </UncontrolledDropdown>
                 </div>

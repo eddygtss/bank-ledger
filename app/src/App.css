@@ -1,0 +1,124 @@
+.jumbotron {
+  align-items: center;
+  background-color: white !important;
+  padding: 2px 10px 35px !important;
+  border-radius: 24px !important;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 12px 0px,
+    rgba(0, 0, 0, 0.04) 0px 24px 32px 0px;
+  margin-bottom: 112px;
+  max-width: 640px;
+  margin: 0px auto;
+  padding-top: 65px !important;
+  padding-bottom: 50px !important;
+}
+.root {
+  font-family: "Circular Pro", sans-serif !important;
+  color: rgb(51, 51, 51);
+  min-height: 100%;
+}
+.myBackGround {
+  font-family: "Circular Pro", sans-serif !important;
+  background: linear-gradient(
+    -0deg,
+    rgb(124, 197, 228),
+    #b7e7f8,
+    rgb(206, 242, 255),
+    rgb(238, 240, 240)
+  ) !important;
+  height: 100vh;
+  padding-top: 32px;
+}
+
+@-webkit-keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+@-moz-keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+@keyframes Gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.h3 {
+  display: block;
+  font-size: 2em;
+  margin-block-start: 0.67em;
+  margin-block-end: 0.67em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  padding-left: 0 !important;
+}
+
+.SignUpButton {
+  min-width: 80px;
+  width: 100% !important;
+  height: 48px;
+  font-family: inherit;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  text-shadow: none;
+  line-height: 22px !important;
+  margin: 24px 15px 5px;
+  border-radius: 25px !important;
+  box-shadow: none;
+  transition: all 0.3s ease 0s !important;
+  padding: auto !important;
+  color: #ffffff !important;
+  background-color: #29a8de !important;
+  border: none !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  text-decoration: none;
+  display: flex !important;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+}
+
+.navbar-brand {
+  background: url(https://cliply.co/wp-content/uploads/2020/02/392002130_GEM_STONE_EMOJI_400px.gif)
+    center / contain no-repeat;
+  height: auto;
+  width: 200px;
+  text-align: center;
+  font-size: 1.35em !important;
+  font-weight: 700;
+  line-height: 2em !important;
+}
+
+.logo {
+  background: url(https://cliply.co/wp-content/uploads/2020/02/392002130_GEM_STONE_EMOJI_400px.gif)
+    center / contain no-repeat;
+  height: auto;
+  width: auto;
+  text-align: center;
+  font-size: 2.25em !important;
+  font-weight: 700;
+  line-height: 5em !important;
+}
