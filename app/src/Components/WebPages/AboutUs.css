@@ -1,0 +1,65 @@
+
+.about-wrapper{
+    vertical-align: center;
+
+
+}
+@font-face {
+    font-family: Staatliches;
+    src: url("./Staatliches-Regular.ttf");
+}
+.about-head-line{
+    text-align: center;
+    align-self: center;
+    justify-content: center;
+    font-family: Staatliches;
+
+
+}
+.about-body{
+    display: flex;
+    align-content: space-evenly;
+    justify-content: center;
+    position: center;
+    background-color: #0062cc;
+    height: 100%;
+
+
+}
+.about-card{
+    width: 318px;
+    margin: 20px;
+    resize: both;
+    overflow: auto;
+}
+.about-card-img{
+    /*height: auto;*/
+    /*width: auto;*/
+
+    /*resize: both;*/
+    max-height: 190px;
+}
+.about-card-tittle{
+    color: black;
+    font-family: Staatliches;
+}
+.about-card-body{
+    color: #ffffff;
+    background-color: #87ceeb;
+    justify-content: center;
+    text-align: center;
+
+}
+
+.about-card-btn{
+    /*background-color: #ffffff;*/
+    background-color: #ffffff;
+    color: #87ceeb;
+}
+.about-bottom-text{
+
+    padding-top: 20px;
+    padding-right: 75px;
+    padding-left: 75px;
+    /*padding-bottom: 100px;*/
+}

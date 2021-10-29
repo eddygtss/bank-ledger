@@ -3,6 +3,7 @@ package gem.banking.controllers;
 import gem.banking.models.Account;
 import gem.banking.models.AccountInfo;
 import gem.banking.models.Transaction;
+import gem.banking.services.AccountInfoService;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,8 @@ public class AccountController {
     @Autowired
     public AccountService accountService;
     @Autowired
+    public AccountInfoService accountInfoService;
+    @Autowired
     public AuthenticationService authenticationService;
 
     // This controller defines all of our API endpoints for Accounts.
@@ -38,15 +41,27 @@ public class AccountController {
     }
 
     // Get Transactions API endpoint (GET/Read)
-//    @GetMapping("/transactions")
-//    public List<Transaction> retrieveTransactionHistory() throws Exception  {
-//        return accountService.getAccount(authenticationService.getCurrentUser()).getTransactionHistory();
-//    }
+    @GetMapping("/transactions")
+    public List<Transaction> retrieveTransactionHistory() throws Exception  {
+        AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+
+        return accountInfo.getTransactionHistory();
+    }
+
+    // Post Transactions API endpoint (POST/Create)
+    @PostMapping("/transactions")
+    public ResponseEntity<Void> createTransaction(@RequestBody Transaction createTransactionRequest) throws Exception {
+        AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+
+        accountService.updateAccountInfo(accountInfoService.recordTransaction(createTransactionRequest, accountInfo));
+
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
     // Get Account API endpoint (GET/Read)
     @GetMapping("/account")
-    public Account getAccount(@RequestParam String documentId) throws InterruptedException, ExecutionException {
-        return accountService.getAccount(documentId);
+    public AccountInfo getAccount() throws InterruptedException, ExecutionException {
+        return accountService.getAccountInfo(authenticationService.getCurrentUser());
     }
 
     // Update Account API endpoint (PUT/Update)
