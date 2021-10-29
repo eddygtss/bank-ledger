@@ -17,7 +17,7 @@ public class FirebaseInitialize {
         try {
 
             InputStream serviceAccount =
-                    getClass().getResourceAsStream("/classes/gem-bankers-united-firebase.json");
+                    getClass().getResourceAsStream("/gem-bankers-united-firebase.json");
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
