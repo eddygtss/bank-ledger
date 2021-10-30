@@ -56,7 +56,9 @@ const AccountCreate = () => {
         );
     };
 
-    const [form, setForm] = useState({ username: '', password: '', firstname: '', lastname: '', address: '', SSN: '' });
+    const [form, setForm] = useState({ username: '', password: '', confirm_password: '', firstname: '', lastname: '', address: '', SSN: '' });
+
+    const [isValid, setIsValid] = useState(false)
 
     const [message, setMessage] = useState('');
 
@@ -144,6 +146,7 @@ const AccountCreate = () => {
                                         type="text"
                                         name="firstname"
                                         placeholder="First Name"
+                                        value={form.firstname}
                                         bsSize="lg"
                                         onChange={(e) => onChange(e.target.name, e.target.value)}
                                     />
@@ -230,9 +233,10 @@ const AccountCreate = () => {
                             </Col>
                         </Row>
                         <Row>
-                            <Button type="submit"
+                            <Button
                                 className="SignUpButton"
                                 value="Submit"
+                                disabled={!form.firstname || !form.lastname || !form.username || !form.password || !form.address || !form.SSN}
                                 onClick={() => handleSubmit(form.username, form.password)}
                             >
                                 Create Account
