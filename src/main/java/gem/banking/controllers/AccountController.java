@@ -35,7 +35,7 @@ public class AccountController {
     // Create new user account API endpoint (POST/Create)
     @PostMapping("/create")
     public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException {
-        authenticationService.createUser("user_" + createAccountRequest.getUsername(), createAccountRequest.getUsername(), createAccountRequest.getPassword());
+        authenticationService.createUser(createAccountRequest);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

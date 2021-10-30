@@ -48,8 +48,29 @@ public class AuthenticationService {
         return "user_" + username;
     }
 
-    public void createUser(String documentId, String username, String password) throws ExecutionException, InterruptedException {
-        accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)), new AccountInfo(documentId, 100.00, new ArrayList<>()));
+    public void createUser(Account account) throws ExecutionException, InterruptedException {
+        String documentId = "user_" + account.getUsername();
+        String username = account.getUsername();
+        String password = account.getPassword();
+        String firstName = account.getFirstName();
+        String lastName = account.getLastName();
+        String ssn = account.getSsn();
+        String address = account.getAddress();
+
+        accountService.createAccount(
+                new Account(
+                        documentId,
+                        username,
+                        passwordEncoder.encode(password),
+                        firstName,
+                        lastName,
+                        ssn,
+                        address
+                ),
+                new AccountInfo(
+                        documentId,
+                        100.00,
+                        new ArrayList<>()));
     }
 
     public void login(HttpServletRequest request, String username, String password) {
