@@ -1,56 +1,247 @@
-import { withRouter } from 'react-router-dom';
-import React, { useState } from 'react';
-import {Container, Button, Form, FormGroup, Label, Input, Row, Col, Jumbotron} from 'reactstrap';
-import {callApi} from "./utils";
+import { withRouter } from "react-router-dom";
+import React, { useState } from "react";
+import {
+    Container,
+    Button,
+    Form,
+    FormGroup,
+    Input,
+    Row,
+    Col,
+    Jumbotron,
+} from "reactstrap";
+import { callApi } from "./utils";
+import "./App.css";
+import { store } from "react-notifications-component";
+import "animate.css";
+import "react-notifications-component/dist/theme.css";
 
 const AccountCreate = () => {
-    const createAccount = (username, password) => {
-        callApi('create', 'POST', JSON.stringify({ username, password })).then(result => {
-            if (result.status === 201) {
-                setMessage('Successfully created account.')
-            } else {
-                result.json().then(data => {
-                    setMessage(`Error creating account${data.message ? `: ${data.message}` : ''}`);
-                });
+    const createAccount = (username, password, firstname, lastname, address, SSN) => {
+        callApi("create", "POST", JSON.stringify({ username, password, firstname, lastname, address, SSN })).then(
+            (result) => {
+                if (result.status === 201) {
+                    setMessage("Successfully created account.");
+                    store.addNotification({
+                        title: "Account Created",
+                        message: "Successfully created account",
+                        type: "success",
+                        container: "top-right",
+
+                        insert: "top",
+                        dismiss: {
+                            duration: 2000,
+                            showIcon: true,
+                        },
+                    });
+                } else {
+                    result.json().then((data) => {
+                        setMessage(
+                            `Error creating account${data.message ? `: ${data.message}` : ''}`
+                        );
+                        store.addNotification({
+                            title: "Error",
+                            message: "Account Creation Failed",
+                            type: "danger",
+                            container: "top-right",
+                            insert: "top",
+                            dismiss: {
+                                duration: 2000,
+                                showIcon: true,
+                            },
+                        });
+                    });
+                }
             }
-        });
+        );
     };
 
+    const [form, setForm] = useState({ username: '', password: '', firstname: '', lastname: '', address: '', SSN: '' });
 
-    const [form, setForm] = useState({ username: '', password: '' });
     const [message, setMessage] = useState('');
 
     const onChange = (name, value) => {
         setForm({ ...form, [name]: value });
     };
 
+    const validate = () => {
+        let input = this.state.form;
+        let errors = {};
+        let isValid = true;
+
+        if (!input['firstname']) {
+            isValid = false;
+            setMessage("Please enter your first name.");
+        }
+
+        if (!input["email"]) {
+            isValid = false;
+            errors["email"] = "Please enter your email Address.";
+        }
+
+        if (typeof input["email"] !== "undefined") {
+
+            const pattern = new RegExp(/^(("[\w-\s]+")|([\w-]+(?:\.[\w-]+)*)|("[\w-\s]+")([\w-]+(?:\.[\w-]+)*))(@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$)|(@\[?((25[0-5]\.|2[0-4][0-9]\.|1[0-9]{2}\.|[0-9]{1,2}\.))((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\.){2}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[0-9]{1,2})\]?$)/i);
+            if (!pattern.test(input["email"])) {
+                isValid = false;
+                errors["email"] = "Please enter valid email address.";
+            }
+        }
+
+        if (!input["password"]) {
+            isValid = false;
+            errors["password"] = "Please enter your password.";
+        }
+
+        if (!input["confirm_password"]) {
+            isValid = false;
+            errors["confirm_password"] = "Please enter your confirm password.";
+        }
+
+        if (typeof input["password"] !== "undefined" && typeof input["confirm_password"] !== "undefined") {
+
+            if (input["password"] !== input["confirm_password"]) {
+                isValid = false;
+                errors["password"] = "Passwords don't match.";
+            }
+        }
+
+        this.setState({
+            errors: errors
+        });
+
+        return isValid;
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if(this.validate()){
+            console.log(this.state);
+
+            let input = {};
+            input["name"] = "";
+            input["email"] = "";
+            input["password"] = "";
+            input["confirm_password"] = "";
+            this.setState({input:input});
+        }
+    }
+
     return (
-      <Container>
-          <Row>
-              { message || '\u00A0' }
-          </Row>
-          <Jumbotron>
-              <h3>Create New Account</h3>
-
-              <Row>
-                  <Col className="col-3" />
-                  <Col className="col-3 col-auto">
-                      <Form>
-                          <FormGroup>
-                              <Label for="username">Email</Label>
-                              <Input type="text" name="username" onChange={e => onChange(e.target.name, e.target.value)}  />
-                          </FormGroup>
-                          <FormGroup>
-                              <Label for="password">Password</Label>
-                              <Input type="password" name="password" id="password" onChange={e => onChange(e.target.name, e.target.value)} />
-                          </FormGroup>
-                      </Form>
-                      <Button onClick={() => createAccount(form.username, form.password)}>Create Account</Button>
-                  </Col>
-              </Row>
-          </Jumbotron>
-
-      </Container>
-    )
+        <div className="myBackGround">
+            <Jumbotron>
+                <div className="logo"> GEM BANK</div>
+                {message || "\u00A0"}
+                <Container fluid>
+                    <h3>Hi, what’s your name?</h3>
+                    <p>Let’s start with some basic information</p>
+                    <Form>
+                        <Row>
+                            <Col>
+                                <FormGroup>
+                                    <Input
+                                        type="text"
+                                        name="firstname"
+                                        placeholder="First Name"
+                                        bsSize="lg"
+                                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    />
+                                </FormGroup>
+                            </Col>
+                            <Col>
+                                <FormGroup>
+                                    <Input
+                                        type="text"
+                                        name="lastname"
+                                        placeholder="Last Name"
+                                        bsSize="lg"
+                                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <FormGroup>
+                            <Input
+                                type="text"
+                                name="username"
+                                placeholder="Your Email"
+                                bsSize="lg"
+                                onChange={(e) => onChange(e.target.name, e.target.value)}
+                            />
+                        </FormGroup>
+                        <Row>
+                            <Col>
+                                <FormGroup>
+                                    <Input
+                                        type="password"
+                                        name="password"
+                                        id="password"
+                                        placeholder="Enter Password"
+                                        bsSize="lg"
+                                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    />
+                                </FormGroup>
+                            </Col>
+                            <Col>
+                                <FormGroup>
+                                    <Input
+                                        type="password"
+                                        name="confirm_password"
+                                        placeholder="Enter confirm password"
+                                        bsSize="lg"
+                                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <FormGroup>
+                            <Input
+                                type="text"
+                                name="address"
+                                id="Your Address"
+                                placeholder="Your Address"
+                                bsSize="lg"
+                                onChange={(e) => onChange(e.target.name, e.target.value)}
+                            />
+                        </FormGroup>
+                        <Row>
+                            <Col>
+                                <FormGroup>
+                                    <Input
+                                        type="password"
+                                        name="SSN"
+                                        placeholder="Enter SSN"
+                                        bsSize="lg"
+                                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    />
+                                </FormGroup>
+                            </Col>
+                            <Col>
+                                <FormGroup>
+                                    <Input
+                                        type="password"
+                                        name="confirm_SSN"
+                                        placeholder="Enter confirm SSN"
+                                        bsSize="lg"
+                                        onChange={(e) => onChange(e.target.name, e.target.value)}
+                                    />
+                                </FormGroup>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Button type="submit"
+                                className="SignUpButton"
+                                value="Submit"
+                                onClick={() => handleSubmit(form.username, form.password)}
+                            >
+                                Create Account
+                            </Button>
+                        </Row>
+                    </Form>
+                </Container>
+            </Jumbotron>
+        </div>
+    );
 };
 export default withRouter(AccountCreate);
