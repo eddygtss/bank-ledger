@@ -16,9 +16,9 @@ public class AccountInfo {
     private double balance;
     private List<Transaction> transactionHistory;
 
-    public AccountInfo(String documentId, double balance, List<Transaction> transactions) {
+    public AccountInfo(String documentId, String accountName, double balance, List<Transaction> transactions) {
         this.documentId = documentId;
-        this.accountName = documentId.substring(5);
+        this.accountName = accountName;
         this.balance = balance;
         this.transactionHistory = transactions;
     }

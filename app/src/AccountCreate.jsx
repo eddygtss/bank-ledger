@@ -17,8 +17,16 @@ import "animate.css";
 import "react-notifications-component/dist/theme.css";
 
 const AccountCreate = () => {
-    const createAccount = (username, password, firstname, lastname, address, SSN) => {
-        callApi("create", "POST", JSON.stringify({ username, password, firstname, lastname, address, SSN })).then(
+    const createAccount = (username, password, firstName, lastName, address, ssn) => {
+        callApi("create", "POST",
+            JSON.stringify({
+                username,
+                password,
+                firstName,
+                lastName,
+                address,
+                ssn
+            })).then(
             (result) => {
                 if (result.status === 201) {
                     setMessage("Successfully created account.");
@@ -56,7 +64,7 @@ const AccountCreate = () => {
         );
     };
 
-    const [form, setForm] = useState({ username: '', password: '', confirm_password: '', firstname: '', lastname: '', address: '', SSN: '' });
+    const [form, setForm] = useState({ username: '', password: '', confirm_password: '', firstName: '', lastName: '', address: '', ssn: '' });
 
     const [isValid, setIsValid] = useState(false)
 
@@ -71,7 +79,7 @@ const AccountCreate = () => {
         let errors = {};
         let isValid = true;
 
-        if (!input['firstname']) {
+        if (!input['firstName']) {
             isValid = false;
             setMessage("Please enter your first name.");
         }
@@ -144,9 +152,9 @@ const AccountCreate = () => {
                                 <FormGroup>
                                     <Input
                                         type="text"
-                                        name="firstname"
+                                        name="firstName"
                                         placeholder="First Name"
-                                        value={form.firstname}
+                                        value={form.firstName}
                                         bsSize="lg"
                                         onChange={(e) => onChange(e.target.name, e.target.value)}
                                     />
@@ -156,7 +164,7 @@ const AccountCreate = () => {
                                 <FormGroup>
                                     <Input
                                         type="text"
-                                        name="lastname"
+                                        name="lastName"
                                         placeholder="Last Name"
                                         bsSize="lg"
                                         onChange={(e) => onChange(e.target.name, e.target.value)}
@@ -191,7 +199,7 @@ const AccountCreate = () => {
                                     <Input
                                         type="password"
                                         name="confirm_password"
-                                        placeholder="Enter confirm password"
+                                        placeholder="Confirm password"
                                         bsSize="lg"
                                         onChange={(e) => onChange(e.target.name, e.target.value)}
                                     />
@@ -202,7 +210,7 @@ const AccountCreate = () => {
                             <Input
                                 type="text"
                                 name="address"
-                                id="Your Address"
+                                id="address"
                                 placeholder="Your Address"
                                 bsSize="lg"
                                 onChange={(e) => onChange(e.target.name, e.target.value)}
@@ -213,7 +221,7 @@ const AccountCreate = () => {
                                 <FormGroup>
                                     <Input
                                         type="password"
-                                        name="SSN"
+                                        name="ssn"
                                         placeholder="Enter SSN"
                                         bsSize="lg"
                                         onChange={(e) => onChange(e.target.name, e.target.value)}
@@ -225,7 +233,7 @@ const AccountCreate = () => {
                                     <Input
                                         type="password"
                                         name="confirm_SSN"
-                                        placeholder="Enter confirm SSN"
+                                        placeholder="Confirm ssn"
                                         bsSize="lg"
                                         onChange={(e) => onChange(e.target.name, e.target.value)}
                                     />
@@ -236,8 +244,8 @@ const AccountCreate = () => {
                             <Button
                                 className="SignUpButton"
                                 value="Submit"
-                                disabled={!form.firstname || !form.lastname || !form.username || !form.password || !form.address || !form.SSN}
-                                onClick={() => handleSubmit(form.username, form.password)}
+                                disabled={!form.firstName || !form.lastName || !form.username || !form.password || !form.address || !form.ssn}
+                                onClick={() => createAccount(form.username, form.password, form.firstName, form.lastName, form.address, form.ssn)}
                             >
                                 Create Account
                             </Button>
