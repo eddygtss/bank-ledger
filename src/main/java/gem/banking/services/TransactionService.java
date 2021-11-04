@@ -12,11 +12,12 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class AccountInfoService {
+public class TransactionService {
 
     public AccountInfo recordTransaction(Transaction transaction, AccountInfo accountInfo) throws InsufficientFundsException, InvalidTransactionException {
         List<Transaction> transactions = accountInfo.getTransactionHistory();
         double balance = accountInfo.getBalance();
+        Transaction.TransactionType transactionType = transaction.getTransactionType();
 
         if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
 
@@ -25,10 +26,10 @@ public class AccountInfoService {
             transaction.setDate(new Date());
         }
 
-        if (transaction.getTransactionType() == Transaction.TransactionType.DEPOSIT) {
+        if (transactionType == Transaction.TransactionType.DEPOSIT || transactionType == Transaction.TransactionType.RECEIVED) {
             transactions.add(transaction);
             balance += transaction.getAmount();
-        } else if (transaction.getTransactionType() == Transaction.TransactionType.WITHDRAWAL) {
+        } else if (transactionType == Transaction.TransactionType.WITHDRAWAL || transactionType == Transaction.TransactionType.SENT) {
             if (balance - transaction.getAmount() < 0.0) {
                 throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", balance));
             }
@@ -41,7 +42,7 @@ public class AccountInfoService {
         accountInfo.setTransactionHistory(transactions);
         accountInfo.setBalance(balance);
 
-        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transaction.getTransactionType() + " - New Balance: " + balance);
+        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType + " - New Balance: " + balance);
 
         return accountInfo;
     }

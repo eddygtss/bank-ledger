@@ -1,9 +1,10 @@
 package gem.banking.controllers;
 
+import gem.banking.exceptions.AccountInvalidException;
 import gem.banking.models.Account;
 import gem.banking.models.AccountInfo;
 import gem.banking.models.Transaction;
-import gem.banking.services.AccountInfoService;
+import gem.banking.services.TransactionService;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class AccountController {
     @Autowired
     public AccountService accountService;
     @Autowired
-    public AccountInfoService accountInfoService;
+    public TransactionService transactionService;
     @Autowired
     public AuthenticationService authenticationService;
 
@@ -53,14 +54,35 @@ public class AccountController {
     public ResponseEntity<Void> createTransaction(@RequestBody Transaction createTransactionRequest) throws Exception {
         AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
 
-        accountService.updateAccountInfo(accountInfoService.recordTransaction(createTransactionRequest, accountInfo));
+        accountService.updateAccountInfo(transactionService.recordTransaction(createTransactionRequest, accountInfo));
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // Send Transaction API endpoint (POST/Create)
+    @PostMapping("/send")
+    public ResponseEntity<String> sendFunds(@RequestBody Transaction createTransactionRequest) throws Exception {
+        String currentUser = authenticationService.getCurrentUser();
+        AccountInfo currentUserAccount = accountService.getAccountInfo(currentUser);
+
+        try {
+            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + createTransactionRequest.getGemUser());
+            accountService.updateAccountInfo(transactionService.recordTransaction(createTransactionRequest, currentUserAccount));
+
+            createTransactionRequest.setTransactionType(Transaction.TransactionType.RECEIVED);
+            createTransactionRequest.setGemUser(currentUser.substring(5));
+
+            accountService.updateAccountInfo(transactionService.recordTransaction(createTransactionRequest, recipientUserAccount));
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+
+        return ResponseEntity.ok("Successfully sent " + createTransactionRequest.getGemUser() + " $" + createTransactionRequest.getAmount());
+    }
+
     // Get Account API endpoint (GET/Read)
     @GetMapping("/account")
-    public AccountInfo getAccount() throws InterruptedException, ExecutionException {
+    public AccountInfo getAccount() throws InterruptedException, ExecutionException, AccountInvalidException {
         return accountService.getAccountInfo(authenticationService.getCurrentUser());
     }
 
@@ -80,6 +102,12 @@ public class AccountController {
     public ResponseEntity<Void> login(@RequestBody Account loginAccountRequest, final HttpServletRequest request) {
         authenticationService.login(request, loginAccountRequest.getUsername(), loginAccountRequest.getPassword());
 
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        authenticationService.logout();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

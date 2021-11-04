@@ -10,12 +10,13 @@ import java.util.Date;
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class Transaction {
     private String memo = "";
+    private String gemUser = "";
     private double  amount;
     @JsonFormat(pattern="yyyy-MM-dd")
     private Date date;
     private TransactionType transactionType;
 
     public enum TransactionType {
-        WITHDRAWAL, DEPOSIT;
+        WITHDRAWAL, DEPOSIT, SENT, RECEIVED;
     }
 }
