@@ -157,20 +157,99 @@ public class TransactionService {
     }
 
     public List<AccountInfo> approveTransaction(Transaction transaction,
-                                                AccountInfo senderAccountInfo,
+                                                AccountInfo approverAccountInfo,
                                                 AccountInfo recipientAccountInfo)
             throws InsufficientFundsException, InvalidTransactionException {
-        //TODO logic for moving money due to approval of request
+        List<AccountInfo> updatedAccounts = new ArrayList<>();
 
-        return new ArrayList<>();
+        List<Transaction> approverTransactions = approverAccountInfo.getTransactionHistory();
+        List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
+
+        double approverBalance = approverAccountInfo.getBalance();
+        double recipientBalance = recipientAccountInfo.getBalance();
+
+        // TransactionType for the approver
+        Transaction.TransactionType transactionType = transaction.getTransactionType();
+
+        // We check if the transaction status is REQUEST and if the person approving is equal to the original recipient of the request
+        if (transactionType == Transaction.TransactionType.REQUEST
+                && approverAccountInfo.getDocumentId().substring(5).equals(transaction.getRecipient())) {
+            if (approverBalance - transaction.getAmount() < 0.0) {
+                throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", approverBalance));
+            }
+            approverTransactions.remove(transaction);
+            transaction.setTransactionStatus(Transaction.TransactionStatus.SENT);
+            recipientTransactions.remove(transaction);
+
+            transaction.setDate(new Date());
+            transaction.setTransactionStatus(Transaction.TransactionStatus.APPROVED);
+            approverTransactions.add(transaction);
+            approverBalance -= transaction.getAmount();
+
+            // Updating the sender's account
+            approverAccountInfo.setTransactionHistory(approverTransactions);
+            approverAccountInfo.setBalance(approverBalance);
+
+            // New Transaction object for the recipient so we can change status and type.
+            Transaction recipient = new Transaction(transaction);
+            recipient.setTransactionStatus(Transaction.TransactionStatus.RECEIVED);
+
+            recipientTransactions.add(recipient);
+            recipientBalance += transaction.getAmount();
+
+            // Updating the recipient's account
+            recipientAccountInfo.setTransactionHistory(recipientTransactions);
+            recipientAccountInfo.setBalance(recipientBalance);
+        } else {
+            throw new InvalidTransactionException("Invalid or missing transaction type");
+        }
+
+        // Adding the sender and recipient account infos into the updated accounts list to return
+        updatedAccounts.add(approverAccountInfo);
+        updatedAccounts.add(recipientAccountInfo);
+
+        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType + " - New Balance: " + approverBalance);
+
+        return updatedAccounts;
     }
 
     public List<AccountInfo> denyTransaction(Transaction transaction,
-                                             AccountInfo senderAccountInfo,
+                                             AccountInfo denierAccountInfo,
                                              AccountInfo recipientAccountInfo)
             throws InsufficientFundsException, InvalidTransactionException {
-        //TODO logic for denying request
+        List<AccountInfo> updatedAccounts = new ArrayList<>();
 
-        return new ArrayList<>();
+        List<Transaction> denierTransactions = denierAccountInfo.getTransactionHistory();
+        List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
+
+
+        Transaction.TransactionType transactionType = transaction.getTransactionType();
+
+        // We check if the transaction status is REQUEST and if the person denying is equal to the original recipient of the request
+        if (transactionType == Transaction.TransactionType.REQUEST
+                && denierAccountInfo.getDocumentId().substring(5).equals(transaction.getRecipient())) {
+            denierTransactions.remove(transaction);
+            transaction.setTransactionStatus(Transaction.TransactionStatus.SENT);
+            recipientTransactions.remove(transaction);
+
+            transaction.setDate(new Date());
+            transaction.setTransactionStatus(Transaction.TransactionStatus.DENIED);
+
+            recipientTransactions.add(transaction);
+            recipientAccountInfo.setTransactionHistory(recipientTransactions);
+
+            denierTransactions.add(transaction);
+            denierAccountInfo.setTransactionHistory(denierTransactions);
+        } else {
+            throw new InvalidTransactionException("Invalid or missing transaction type");
+        }
+
+        // Adding the requester and recipient account infos into the updated accounts list to return
+        updatedAccounts.add(denierAccountInfo);
+        updatedAccounts.add(recipientAccountInfo);
+
+        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType);
+
+        return updatedAccounts;
     }
 }
