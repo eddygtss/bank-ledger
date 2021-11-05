@@ -41,7 +41,10 @@ const TransactionHistory = () => {
                       <td>{t.transactionType}</td>
                       <td>{t.transactionStatus}</td>
                       <td>{t.transactionStatus === 'PENDING' || t.transactionStatus === 'APPROVED' || t.transactionStatus === 'RECEIVED' ? t.sender : t.recipient}</td>
-                      <td>{formatCurrency(t.transactionType === 'DEPOSIT' || t.transactionStatus === 'RECEIVED' ? t.amount : t.amount * -1)}</td>
+                      <td>{formatCurrency(
+                          t.transactionType === 'DEPOSIT' ||
+                          t.transactionStatus === 'RECEIVED' ||
+                          (t.transactionStatus === 'SENT' && t.transactionType === 'REQUEST') ? t.amount : t.amount * -1)}</td>
                   </tr>))
           }
           {!accountInfo.transactionHistory.length && 'No transactions recorded.'}
