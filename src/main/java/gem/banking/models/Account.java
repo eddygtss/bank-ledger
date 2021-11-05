@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Getter @Setter
 @RequiredArgsConstructor
@@ -20,9 +19,30 @@ public class Account implements Serializable {
 
     private String password;
 
+    private String firstName;
+
+    private String lastName;
+
+    private String address;
+
+    private String ssn;
+
+
+
+
     public Account(String documentId, String username, String password) {
         this.documentId = documentId;
         this.username = username;
         this.password = password;
+    }
+
+    public Account(String documentId, String username, String password, String firstName, String lastName, String address, String ssn) {
+        this.documentId = documentId;
+        this.username = username;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.address = address;
+        this.ssn = ssn;
     }
 }

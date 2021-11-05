@@ -30,8 +30,83 @@ const TransactionCreate = () => {
     });
   };
 
-  const [form, setForm] = useState({memo: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+  const createSendTransaction = (memo, recipient, amount, date, transactionType) => {
+    callApi('send', 'POST', JSON.stringify({memo, recipient, amount, date, transactionType})).then(result => {
+      if (result.status === 201) {
+        setMessage('Successfully sent $' + amount + ' to ' + recipient);
+        setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'SEND'});
+      } else {
+        result.json().then(data => {
+          setMessage(`Error ${data.message ? `: ${data.message}` : ''}`);
+        });
+      }
+    });
+  };
+
+  const createRequestTransaction = (memo, recipient, amount, date, transactionType) => {
+    callApi('request', 'POST', JSON.stringify({memo, recipient, amount, date, transactionType})).then(result => {
+      if (result.status === 201) {
+        setMessage('Request successfully sent to ' + recipient);
+        setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'SEND'});
+      } else {
+        result.json().then(data => {
+          setMessage(`Error ${data.message ? `: ${data.message}` : ''}`);
+        });
+      }
+    });
+  };
+
+  const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
   const [message, setMessage] = useState('');
+
+  const recipientField = () => {
+    if(form.transactionType === 'SEND' || form.transactionType === 'REQUEST') {
+      return (
+          <FormGroup>
+            <Label for="recipient">Recipient</Label>
+            <Input name="recipient" onChange={e => onChange(e.target.name, e.target.value)} required/>
+          </FormGroup>
+      )
+    }
+  }
+
+  const submitButton = () => {
+    if(form.transactionType === 'SEND') {
+      return (
+          <Button onClick={() => createSendTransaction(
+              form.memo,
+              form.recipient,
+              form.amount,
+              form.date,
+              form.transactionType)}>Send Funds</Button>
+      )
+    } else if(form.transactionType === 'REQUEST') {
+      return (
+          <Button onClick={() => createRequestTransaction(
+              form.memo,
+              form.recipient,
+              form.amount,
+              form.date,
+              form.transactionType)}>Request Funds</Button>
+      )
+    } else if(form.transactionType === 'DEPOSIT') {
+      return (
+          <Button onClick={() => createTransaction(
+              form.memo,
+              form.amount,
+              form.date,
+              form.transactionType)}>Deposit</Button>
+      )
+    } else {
+      return (
+          <Button onClick={() => createTransaction(
+              form.memo,
+              form.amount,
+              form.date,
+              form.transactionType)}>Withdraw</Button>
+      )
+    }
+  }
 
   const onChange = (name, value) => {
     setForm({...form, [name]: value});
@@ -52,6 +127,7 @@ const TransactionCreate = () => {
                 <Label for="memo">Memo</Label>
                 <Input name="memo" onChange={e => onChange(e.target.name, e.target.value)} required/>
               </FormGroup>
+              {recipientField()}
               <FormGroup>
                 <Label for="amount">Amount</Label>
                 <InputGroup>
@@ -72,11 +148,12 @@ const TransactionCreate = () => {
                        required>
                   <option>DEPOSIT</option>
                   <option>WITHDRAWAL</option>
+                  <option>SEND</option>
+                  <option>REQUEST</option>
                 </Input>
               </FormGroup>
             </Form>
-            <Button onClick={() => createTransaction(form.memo, form.amount, form.date, form.transactionType)}>Add
-              Transaction</Button>
+            {submitButton()}
           </Col>
         </Row>
       </Jumbotron>

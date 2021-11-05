@@ -10,11 +10,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -48,8 +45,31 @@ public class AuthenticationService {
         return "user_" + username;
     }
 
-    public void createUser(String documentId, String username, String password) throws ExecutionException, InterruptedException {
-        accountService.createAccount(new Account(documentId, username, passwordEncoder.encode(password)), new AccountInfo(documentId, 100.00, new ArrayList<>()));
+    public void createUser(Account account) throws ExecutionException, InterruptedException {
+        String documentId = "user_" + account.getUsername();
+        String username = account.getUsername();
+        String password = account.getPassword();
+        String firstName = account.getFirstName();
+        String lastName = account.getLastName();
+        String ssn = account.getSsn();
+        String address = account.getAddress();
+        String accountName = firstName + "'s Checking";
+
+        accountService.createAccount(
+                new Account(
+                        documentId,
+                        username,
+                        passwordEncoder.encode(password),
+                        firstName,
+                        lastName,
+                        address,
+                        ssn
+                ),
+                new AccountInfo(
+                        documentId,
+                        accountName,
+                        100.00,
+                        new ArrayList<>()));
     }
 
     public void login(HttpServletRequest request, String username, String password) {

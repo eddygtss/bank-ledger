@@ -6,6 +6,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
+import gem.banking.exceptions.AccountInvalidException;
 import gem.banking.models.Account;
 import gem.banking.models.AccountInfo;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class AccountService {
         return "Successfully deleted " + documentId;
     }
 
-    public AccountInfo getAccountInfo(String documentId) throws ExecutionException, InterruptedException {
+    public AccountInfo getAccountInfo(String documentId) throws ExecutionException, InterruptedException, AccountInvalidException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         DocumentReference bankAccDocumentReference = dbFirestore.collection(COL_BANK_ACCOUNTS).document(documentId);
         ApiFuture<DocumentSnapshot> bankAccFuture = bankAccDocumentReference.get();
@@ -67,7 +68,8 @@ public class AccountService {
         if (bankAccDocument.exists()) {
             accountInfo = bankAccDocument.toObject(AccountInfo.class);
             return accountInfo;
+        } else {
+            throw new AccountInvalidException(documentId.substring(5) + " account not valid.");
         }
-        return null;
     }
 }

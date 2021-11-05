@@ -1,9 +1,8 @@
 package gem.banking.controllers;
 
+import gem.banking.exceptions.AccountInvalidException;
 import gem.banking.models.Account;
 import gem.banking.models.AccountInfo;
-import gem.banking.models.Transaction;
-import gem.banking.services.AccountInfoService;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -22,8 +20,6 @@ import java.util.concurrent.ExecutionException;
 public class AccountController {
     @Autowired
     public AccountService accountService;
-    @Autowired
-    public AccountInfoService accountInfoService;
     @Autowired
     public AuthenticationService authenticationService;
 
@@ -35,32 +31,14 @@ public class AccountController {
     // Create new user account API endpoint (POST/Create)
     @PostMapping("/create")
     public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException {
-        authenticationService.createUser("user_" + createAccountRequest.getUsername(), createAccountRequest.getUsername(), createAccountRequest.getPassword());
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    // Get Transactions API endpoint (GET/Read)
-    @GetMapping("/transactions")
-    public List<Transaction> retrieveTransactionHistory() throws Exception  {
-        AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
-
-        return accountInfo.getTransactionHistory();
-    }
-
-    // Post Transactions API endpoint (POST/Create)
-    @PostMapping("/transactions")
-    public ResponseEntity<Void> createTransaction(@RequestBody Transaction createTransactionRequest) throws Exception {
-        AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
-
-        accountService.updateAccountInfo(accountInfoService.recordTransaction(createTransactionRequest, accountInfo));
+        authenticationService.createUser(createAccountRequest);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Get Account API endpoint (GET/Read)
     @GetMapping("/account")
-    public AccountInfo getAccount() throws InterruptedException, ExecutionException {
+    public AccountInfo getAccount() throws InterruptedException, ExecutionException, AccountInvalidException {
         return accountService.getAccountInfo(authenticationService.getCurrentUser());
     }
 
@@ -80,6 +58,12 @@ public class AccountController {
     public ResponseEntity<Void> login(@RequestBody Account loginAccountRequest, final HttpServletRequest request) {
         authenticationService.login(request, loginAccountRequest.getUsername(), loginAccountRequest.getPassword());
 
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        authenticationService.logout();
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
