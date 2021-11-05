@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -49,7 +50,7 @@ public class AccountController {
         return accountInfo.getTransactionHistory();
     }
 
-    // Post Transactions API endpoint (POST/Create)
+    // Post (DEPOSIT/WITHDRAWAL) Transactions API endpoint (POST/Create)
     @PostMapping("/transactions")
     public ResponseEntity<Void> createTransaction(@RequestBody Transaction createTransactionRequest) throws Exception {
         AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
@@ -61,23 +62,68 @@ public class AccountController {
 
     // Send Transaction API endpoint (POST/Create)
     @PostMapping("/send")
-    public ResponseEntity<String> sendFunds(@RequestBody Transaction createTransactionRequest) throws Exception {
-        String currentUser = authenticationService.getCurrentUser();
-        AccountInfo currentUserAccount = accountService.getAccountInfo(currentUser);
+    public ResponseEntity<String> sendFunds(@RequestBody Transaction sendFundsTransaction) throws Exception {
+        String sender = authenticationService.getCurrentUser();
+
+        AccountInfo currentUserAccount = accountService.getAccountInfo(sender);
+        sendFundsTransaction.setSender(sender.substring(5));
 
         try {
-            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + createTransactionRequest.getGemUser());
-            accountService.updateAccountInfo(transactionService.recordTransaction(createTransactionRequest, currentUserAccount));
+            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + sendFundsTransaction.getRecipient());
 
-            createTransactionRequest.setTransactionType(Transaction.TransactionType.RECEIVED);
-            createTransactionRequest.setGemUser(currentUser.substring(5));
+            List<AccountInfo> updatedAccounts =
+                    transactionService.sendTransaction(sendFundsTransaction, currentUserAccount, recipientUserAccount);
 
-            accountService.updateAccountInfo(transactionService.recordTransaction(createTransactionRequest, recipientUserAccount));
+            // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
+            for (AccountInfo account: updatedAccounts) {
+                accountService.updateAccountInfo(account);
+            }
+
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return ResponseEntity.ok("Successfully sent " + createTransactionRequest.getGemUser() + " $" + createTransactionRequest.getAmount());
+        return ResponseEntity.ok("Successfully sent " + sendFundsTransaction.getRecipient() + " $" + sendFundsTransaction.getAmount());
+    }
+
+    @PostMapping("/request")
+    public ResponseEntity<String> requestFunds(@RequestBody Transaction requestFundsTransaction) throws Exception {
+        String requester = authenticationService.getCurrentUser();
+
+        AccountInfo requesterUserAccount = accountService.getAccountInfo(requester);
+        requestFundsTransaction.setSender(requester.substring(5));
+
+        try {
+            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + requestFundsTransaction.getRecipient());
+
+            List<AccountInfo> updatedAccounts =
+                    transactionService.requestTransaction(requestFundsTransaction, requesterUserAccount, recipientUserAccount);
+
+            // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
+            for (AccountInfo account: updatedAccounts) {
+                accountService.updateAccountInfo(account);
+            }
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+
+        return ResponseEntity.ok("Successfully sent " + requestFundsTransaction.getRecipient() + " a request for $" + requestFundsTransaction.getAmount());
+    }
+
+    @PostMapping("/approveRequest")
+    public ResponseEntity<String> approveRequestedFunds(@RequestBody int approvedTransactionRequest) throws Exception {
+        //TODO get the correct transaction by getting accountInfo and getting transaction by index number
+        // then set the transactionStatus to RECEIVED for the requester and SENT for the recipient of the request
+
+        return ResponseEntity.ok("TODO");
+    }
+
+    @PostMapping("/denyRequest")
+    public ResponseEntity<String> denyRequestedFunds(@RequestBody int deniedTransactionRequest) throws Exception {
+        //TODO get the correct transaction by getting accountInfo and getting transaction by index number
+        // then set the transactionStatus to DENIED for the requester and DENIED for the recipient of the request
+
+        return ResponseEntity.ok("TODO");
     }
 
     // Get Account API endpoint (GET/Read)

@@ -25,9 +25,10 @@ const TransactionHistory = () => {
           <thead>
           <tr>
             <th>Date</th>
-            <th>Memo</th>
+            <th>Message</th>
             <th>Type</th>
-            <th>Recipient</th>
+            <th>Status</th>
+            <th>Account</th>
             <th>Amount</th>
           </tr>
           </thead>
@@ -38,8 +39,9 @@ const TransactionHistory = () => {
                       <td>{t.date}</td>
                       <td>{t.memo}</td>
                       <td>{t.transactionType}</td>
-                      <td>{t.gemUser}</td>
-                      <td>{formatCurrency(t.transactionType === 'DEPOSIT' || t.transactionType === 'RECEIVED' ? t.amount : t.amount * -1)}</td>
+                      <td>{t.transactionStatus}</td>
+                      <td>{t.transactionStatus === 'PENDING' || t.transactionStatus === 'APPROVED' || t.transactionStatus === 'RECEIVED' ? t.sender : t.recipient}</td>
+                      <td>{formatCurrency(t.transactionType === 'DEPOSIT' || t.transactionStatus === 'RECEIVED' ? t.amount : t.amount * -1)}</td>
                   </tr>))
           }
           {!accountInfo.transactionHistory.length && 'No transactions recorded.'}
