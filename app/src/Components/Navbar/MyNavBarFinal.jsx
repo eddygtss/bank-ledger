@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import { NavLink as RRNavLink} from "react-router-dom";
+import { NavLink as RRNavLink, Link } from "react-router-dom";
 import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown, NavItem } from "reactstrap";
 import "./MyNavBarFinal.css";
 import { LoginContext } from "../../loginContext";
@@ -42,7 +42,7 @@ export const MyNavBarFinal = () => {
         <>
             <nav className="navbar">
                 <div className="nav-logo">
-                    <img src={GemLogo}/>  <h1>&nbsp;Gem Bankers United</h1>
+                    <Link to={"/"}><img src={GemLogo}/>  <h1>&nbsp;Gem Bankers United</h1></Link>
                 </div>
                 <div className="NavMenu">
 
