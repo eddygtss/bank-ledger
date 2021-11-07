@@ -1,5 +1,5 @@
-import {withRouter} from 'react-router-dom';
-import React, {useState} from 'react';
+import { withRouter, Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import {
   Container,
   Button,
@@ -21,7 +21,7 @@ const TransactionCreate = () => {
     callApi('transactions', 'POST', JSON.stringify({memo, amount, date, transactionType})).then(result => {
       if (result.status === 201) {
         setMessage('Transaction created.');
-        setForm({memo: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+        setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
       } else {
         result.json().then(data => {
           setMessage(`Error creating account${data.message ? `: ${data.message}` : ''}`);

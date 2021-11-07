@@ -2,6 +2,7 @@ package gem.banking.controllers;
 
 import gem.banking.models.AccountInfo;
 import gem.banking.models.Transaction;
+import gem.banking.models.TransactionId;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import gem.banking.services.TransactionService;
@@ -103,11 +104,11 @@ public class TransactionController {
     }
 
     @PostMapping("/approveRequest")
-    public ResponseEntity<String> approveRequestedFunds(@RequestParam int transactionId ) throws Exception {
+    public ResponseEntity<String> approveRequestedFunds(@RequestBody TransactionId transactionId) throws Exception {
         String currentUser = authenticationService.getCurrentUser();
 
         AccountInfo approverAccount = accountService.getAccountInfo(currentUser);
-        Transaction approvedTransaction = approverAccount.getTransactionHistory().get(transactionId);
+        Transaction approvedTransaction = approverAccount.getTransactionHistory().get(transactionId.getTransactionId());
 
         String recipient = "user_" + approvedTransaction.getSender();
         AccountInfo recipientAccount = accountService.getAccountInfo(recipient);
