@@ -2,7 +2,6 @@ import {NavLink as RRNavLink, withRouter} from 'react-router-dom';
 import React, { useState, useContext } from 'react';
 
 import "animate.css"
-import 'react-notifications-component/dist/theme.css'
 import "./Home.css"
 import {
     Card, CardImg, CardText, CardBody,

@@ -1,4 +1,4 @@
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import React, { useState } from 'react';
 import {
   Container,
@@ -9,22 +9,22 @@ import {
   Input,
   Row,
   Col,
-  Jumbotron,
   InputGroup,
-  InputGroupAddon,
   InputGroupText
 } from 'reactstrap';
-import {callApi} from "./utils";
+import { callApi } from "./utils";
+import cogoToast from 'cogo-toast';
 
-const TransactionCreate = () => {
+const TransactionCreate = ({ history }) => {
   const createTransaction = (memo, amount, date, transactionType) => {
     callApi('transactions', 'POST', JSON.stringify({memo, amount, date, transactionType})).then(result => {
       if (result.status === 201) {
-        setMessage('Transaction created.');
+        cogoToast.success('Transaction created.');
         setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+        redirectToHistory();
       } else {
         result.json().then(data => {
-          setMessage(`Error creating account${data.message ? `: ${data.message}` : ''}`);
+          cogoToast.error(`Error creating account${data.message ? `: ${data.message}` : ''}`);
         });
       }
     });
@@ -33,11 +33,12 @@ const TransactionCreate = () => {
   const createSendTransaction = (memo, recipient, amount, date, transactionType) => {
     callApi('send', 'POST', JSON.stringify({memo, recipient, amount, date, transactionType})).then(result => {
       if (result.status === 201) {
-        setMessage('Successfully sent $' + amount + ' to ' + recipient);
+        cogoToast.success('Successfully sent $' + amount + ' to ' + recipient);
         setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'SEND'});
+        redirectToHistory();
       } else {
         result.json().then(data => {
-          setMessage(`Error ${data.message ? `: ${data.message}` : ''}`);
+          cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
         });
       }
     });
@@ -46,18 +47,18 @@ const TransactionCreate = () => {
   const createRequestTransaction = (memo, recipient, amount, date, transactionType) => {
     callApi('request', 'POST', JSON.stringify({memo, recipient, amount, date, transactionType})).then(result => {
       if (result.status === 201) {
-        setMessage('Request successfully sent to ' + recipient);
+        cogoToast.success('Request successfully sent to ' + recipient);
         setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'SEND'});
+        redirectToHistory();
       } else {
         result.json().then(data => {
-          setMessage(`Error ${data.message ? `: ${data.message}` : ''}`);
+          cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
         });
       }
     });
   };
 
   const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
-  const [message, setMessage] = useState('');
 
   const recipientField = () => {
     if(form.transactionType === 'SEND' || form.transactionType === 'REQUEST') {
@@ -68,6 +69,10 @@ const TransactionCreate = () => {
           </FormGroup>
       )
     }
+  }
+
+  const redirectToHistory = () => {
+    history.replace('/transaction-history')
   }
 
   const submitButton = () => {
@@ -114,10 +119,7 @@ const TransactionCreate = () => {
 
   return (
     <Container>
-      <Row>
-        {message || '\u00A0'}
-      </Row>
-      <Jumbotron>
+      <div className="rounded px-3 px-sm-4 py-3 py-sm-5">
         <h3>Create Transaction</h3>
         <Row>
           <Col className="col-3"/>
@@ -131,9 +133,7 @@ const TransactionCreate = () => {
               <FormGroup>
                 <Label for="amount">Amount</Label>
                 <InputGroup>
-                  <InputGroupAddon addonType="prepend">
-                    <InputGroupText>$</InputGroupText>
-                  </InputGroupAddon>
+                  <InputGroupText>$</InputGroupText>
                   <Input type="number" name="amount" value={form.amount}
                          onChange={e => onChange(e.target.name, e.target.value)} required/>
                 </InputGroup>
@@ -156,8 +156,7 @@ const TransactionCreate = () => {
             {submitButton()}
           </Col>
         </Row>
-      </Jumbotron>
-
+      </div>
     </Container>
   )
 };

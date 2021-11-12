@@ -11,6 +11,19 @@
   padding-top: 65px !important;
   padding-bottom: 50px !important;
 }
+.offcanvas-end {
+  width: 800px;
+}
+.moneyTables {
+  padding: 20px;
+}
+.bdr {
+  border-radius: 10px;
+  overflow:hidden;
+}
+.requestBtn {
+  float: right;
+}
 .root {
   font-family: "Circular Pro", sans-serif !important;
   color: rgb(51, 51, 51);

@@ -71,7 +71,7 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return ResponseEntity.ok("Successfully sent " + sendFundsTransaction.getRecipient() + " $" + sendFundsTransaction.getAmount());
+        return new ResponseEntity<>("Successfully sent " + sendFundsTransaction.getRecipient() + " $" + sendFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 
     @PostMapping("/request")
@@ -100,7 +100,7 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return ResponseEntity.ok("Successfully sent " + requestFundsTransaction.getRecipient() + " a request for $" + requestFundsTransaction.getAmount());
+        return new ResponseEntity<>("Successfully sent " + requestFundsTransaction.getRecipient() + " a request for $" + requestFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 
     @PostMapping("/approveRequest")
@@ -126,11 +126,11 @@ public class TransactionController {
     }
 
     @PostMapping("/denyRequest")
-    public ResponseEntity<String> denyRequestedFunds(@RequestParam int transactionId) throws Exception {
+    public ResponseEntity<String> denyRequestedFunds(@RequestBody TransactionId transactionId) throws Exception {
         String currentUser = authenticationService.getCurrentUser();
 
         AccountInfo denierAccount = accountService.getAccountInfo(currentUser);
-        Transaction deniedTransaction = denierAccount.getTransactionHistory().get(transactionId);
+        Transaction deniedTransaction = denierAccount.getTransactionHistory().get(transactionId.getTransactionId());
 
         String recipient = "user_" + deniedTransaction.getSender();
         AccountInfo recipientAccount = accountService.getAccountInfo(recipient);

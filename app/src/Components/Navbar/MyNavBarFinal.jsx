@@ -1,6 +1,6 @@
 import React, {useContext, useState} from "react";
-import { NavLink as RRNavLink, Link } from "react-router-dom";
-import { DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown, NavItem } from "reactstrap";
+import {NavLink as RRNavLink, Link, NavLink} from "react-router-dom";
+import {DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown, NavItem, Nav} from "reactstrap";
 import "./MyNavBarFinal.css";
 import { LoginContext } from "../../loginContext";
 import GemLogo from "./GemLogo.png";
@@ -39,10 +39,12 @@ export const MyNavBarFinal = () => {
     }
 
     return (
-        <>
-            <nav className="navbar">
-                <div className="nav-logo">
-                    <Link to={"/"}><img src={GemLogo}/>  <h1>&nbsp;Gem Bankers United</h1></Link>
+            <Nav className="navbar">
+                <div className="nav-logo" >
+                    <img src={GemLogo}  alt={"GemBank Logo"}/>
+                    <NavLink className="nav-link" tag={RRNavLink} exact to="/about-us" activeClassName="active">
+                        <h1>&nbsp;Gem Bankers United</h1>
+                    </NavLink>
                 </div>
                 <div className="NavMenu">
 
@@ -93,9 +95,7 @@ export const MyNavBarFinal = () => {
                             </DropdownMenu>
                         </UncontrolledDropdown>
                 </div>
-
-            </nav>
-        </>
+            </Nav>
     );
 }
 
