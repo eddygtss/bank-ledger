@@ -2,6 +2,7 @@ package gem.banking.controllers;
 
 import gem.banking.models.AccountInfo;
 import gem.banking.models.Transaction;
+import gem.banking.models.TransactionId;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import gem.banking.services.TransactionService;
@@ -70,7 +71,7 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return ResponseEntity.ok("Successfully sent " + sendFundsTransaction.getRecipient() + " $" + sendFundsTransaction.getAmount());
+        return new ResponseEntity<>("Successfully sent " + sendFundsTransaction.getRecipient() + " $" + sendFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 
     @PostMapping("/request")
@@ -99,15 +100,15 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return ResponseEntity.ok("Successfully sent " + requestFundsTransaction.getRecipient() + " a request for $" + requestFundsTransaction.getAmount());
+        return new ResponseEntity<>("Successfully sent " + requestFundsTransaction.getRecipient() + " a request for $" + requestFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 
     @PostMapping("/approveRequest")
-    public ResponseEntity<String> approveRequestedFunds(@RequestParam int transactionId ) throws Exception {
+    public ResponseEntity<String> approveRequestedFunds(@RequestBody TransactionId transactionId) throws Exception {
         String currentUser = authenticationService.getCurrentUser();
 
         AccountInfo approverAccount = accountService.getAccountInfo(currentUser);
-        Transaction approvedTransaction = approverAccount.getTransactionHistory().get(transactionId);
+        Transaction approvedTransaction = approverAccount.getTransactionHistory().get(transactionId.getTransactionId());
 
         String recipient = "user_" + approvedTransaction.getSender();
         AccountInfo recipientAccount = accountService.getAccountInfo(recipient);
@@ -125,11 +126,11 @@ public class TransactionController {
     }
 
     @PostMapping("/denyRequest")
-    public ResponseEntity<String> denyRequestedFunds(@RequestParam int transactionId) throws Exception {
+    public ResponseEntity<String> denyRequestedFunds(@RequestBody TransactionId transactionId) throws Exception {
         String currentUser = authenticationService.getCurrentUser();
 
         AccountInfo denierAccount = accountService.getAccountInfo(currentUser);
-        Transaction deniedTransaction = denierAccount.getTransactionHistory().get(transactionId);
+        Transaction deniedTransaction = denierAccount.getTransactionHistory().get(transactionId.getTransactionId());
 
         String recipient = "user_" + deniedTransaction.getSender();
         AccountInfo recipientAccount = accountService.getAccountInfo(recipient);

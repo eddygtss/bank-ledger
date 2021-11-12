@@ -2,14 +2,13 @@ import {NavLink as RRNavLink, withRouter} from 'react-router-dom';
 import React, { useState, useContext } from 'react';
 
 import "animate.css"
-import 'react-notifications-component/dist/theme.css'
-import "./AboutUs.css"
+import "./Home.css"
 import {
     Card, CardImg, CardText, CardBody,
     CardTitle, CardSubtitle, Button
 } from 'reactstrap';
 
-const AboutUs = () => {
+const Home = () => {
 
 
     return (
@@ -64,4 +63,4 @@ const AboutUs = () => {
 
     )
 };
-export default withRouter(AboutUs);
+export default withRouter(Home);
