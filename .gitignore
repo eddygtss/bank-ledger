@@ -31,3 +31,4 @@ HELP.md
 /node_modules/
 /package-lock.json
 /app/.yarn/
+/app/.yarnrc.yml

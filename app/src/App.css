@@ -1,15 +1,50 @@
-.jumbotron {
+.modalGreenButton{
+  min-width: 100px;
+  height: 48px;
+  font-family: inherit;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  text-shadow: none;
+  line-height: 22px !important;
+  margin: 24px 15px 5px;
+  border-radius: 25px !important;
+  box-shadow: none;
+  transition: all 0.3s ease 0s !important;
+  padding: auto !important;
+  color: #ffffff !important;
+  background-color: green !important;
+  border: none !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  text-decoration: none;
+  -webkit-box-align: center;
   align-items: center;
-  background-color: white !important;
-  padding: 2px 10px 35px !important;
-  border-radius: 24px !important;
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 12px 0px,
-    rgba(0, 0, 0, 0.04) 0px 24px 32px 0px;
-  margin-bottom: 112px;
-  max-width: 640px;
-  margin: 0px auto;
-  padding-top: 65px !important;
-  padding-bottom: 50px !important;
+  -webkit-box-pack: center;
+  justify-content: center;
+}
+.modalRedButton{
+  min-width: 100px;
+  height: 48px;
+  font-family: inherit;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  text-shadow: none;
+  line-height: 22px !important;
+  margin: 24px 15px 5px;
+  border-radius: 25px !important;
+  box-shadow: none;
+  transition: all 0.3s ease 0s !important;
+  padding: auto !important;
+  color: #ffffff !important;
+  background-color: red !important;
+  border: none !important;
+  cursor: pointer !important;
+  text-align: center !important;
+  text-decoration: none;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
 }
 .offcanvas-end {
   width: 800px;
