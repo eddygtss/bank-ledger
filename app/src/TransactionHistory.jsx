@@ -3,11 +3,39 @@ import {Alert, Button, Col, Container, Offcanvas, OffcanvasBody, OffcanvasHeader
 import {callApi, formatCurrency} from "./utils";
 import {CheckSquare, XSquare} from "react-feather";
 import cogoToast from 'cogo-toast';
+import {DepositFundsModal} from "./Components/Modal/DepositFundsModal";
+import {RequestFundsModal} from "./Components/Modal/RequestFundsModal";
+import {WithdrawFundsModal} from "./Components/Modal/WithdrawFundsModal";
+import {SendFundsModal} from "./Components/Modal/SendFundsModal";
 
 const TransactionHistory = () => {
   const [accountInfo, setInfo] = useState({});
   const [message, setMessage] = useState('');
+  const [sendModal, setSendModal] = useState(false);
+  const [requestModal, setRequestModal] = useState(false);
+  const [depositModal, setDepositModal] = useState(false);
+  const [withdrawModal, setWithdrawModal] = useState(false);
   const [offCanvas, setOffCanvas] = useState(false);
+
+  const toggle = (component) => {
+    switch (component) {
+      case 'offCanvas':
+        setOffCanvas(!offCanvas);
+        break;
+      case 'sendModal':
+        setSendModal(!sendModal);
+        break;
+      case 'requestModal':
+        setRequestModal(!requestModal);
+        break;
+      case 'depositModal':
+        setDepositModal(!depositModal);
+        break;
+      case 'withdrawModal':
+        setWithdrawModal(!withdrawModal);
+        break;
+    }
+  }
 
   useEffect(() => {
     callApi('account').then(result => {
@@ -17,9 +45,7 @@ const TransactionHistory = () => {
         });
       }
     });
-  }, [message]);
-
-  const toggle = () => setOffCanvas(!offCanvas);
+  }, [message, depositModal, requestModal, sendModal, withdrawModal]);
 
   const approveTransaction = (transactionId) => {
     callApi('approveRequest', 'POST', JSON.stringify({transactionId})).then(result => {
@@ -106,8 +132,8 @@ const TransactionHistory = () => {
 
   return (
       <>
-        <Offcanvas toggle={toggle} isOpen={offCanvas} direction="end">
-          <OffcanvasHeader toggle={toggle}>
+        <Offcanvas toggle={() => toggle('offCanvas')} isOpen={offCanvas} direction="end">
+          <OffcanvasHeader toggle={() => toggle('offCanvas')}>
             Requests
           </OffcanvasHeader>
           <OffcanvasBody>
@@ -153,8 +179,10 @@ const TransactionHistory = () => {
         <Container fluid className="px-4">
           {accountInfo.accountName &&
           <div>
-            <h3>Account Name: {accountInfo.accountName}</h3><Button className="requestBtn btn-info" onClick={() => toggle()}>View Requests</Button>
+            <h3>Account Name: {accountInfo.accountName}</h3>
+            <Button className="requestBtn btn-info" onClick={() => toggle('offCanvas')}>View Requests</Button>
             <h4>Balance: {formatCurrency(accountInfo.balance)}</h4>
+
             <br/>
           </div>
           }
@@ -163,6 +191,11 @@ const TransactionHistory = () => {
           <Row lg="2" md="1" className="gx-2">
           <Col className="border moneyTables bdr pr-4">
             <h4>Money In</h4>
+            <Button className="modalGreenButton" onClick={() => toggle('requestModal')}>Request</Button>
+            <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal}/>
+
+            <Button className="modalGreenButton requestBtn" onClick={() => toggle('depositModal')}>Deposit</Button>
+            <DepositFundsModal depositModal={depositModal} setDepositModal={setDepositModal}/>
             {accountInfo.accountName &&
               <Table responsive
                      size="sm" striped className="bdr table-success">
@@ -202,6 +235,11 @@ const TransactionHistory = () => {
           </Col>
           <Col className="border moneyTables bdr pl-4">
             <h4>Money Out</h4>
+            <Button className="modalRedButton" onClick={() => toggle('sendModal')}>Send</Button>
+            <SendFundsModal sendModal={sendModal} setSendModal={setSendModal}/>
+
+            <Button className="modalRedButton requestBtn" onClick={() => toggle('withdrawModal')}>Withdraw</Button>
+            <WithdrawFundsModal withdrawModal={withdrawModal} setWithdrawModal={setWithdrawModal}/>
             {accountInfo.accountName &&
               <Table responsive
                      size="sm" striped className="bdr table-danger">

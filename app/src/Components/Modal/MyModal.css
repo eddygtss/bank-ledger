@@ -1,0 +1,51 @@
+.Modal{
+    /*outline: none;*/
+    /*resize: both;*/
+    /*padding-top: 80px;*/
+    /*zoom: 57%;*/
+    /*position: center;*/
+
+}
+
+.titleCloseBtn {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.titleCloseBtn button {
+    background-color: transparent;
+    border: none;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.formText{
+    text-align: left;
+
+}
+.createTransactionSubmitBtn{
+    min-width: 80px;
+    width: 100% !important;
+    height: 48px;
+    font-family: inherit;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    text-shadow: none;
+    line-height: 22px !important;
+    /*margin: 24px 15px 5px;*/
+    border-radius: 25px !important;
+    box-shadow: none;
+    transition: all 0.3s ease 0s !important;
+    /*padding: auto !important;*/
+    color: #ffffff !important;
+    background-color: #29a8de !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    text-decoration: none;
+    display: flex !important;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+}
