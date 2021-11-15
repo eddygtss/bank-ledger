@@ -1,70 +1,39 @@
 .navbar {
     background-color: #87ceeb;
     height: 80px;
-    width: 100%;
+    width: auto;
     display: flex;
     align-items: center;
     font-size: 1.2rem;
     position: relative;
     top: 0;
     z-index: 20;
-
 }
-
-
 .NavMenu {
     display: flex;
     align-items: center;
-
-
 }
-
 @font-face {
     font-family: Lobster;
     src: url("./Lobster-Regular.ttf");
 }
-
 .nav-logo {
     color: #ffffff;
-    font-family: Lobster;
+    font-family: Lobster, serif;
     display: flex;
-    align-items: center;
-    padding: 0 1rem;
+    align-items: start;
     height: 100%;
     cursor: pointer;
     text-decoration: none;
     margin-left: 20px;
-
 }
-
 .nav-link {
     color: white;
-
 }
-
+.nav-link a:hover nav:focus {
+    display: block;
+    color: white;
+}
 .DropDownText {
     color: white;
-
-}
-
-@media screen and (max-width: 500px) {
-    .navbar {
-        align-content: center;
-        justify-content: center;
-    }
-
-    .nav-logo {
-        display: none;
-
-    }
-
-
-    .NavMenu {
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-
-
-    }
-
 }
