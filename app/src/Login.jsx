@@ -1,5 +1,5 @@
 import { withRouter } from "react-router-dom";
-import React, { useState, useContext } from "react";
+import React, {useEffect, useState} from "react";
 import {
     Container,
     Button,
@@ -14,15 +14,15 @@ import "./App.css";
 
 import cogoToast from 'cogo-toast';
 import "animate.css";
+import axios from "axios";
 
-const Login = ({ history, setLogin }) => {
-    const loginContext = useContext(LoginContext);
+const Login = ({ history, loginContext }) => {
     const checkCredentials = (username, password) => {
         callApi("login", "POST", JSON.stringify({ username, password })).then(
             result => {
                 if (result.status === 200) {
                     loginContext.setLogin(true);
-                    history.replace("/transaction-history");
+                    history.replace("/account-summary");
                     cogoToast.success('Login Successful')
                 } else {
                     cogoToast.error('Login Invalid')
@@ -64,7 +64,7 @@ const Login = ({ history, setLogin }) => {
                                 onChange={(e) => onChange(e.target.name, e.target.value)}
                             />
                         </FormGroup>
-                        <Row>
+                        <Row className="rowCenter">
                             <Button
                                 className="SignUpButton"
                                 onClick={() => checkCredentials(form.username, form.password)}

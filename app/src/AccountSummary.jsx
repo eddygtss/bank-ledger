@@ -8,7 +8,7 @@ import {RequestFundsModal} from "./Components/Modal/RequestFundsModal";
 import {WithdrawFundsModal} from "./Components/Modal/WithdrawFundsModal";
 import {SendFundsModal} from "./Components/Modal/SendFundsModal";
 
-const TransactionHistory = () => {
+const AccountSummary = () => {
   const [accountInfo, setInfo] = useState({});
   const [message, setMessage] = useState('');
   const [sendModal, setSendModal] = useState(false);
@@ -188,7 +188,7 @@ const TransactionHistory = () => {
           }
           {showPendingRequestAlert()}
           <br/>
-          <Row lg="2" md="1" className="gx-2">
+          <Row lg="2" md="1" sm="1" xs="1" className="gx-2">
           <Col className="border moneyTables bdr pr-4">
             <h4>Money In</h4>
             <Button className="modalGreenButton" onClick={() => toggle('requestModal')}>Request</Button>
@@ -283,4 +283,4 @@ const TransactionHistory = () => {
   );
 };
 
-export default TransactionHistory;
+export default AccountSummary;

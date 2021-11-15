@@ -1,9 +1,3 @@
-
-.about-wrapper{
-    vertical-align: center;
-
-
-}
 @font-face {
     font-family: Staatliches;
     src: url("./Staatliches-Regular.ttf");
@@ -12,9 +6,14 @@
     text-align: center;
     align-self: center;
     justify-content: center;
-    font-family: Staatliches;
-
-
+    font-family: Staatliches, serif;
+}
+.home-cards {
+    display: flex;
+    justify-content: center;
+}
+.home-cards.col {
+    padding: 0;
 }
 .about-body{
     display: flex;
@@ -23,13 +22,9 @@
     position: center;
     background-color: #0062cc;
     height: 100%;
-
-
 }
 .about-card{
     width: 318px;
-    margin: 20px;
-    resize: both;
     overflow: auto;
 }
 .about-card-img{
@@ -48,16 +43,13 @@
     background-color: #87ceeb;
     justify-content: center;
     text-align: center;
-
 }
-
 .about-card-btn{
     /*background-color: #ffffff;*/
     background-color: #ffffff;
     color: #87ceeb;
 }
 .about-bottom-text{
-
     padding-top: 20px;
     padding-right: 75px;
     padding-left: 75px;
