@@ -1,0 +1,39 @@
+.navbar {
+    background-color: #87ceeb;
+    height: 80px;
+    width: auto;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    position: relative;
+    top: 0;
+    z-index: 20;
+}
+.NavMenu {
+    display: flex;
+    align-items: center;
+}
+@font-face {
+    font-family: Lobster;
+    src: url("./Lobster-Regular.ttf");
+}
+.nav-logo {
+    color: #ffffff;
+    font-family: Lobster, serif;
+    display: flex;
+    align-items: start;
+    height: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 20px;
+}
+.nav-link {
+    color: white;
+}
+.nav-link a:hover nav:focus {
+    display: block;
+    color: white;
+}
+.DropDownText {
+    color: white;
+}

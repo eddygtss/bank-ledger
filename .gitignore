@@ -30,3 +30,5 @@ HELP.md
 /src/main/resources/gem-bankers-united-firebase.json
 /node_modules/
 /package-lock.json
+/app/.yarn/
+/app/.yarnrc.yml

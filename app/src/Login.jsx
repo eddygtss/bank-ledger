@@ -1,62 +1,37 @@
 import { withRouter } from "react-router-dom";
-import React, { useState, useContext } from "react";
+import React, {useEffect, useState} from "react";
 import {
     Container,
     Button,
     Form,
     FormGroup,
     Input,
-    Row,
-    Jumbotron,
+    Row
 } from "reactstrap";
 import { callApi } from "./utils";
 import { LoginContext } from "./loginContext";
 import "./App.css";
 
-import { store } from "react-notifications-component";
+import cogoToast from 'cogo-toast';
 import "animate.css";
-import "react-notifications-component/dist/theme.css";
+import axios from "axios";
 
-const Login = ({ history, setLogin }) => {
-    const loginContext = useContext(LoginContext);
+const Login = ({ history, loginContext }) => {
     const checkCredentials = (username, password) => {
         callApi("login", "POST", JSON.stringify({ username, password })).then(
             result => {
                 if (result.status === 200) {
                     loginContext.setLogin(true);
-                    history.replace("/transaction-history");
-
-                    store.addNotification({
-                        title: "Congratulations",
-                        message: "Login Successful",
-                        type: "success",
-                        container: "bottom-center",
-                        insert: "top",
-                        dismiss: {
-                            duration: 2000,
-                            showIcon: true,
-                        },
-                    });
+                    history.replace("/account-summary");
+                    cogoToast.success('Login Successful')
                 } else {
-                    setMessage("Invalid Login");
-                    store.addNotification({
-                        title: "Error",
-                        message: "Login Failed",
-                        type: "success",
-                        container: "bottom-center",
-                        insert: "top",
-                        dismiss: {
-                            duration: 2000,
-                            showIcon: true,
-                        },
-                    });
+                    cogoToast.error('Login Invalid')
                 }
             }
         );
     };
 
     const [form, setForm] = useState({ username: '', password: '' });
-    const [message, setMessage] = useState('');
 
     const onChange = (name, value) => {
         setForm({ ...form, [name]: value });
@@ -64,9 +39,8 @@ const Login = ({ history, setLogin }) => {
 
     return (
         <div className="myBackGround">
-            <Jumbotron>
+            <div className="rounded px-3 px-sm-4 py-3 py-sm-5">
                 <div className="logo"> GEM BANK</div>
-                {message || "\u00A0"}
                 <Container fluid>
                     <h3>Welcome Back</h3>
                     <p>Don't miss your next opportunity.</p>
@@ -90,7 +64,7 @@ const Login = ({ history, setLogin }) => {
                                 onChange={(e) => onChange(e.target.name, e.target.value)}
                             />
                         </FormGroup>
-                        <Row>
+                        <Row className="rowCenter">
                             <Button
                                 className="SignUpButton"
                                 onClick={() => checkCredentials(form.username, form.password)}
@@ -100,7 +74,7 @@ const Login = ({ history, setLogin }) => {
                         </Row>
                     </Form>
                 </Container>
-            </Jumbotron>
+            </div>
         </div>
     );
 };
