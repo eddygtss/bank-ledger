@@ -1,6 +1,6 @@
 import { Table } from "reactstrap";
 import {callApi, formatCurrency} from "../../utils";
-import React, {useState} from "react";
+import React from "react";
 import cogoToast from "cogo-toast";
 import {CheckSquare, XSquare} from "react-feather";
 import TableRows from "./TableRows";

@@ -6,8 +6,9 @@ import {RequestFundsModal} from "./Components/Modal/RequestFundsModal";
 import {WithdrawFundsModal} from "./Components/Modal/WithdrawFundsModal";
 import {SendFundsModal} from "./Components/Modal/SendFundsModal";
 import TransactionEntries from "./Components/Transactions/TransactionEntries";
+import cogoToast from "cogo-toast";
 
-const AccountSummary = () => {
+const AccountSummary = ({ setLogin }) => {
   const [accountInfo, setInfo] = useState({});
   const [message, setMessage] = useState('');
   const [sendModal, setSendModal] = useState(false);
@@ -42,6 +43,10 @@ const AccountSummary = () => {
         result.json().then(data => {
           setInfo(data);
         });
+      } else {
+        setLogin(false);
+        sessionStorage.setItem("isLoggedIn", "false");
+        cogoToast.error('You have been logged out.')
       }
     });
   }, [message, depositModal, requestModal, sendModal, withdrawModal]);
@@ -77,7 +82,7 @@ const AccountSummary = () => {
             }
           </OffcanvasBody>
         </Offcanvas>
-        <Container fluid className="px-4">
+        <Container fluid className="px-4 myBackGround">
           {accountInfo.accountName &&
           <div>
             <h3>Account Name: {accountInfo.accountName}</h3>
@@ -89,24 +94,27 @@ const AccountSummary = () => {
           }
           {showPendingRequestAlert()}
           <br/>
-          <Row lg="2" md="1" sm="1" xs="1" className="gx-2">
-          <Col className="border moneyTables bdr pr-4">
-            <h4>Money In</h4>
-            <Button className="modalGreenButton" onClick={() => toggle('requestModal')}>Request</Button>
+          <Row lg="2" md="1" sm="1" xs="1" className="gx-2" style={{
+            alignContent: "space-evenly"
+          }}>
+          <Col className="border table-light moneyTables bdr pr-4 mb-2">
+            <h4 className="text-center">Money In</h4>
+            <Button className="modalGreenButton mb-3" onClick={() => toggle('requestModal')}>Request</Button>
             <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal}/>
 
-            <Button className="modalGreenButton requestBtn" onClick={() => toggle('depositModal')}>Deposit</Button>
+            <Button className="modalGreenButton requestBtn mb-3" onClick={() => toggle('depositModal')}>Deposit</Button>
             <DepositFundsModal depositModal={depositModal} setDepositModal={setDepositModal}/>
+            <br />
             {accountInfo.accountName &&
               <TransactionEntries accountInfo={accountInfo} transType={'moneyIn'} setMessage={setMessage}/>
             }
           </Col>
-          <Col className="border moneyTables bdr pl-4">
-            <h4>Money Out</h4>
-            <Button className="modalRedButton" onClick={() => toggle('sendModal')}>Send</Button>
+          <Col className="border table-light moneyTables bdr pl-4 mb-2">
+            <h4 className="text-center">Money Out</h4>
+            <Button className="modalRedButton mb-3" onClick={() => toggle('sendModal')}>Send</Button>
             <SendFundsModal sendModal={sendModal} setSendModal={setSendModal}/>
 
-            <Button className="modalRedButton requestBtn" onClick={() => toggle('withdrawModal')}>Withdraw</Button>
+            <Button className="modalRedButton requestBtn mb-3" onClick={() => toggle('withdrawModal')}>Withdraw</Button>
             <WithdrawFundsModal withdrawModal={withdrawModal} setWithdrawModal={setWithdrawModal}/>
             {accountInfo.accountName &&
               <TransactionEntries accountInfo={accountInfo} transType={'moneyOut'} setMessage={setMessage}/>

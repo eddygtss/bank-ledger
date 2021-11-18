@@ -16,12 +16,12 @@ import cogoToast from "cogo-toast";
 import {XSquare} from "react-feather";
 
 export const RequestFundsModal = ({requestModal, setRequestModal}) => {
-    const createRequestTransaction = (memo, recipient, amount, date, transactionType) => {
-        callApi('request', 'POST', JSON.stringify({memo, recipient, amount, date, transactionType})).then(result => {
+    const createRequestTransaction = (memo, recipient, amount, transactionType) => {
+        callApi('request', 'POST', JSON.stringify({memo, recipient, amount, transactionType})).then(result => {
             if (result.status === 201) {
                 cogoToast.success('Request successfully sent to ' + recipient);
                 setRequestModal(!requestModal);
-                setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'SEND'});
+                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
             } else {
                 result.json().then(data => {
                     cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
@@ -30,7 +30,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
         });
     };
 
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'DEPOSIT'});
 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
@@ -64,12 +64,6 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                         </InputGroup>
                     </FormGroup>
-                    <FormGroup>
-                        <Label for="date">Date</Label>
-                        <Input type="date" name="date" bsSize="lg"
-                               onChange={e => onChange(e.target.name, e.target.value)}
-                               required/>
-                    </FormGroup>
 
                 </Form>
                 <br/>
@@ -77,7 +71,6 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
                     form.memo,
                     form.recipient,
                     form.amount,
-                    form.date,
                     "REQUEST")}>Request Funds</Button>
                 <br/>
 

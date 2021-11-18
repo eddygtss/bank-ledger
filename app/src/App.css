@@ -69,7 +69,7 @@ body {  min-width: 500px; }
   padding: 20px;
 }
 .bdr {
-  border-radius: 10px;
+  border-radius: 20px;
   overflow: hidden;
 }
 .requestBtn {
@@ -89,8 +89,9 @@ body {  min-width: 500px; }
           rgb(206, 242, 255),
           rgb(238, 240, 240)
   ) !important;
-  height: 100vh;
+  height: auto;
   padding-top: 32px;
+  padding-bottom: 32px;
 }
 
 @-webkit-keyframes Gradient {

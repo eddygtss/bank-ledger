@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import {Switch, Route, Redirect} from 'react-router-dom';
 import Login from './Login';
-import Logout from './Logout';
 import AccountCreate from './AccountCreate';
 import AccountSummary from './AccountSummary';
 import TransactionCreate from './TransactionCreate';
-import { LoginContext } from './loginContext';
 import Home from "./Components/WebPages/Home";
 import AboutUs from "./Components/WebPages/AboutUs";
 import ContactUs from "./Components/WebPages/ContactUs";
@@ -13,9 +11,7 @@ import ContactUs from "./Components/WebPages/ContactUs";
 // redirect user to login page if trying to access protected route and not logged in.
 const ProtectedRoute = ({ isAllowed, ...props }) => isAllowed ? <Route {...props}/> : <Redirect to="/login"/>;
 
-const Main = () => {
-    const loginContext = useContext(LoginContext);
-    console.log(loginContext);
+const Main = ({ setLogin, isLoggedIn }) => {
 
     return (
         <>
@@ -25,20 +21,19 @@ const Main = () => {
                     path="/"
                     render={() => {
                         return (
-                            loginContext.isLoggedIn ?
+                            isLoggedIn ?
                                 <Redirect to="/account-summary" /> :
                                 <Redirect to="/home" />
                         )
                     }}
                 />
-                <Route exact path='/about-us' component={AboutUs}/>
-                <Route exact path='/contact-us' component={ContactUs}/>
-                <Route exact path='/home' component={Home}/>
-                <Route exact path='/login' render={() => <Login loginContext={loginContext}/> }/>
-                <Route exact path='/logout' render={() => <Logout loginContext={loginContext} />}/>
-                <Route exact path='/account-create'  render={() => <AccountCreate loginContext={loginContext}/> } />
-                <ProtectedRoute exact path='/account-summary' component={AccountSummary} isAllowed={loginContext.isLoggedIn} />
-                <ProtectedRoute exact path='/transaction-create' component={TransactionCreate} isAllowed={loginContext.isLoggedIn} />
+                <Route exact path='/about-us' render={() => <AboutUs />}/>
+                <Route exact path='/contact-us' render={() => <ContactUs />}/>
+                <Route exact path='/home' render={() => <Home />}/>
+                <Route exact path='/login' render={() => <Login setLogin={setLogin} />}/>
+                <Route exact path='/account-create' render={() => <AccountCreate setLogin={setLogin}/>}/>
+                <ProtectedRoute exact path='/account-summary' isAllowed={isLoggedIn} render={() => <AccountSummary setLogin={setLogin} />}/>
+                <ProtectedRoute exact path='/transaction-create' component={TransactionCreate} isAllowed={isLoggedIn} />
             </Switch>
         </>
     );

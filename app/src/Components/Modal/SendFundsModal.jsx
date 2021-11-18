@@ -72,7 +72,6 @@ export const SendFundsModal = ({sendModal, setSendModal}) => {
                                onChange={e => onChange(e.target.name, e.target.value)}
                                required/>
                     </FormGroup>
-
                 </Form>
                 <br/>
                 <Button className="createTransactionSubmitBtn" onClick={() => createSendTransaction(

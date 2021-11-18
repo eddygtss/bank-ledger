@@ -1,5 +1,5 @@
 import { withRouter } from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, { useState } from "react";
 import {
     Container,
     Button,
@@ -9,22 +9,23 @@ import {
     Row
 } from "reactstrap";
 import { callApi } from "./utils";
-import { LoginContext } from "./loginContext";
 import "./App.css";
 
 import cogoToast from 'cogo-toast';
 import "animate.css";
-import axios from "axios";
 
-const Login = ({ history, loginContext }) => {
+const Login = ({ history, setLogin }) => {
     const checkCredentials = (username, password) => {
         callApi("login", "POST", JSON.stringify({ username, password })).then(
             result => {
                 if (result.status === 200) {
-                    loginContext.setLogin(true);
+                    sessionStorage.setItem("isLoggedIn", "true")
+                    setLogin(true);
                     history.replace("/account-summary");
                     cogoToast.success('Login Successful')
                 } else {
+                    setLogin(false);
+                    history.replace("/login")
                     cogoToast.error('Login Invalid')
                 }
             }

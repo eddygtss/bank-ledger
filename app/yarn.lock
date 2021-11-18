@@ -8617,6 +8617,11 @@ react-app-polyfill@^0.2.1:
     raf "3.4.1"
     whatwg-fetch "3.0.0"
 
+react-client-session@0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/react-client-session/-/react-client-session-0.0.7.tgz#b1bdee73d2dd29a0cd2ed220c91bd86671787dec"
+  integrity sha512-UeiECmKybfqTp/Fk7qCOs0OV/Lnw3km5vNoYnVjygVDwqg8SPm8YzFKJcFsmNDhPh6Ak1oCjAySJfSDrSZglbQ==
+
 react-cookie@3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-cookie/-/react-cookie-3.0.4.tgz#ae57db00cb5160675ce2fe06ab0962c728a6630b"
