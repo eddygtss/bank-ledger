@@ -32,3 +32,4 @@ HELP.md
 /package-lock.json
 /app/.yarn/
 /app/.yarnrc.yml
+/build_latest_docker_img.bat
