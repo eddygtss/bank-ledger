@@ -13,7 +13,7 @@ public class Transaction {
     private String sender = "";
     private String recipient = "";
     private double  amount;
-    @JsonFormat(pattern="yyyy-MM-dd")
+    @JsonFormat(pattern="MM-dd-yyyy")
     private Date date;
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;

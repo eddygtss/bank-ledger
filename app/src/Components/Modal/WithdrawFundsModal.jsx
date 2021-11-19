@@ -11,18 +11,18 @@ import {
     Label,
     Modal
 } from "reactstrap";
-import "./MyModal.css";
+import "./Modal.css";
 import {callApi} from "../../utils";
 import cogoToast from "cogo-toast";
 import {XSquare} from "react-feather";
 
 export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
-    const createTransaction = (memo, amount, date, transactionType) => {
-        callApi('transactions', 'POST', JSON.stringify({memo, amount, date, transactionType})).then(result => {
+    const createTransaction = (memo, amount, transactionType) => {
+        callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType})).then(result => {
             if (result.status === 201) {
                 cogoToast.success('Transaction created.');
                 setWithdrawModal(!withdrawModal);
-                setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'DEPOSIT'});
             } else {
                 result.json().then(data => {
                     cogoToast.error(`Error creating account${data.message ? `: ${data.message}` : ''}`);
@@ -30,7 +30,7 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
             }
         });
     };
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'DEPOSIT'});
 
 
     const onChange = (name, value) => {
@@ -40,13 +40,10 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
 
         <Modal className="Modal" isOpen={withdrawModal}>
 
-
-            <div className="titleCloseBtn" onClick={() => setWithdrawModal(!withdrawModal)}>
-                <XSquare color="red" size={48}/>
-            </div>
+            <Button className="btn-close align-self-end m-2" onClick={() => setWithdrawModal(!withdrawModal)} />
 
             <Container>
-                <h1>Withdraw Funds</h1>
+                <h1 className="text-center">Withdraw Funds</h1>
                 <br/>
                 <Form className="formText">
                     <FormGroup>
@@ -62,19 +59,11 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                         </InputGroup>
                     </FormGroup>
-                    <FormGroup>
-                        <Label for="date">Date</Label>
-                        <Input type="date" name="date" bsSize="lg"
-                               onChange={e => onChange(e.target.name, e.target.value)}
-                               required/>
-                    </FormGroup>
-
                 </Form>
                 <br/>
                 <Button className="createTransactionSubmitBtn" onClick={() => createTransaction(
                     form.memo,
                     form.amount,
-                    form.date,
                     "WITHDRAWAL")}>Withdraw Funds</Button>
                 <br/>
 

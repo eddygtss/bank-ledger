@@ -16,7 +16,7 @@ import StepWizard from "react-step-wizard";
 import cogoToast from "cogo-toast";
 import { FolderPlus } from "react-feather";
 
-const AccountCreate = ({ history, loginContext }) => {
+const AccountCreate = ({ history, setLogin }) => {
     const createAccount = (
         username,
         password,
@@ -42,7 +42,8 @@ const AccountCreate = ({ history, loginContext }) => {
                 callApi("login", "POST", JSON.stringify({ username, password })).then(
                     result => {
                         if (result.status === 200) {
-                            loginContext.setLogin(true);
+                            sessionStorage.setItem("isLoggedIn", "true");
+                            setLogin(true);
                             history.replace("/account-summary");
                         } else {
                             cogoToast.error('Something went wrong while authenticating.')
@@ -52,6 +53,7 @@ const AccountCreate = ({ history, loginContext }) => {
             } else {
                 result.json().then((data) => {
                     cogoToast.error(`Error creating account${data.message ? `: ${data.message}` : ''}`);
+                    setFormStep(0);
                 });
             }
         });
@@ -165,7 +167,7 @@ const AccountCreate = ({ history, loginContext }) => {
                                     </Row>
                                     <FormGroup>
                                         <Input
-                                            type="text"
+                                            type="email"
                                             name="username"
                                             placeholder="Your Email"
                                             bsSize="lg"

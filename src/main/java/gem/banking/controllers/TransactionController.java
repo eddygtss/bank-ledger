@@ -1,8 +1,9 @@
 package gem.banking.controllers;
 
+import gem.banking.exceptions.RequestNotFoundException;
 import gem.banking.models.AccountInfo;
+import gem.banking.models.Request;
 import gem.banking.models.Transaction;
-import gem.banking.models.TransactionId;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import gem.banking.services.TransactionService;
@@ -75,19 +76,19 @@ public class TransactionController {
     }
 
     @PostMapping("/request")
-    public ResponseEntity<String> requestFunds(@RequestBody Transaction requestFundsTransaction) throws Exception {
+    public ResponseEntity<String> requestFunds(@RequestBody Request requestFundsTransaction) throws Exception {
         String requester = authenticationService.getCurrentUser();
 
-        if (requester.substring(5).equals(requestFundsTransaction.getRecipient())){
+        if (requester.substring(5).equals(requestFundsTransaction.getResponder())){
             return ResponseEntity.badRequest().body("You cannot request money from yourself.");
         }
 
         AccountInfo requesterUserAccount = accountService.getAccountInfo(requester);
-        requestFundsTransaction.setSender(requester.substring(5));
+        requestFundsTransaction.setRequester(requester.substring(5));
 
 
         try {
-            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + requestFundsTransaction.getRecipient());
+            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + requestFundsTransaction.getResponder());
 
             List<AccountInfo> updatedAccounts =
                     transactionService.requestTransaction(requestFundsTransaction, requesterUserAccount, recipientUserAccount);
@@ -100,49 +101,61 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return new ResponseEntity<>("Successfully sent " + requestFundsTransaction.getRecipient() + " a request for $" + requestFundsTransaction.getAmount(), HttpStatus.CREATED);
+        return new ResponseEntity<>("Successfully sent " + requestFundsTransaction.getResponder() + " a request for $" + requestFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 
-    @PostMapping("/approveRequest")
-    public ResponseEntity<String> approveRequestedFunds(@RequestBody TransactionId transactionId) throws Exception {
-        String currentUser = authenticationService.getCurrentUser();
+    @PostMapping("/approve-request")
+    public ResponseEntity<String> approveRequestedFunds(@RequestBody String id) throws Exception {
+        AccountInfo responderAccountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+        List<Request> responderRequests = responderAccountInfo.getRequestHistory();
 
-        AccountInfo approverAccount = accountService.getAccountInfo(currentUser);
-        Transaction approvedTransaction = approverAccount.getTransactionHistory().get(transactionId.getTransactionId());
+        Request parsed = new Request(id);
 
-        String recipient = "user_" + approvedTransaction.getSender();
-        AccountInfo recipientAccount = accountService.getAccountInfo(recipient);
+        // Loop through each request in responderRequest and locate the correct request object by requestId
+        for (Request request: responderRequests) {
+            if (request.getId().equals(parsed.getId())){
+                String requester = "user_" + request.getRequester();
+                AccountInfo requesterAccountInfo = accountService.getAccountInfo(requester);
 
+                List<AccountInfo> updatedAccounts =
+                        transactionService.approveTransaction(request, responderAccountInfo, requesterAccountInfo);
 
-        List<AccountInfo> updatedAccounts =
-                transactionService.approveTransaction(approvedTransaction, approverAccount, recipientAccount);
+                // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
+                for (AccountInfo account: updatedAccounts) {
+                    accountService.updateAccountInfo(account);
+                }
 
-        // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
-        for (AccountInfo account: updatedAccounts) {
-            accountService.updateAccountInfo(account);
+                return ResponseEntity.ok("Sent " + requester.substring(5) + " $" + request.getAmount());
+            }
         }
 
-        return ResponseEntity.ok("Sent " + recipient.substring(5) + " $" + approvedTransaction.getAmount());
+        return ResponseEntity.badRequest().body("The request approved was not found in the database.");
     }
 
-    @PostMapping("/denyRequest")
-    public ResponseEntity<String> denyRequestedFunds(@RequestBody TransactionId transactionId) throws Exception {
-        String currentUser = authenticationService.getCurrentUser();
+    @PostMapping("/deny-request")
+    public ResponseEntity<String> denyRequestedFunds(@RequestBody String id) throws Exception {
+        AccountInfo responderAccountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+        List<Request> responderRequests = responderAccountInfo.getRequestHistory();
 
-        AccountInfo denierAccount = accountService.getAccountInfo(currentUser);
-        Transaction deniedTransaction = denierAccount.getTransactionHistory().get(transactionId.getTransactionId());
+        Request parsed = new Request(id);
 
-        String recipient = "user_" + deniedTransaction.getSender();
-        AccountInfo recipientAccount = accountService.getAccountInfo(recipient);
+        for (Request request: responderRequests) {
+            if (request.getId().equals(parsed.getId())){
+                String requester = "user_" + request.getRequester();
+                AccountInfo requesterAccountInfo = accountService.getAccountInfo(requester);
 
-        List<AccountInfo> updatedAccounts =
-                transactionService.denyTransaction(deniedTransaction, denierAccount, recipientAccount);
+                List<AccountInfo> updatedAccounts =
+                        transactionService.denyRequest(request, responderAccountInfo, requesterAccountInfo);
 
-        // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
-        for (AccountInfo account: updatedAccounts) {
-            accountService.updateAccountInfo(account);
+                // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
+                for (AccountInfo account: updatedAccounts) {
+                    accountService.updateAccountInfo(account);
+                }
+
+                return ResponseEntity.ok("Sent " + requester.substring(5) + " $" + request.getAmount());
+            }
         }
 
-        return ResponseEntity.ok("Sent " + recipient.substring(5) + " $" + deniedTransaction.getAmount());
+        return ResponseEntity.badRequest().body("The request denied was not found in the database.");
     }
 }
