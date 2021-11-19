@@ -7,7 +7,7 @@ import {
     NavbarBrand,
     NavbarToggler,
     Collapse,
-    NavLink
+    NavLink, Row, Col
 } from "reactstrap";
 import "./NavBar.css";
 import GemLogo from "./GemLogo.png";
@@ -93,24 +93,29 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
     return (
             <Navbar
                 light
-                container="fluid"
                 expand="lg"
+                className="pl-0"
             >
+                <div className="container-fluid justify-content-center">
                     <NavbarBrand
                         className="me-auto"
                         href="/home"
                     >
-                        <div className="nav-logo" >
-                            <img src={GemLogo}  alt={"GemBank Logo"}/>
-                            <h1>&nbsp;Gem Bankers United</h1>
-                        </div>
+                        <Row xs="1" sm="2" md="2" className="nav-logo">
+                            <Col style={{maxWidth: "fit-content"}}>
+                                <img src={GemLogo}  alt={"GemBank Logo"}/>
+                            </Col>
+                            <Col style={{maxWidth: "fit-content"}}>
+                                <h1>Gem Bankers United</h1>
+                            </Col>
+                        </Row>
                     </NavbarBrand>
                     <NavbarToggler
                         onClick={() => toggle('hamburger')}
                     />
                     <Collapse navbar isOpen={hamburger} className="justify-content-end">
                         <Nav
-                            className="align-items-end"
+                            className="align-items-center"
                             navbar
                         >
                             <NavItem>
@@ -127,6 +132,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
                             {showLoggedOutBtns()}
                         </Nav>
                     </Collapse>
+                </div>
             </Navbar>
     );
 }

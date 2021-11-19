@@ -4,6 +4,7 @@
     width: auto;
     display: flex;
     align-items: center;
+    padding-right: unset;
     font-size: 1.2rem;
     position: relative;
     top: 0;
@@ -21,11 +22,10 @@
     color: #ffffff;
     font-family: Lobster, serif;
     display: flex;
-    align-items: start;
+    justify-content: center;
     height: 100%;
     cursor: pointer;
     text-decoration: none;
-    margin-left: 20px;
 }
 .nav-link {
     color: white;
