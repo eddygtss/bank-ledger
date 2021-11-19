@@ -1,8 +1,10 @@
 package gem.banking.services;
 
 import gem.banking.exceptions.InsufficientFundsException;
+import gem.banking.exceptions.InvalidRequesteeException;
 import gem.banking.exceptions.InvalidTransactionException;
 import gem.banking.models.AccountInfo;
+import gem.banking.models.Request;
 import gem.banking.models.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -66,11 +68,7 @@ public class TransactionService {
         Transaction.TransactionType transactionType = transaction.getTransactionType();
 
         if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
-
-
-        if (transaction.getDate() == null) {
-            transaction.setDate(new Date());
-        }
+        transaction.setDate(new Date());
 
         // We check if the transaction type is SEND because we are subtracting money from the account balance
         if (transactionType == Transaction.TransactionType.SEND) {
@@ -109,146 +107,139 @@ public class TransactionService {
         return updatedAccounts;
     }
 
-    public List<AccountInfo> requestTransaction(Transaction transaction,
+    public List<AccountInfo> requestTransaction(Request request,
                                                 AccountInfo requesterAccountInfo,
-                                                AccountInfo recipientAccountInfo)
+                                                AccountInfo responderAccountInfo)
             throws InsufficientFundsException, InvalidTransactionException {
         List<AccountInfo> updatedAccounts = new ArrayList<>();
 
-        List<Transaction> requesterTransactions = requesterAccountInfo.getTransactionHistory();
-        List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
+        List<Request> requesterRequests = requesterAccountInfo.getRequestHistory();
+        List<Request> responderRequests = responderAccountInfo.getRequestHistory();
 
-        // TransactionType for the sender
-        Transaction.TransactionType transactionType = transaction.getTransactionType();
+        if (request.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
+        request.setDate(new Date());
 
-        if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
+        // RequestStatus for the responder so they see PENDING for a request in their requests list
+        request.setRequestStatus(Request.RequestStatus.PENDING);
 
+        responderRequests.add(request);
+        responderAccountInfo.setRequestHistory(responderRequests);
 
-        if (transaction.getDate() == null) {
-            transaction.setDate(new Date());
-        }
+        // RequestStatus for the requester so they see SENT for their request
+        Request requesterRequest = new Request(request);
+        requesterRequest.setRequestStatus(Request.RequestStatus.SENT);
 
-        // We check if the transaction status is REQUEST
-        if (transactionType == Transaction.TransactionType.REQUEST) {
-            // TransactionStatus for the recipient so they see PENDING for a request in their transactions
-            transaction.setTransactionStatus(Transaction.TransactionStatus.PENDING);
+        requesterRequests.add(requesterRequest);
+        requesterAccountInfo.setRequestHistory(requesterRequests);
 
-            recipientTransactions.add(transaction);
-            recipientAccountInfo.setTransactionHistory(recipientTransactions);
-
-
-            // TransactionStatus for the requester so they see SENT for their request
-            Transaction request = new Transaction(transaction);
-            request.setTransactionStatus(Transaction.TransactionStatus.SENT);
-
-            requesterTransactions.add(request);
-            requesterAccountInfo.setTransactionHistory(requesterTransactions);
-        } else {
-            throw new InvalidTransactionException("Invalid or missing transaction type");
-        }
-
-        // Adding the requester and recipient account infos into the updated accounts list to return
+        // Adding the requester and responder account infos into the updated accounts list to return
         updatedAccounts.add(requesterAccountInfo);
-        updatedAccounts.add(recipientAccountInfo);
-
-        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType);
+        updatedAccounts.add(responderAccountInfo);
 
         return updatedAccounts;
     }
 
-    public List<AccountInfo> approveTransaction(Transaction transaction,
-                                                AccountInfo approverAccountInfo,
-                                                AccountInfo recipientAccountInfo)
-            throws InsufficientFundsException, InvalidTransactionException {
+    public List<AccountInfo> approveTransaction(Request request,
+                                                AccountInfo responderAccountInfo,
+                                                AccountInfo requesterAccountInfo)
+            throws InsufficientFundsException, InvalidRequesteeException {
         List<AccountInfo> updatedAccounts = new ArrayList<>();
 
-        List<Transaction> approverTransactions = approverAccountInfo.getTransactionHistory();
-        List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
+        List<Transaction> responderTransactions = responderAccountInfo.getTransactionHistory();
+        List<Transaction> requesterTransactions = requesterAccountInfo.getTransactionHistory();
 
-        double approverBalance = approverAccountInfo.getBalance();
-        double recipientBalance = recipientAccountInfo.getBalance();
+        List<Request> responderRequests = responderAccountInfo.getRequestHistory();
+        List<Request> requesterRequests = requesterAccountInfo.getRequestHistory();
 
-        // TransactionType for the approver
-        Transaction.TransactionType transactionType = transaction.getTransactionType();
+        double responderBalance = responderAccountInfo.getBalance();
+        double requesterBalance = requesterAccountInfo.getBalance();
 
-        // We check if the transaction status is REQUEST and if the person approving is equal to the original recipient of the request
-        if (transactionType == Transaction.TransactionType.REQUEST
-                && approverAccountInfo.getDocumentId().substring(5).equals(transaction.getRecipient())) {
-            if (approverBalance - transaction.getAmount() < 0.0) {
-                throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", approverBalance));
+        // We check if the person approving is equal to the responder of the request
+        if (responderAccountInfo.getDocumentId().substring(5).equals(request.getResponder())) {
+            if (responderBalance - request.getAmount() < 0.0) {
+                throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", responderBalance));
             }
-            approverTransactions.remove(transaction);
-            transaction.setTransactionStatus(Transaction.TransactionStatus.SENT);
-            recipientTransactions.remove(transaction);
+            // We want to delete the old request information from both the requester and the responder
+            responderRequests.remove(request);
+            requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
 
-            transaction.setDate(new Date());
-            transaction.setTransactionStatus(Transaction.TransactionStatus.APPROVED);
-            approverTransactions.add(transaction);
-            approverBalance -= transaction.getAmount();
+            request.setRequestStatus(Request.RequestStatus.APPROVED);
+            request.setDate(new Date());
 
-            // Updating the sender's account
-            approverAccountInfo.setTransactionHistory(approverTransactions);
-            approverAccountInfo.setBalance(approverBalance);
+            Transaction approvedTransaction =
+                    new Transaction(
+                            request.getMemo(),
+                            request.getResponder(),
+                            request.getRequester(),
+                            request.getAmount(),
+                            request.getDate(),
+                            Transaction.TransactionType.REQUEST,
+                            Transaction.TransactionStatus.SENT
+                    );
 
-            // New Transaction object for the recipient so we can change status and type.
-            Transaction recipient = new Transaction(transaction);
-            recipient.setTransactionStatus(Transaction.TransactionStatus.RECEIVED);
+            responderTransactions.add(approvedTransaction);
+            responderRequests.add(request);
+            responderBalance -= request.getAmount();
 
-            recipientTransactions.add(recipient);
-            recipientBalance += transaction.getAmount();
+            // Updating the senders account
+            responderAccountInfo.setTransactionHistory(responderTransactions);
+            responderAccountInfo.setRequestHistory(responderRequests);
+            responderAccountInfo.setBalance(responderBalance);
 
-            // Updating the recipient's account
-            recipientAccountInfo.setTransactionHistory(recipientTransactions);
-            recipientAccountInfo.setBalance(recipientBalance);
+            // New Transaction object for the requester so we can change status.
+            Transaction requesterTransaction = new Transaction(approvedTransaction);
+            requesterTransaction.setTransactionStatus(Transaction.TransactionStatus.RECEIVED);
+
+            requesterTransactions.add(requesterTransaction);
+            requesterRequests.add(request);
+            requesterBalance += request.getAmount();
+
+            // Updating the requesters account
+            requesterAccountInfo.setTransactionHistory(requesterTransactions);
+            requesterAccountInfo.setRequestHistory(requesterRequests);
+            requesterAccountInfo.setBalance(requesterBalance);
         } else {
-            throw new InvalidTransactionException("Invalid or missing transaction type");
+            throw new InvalidRequesteeException("Error: Unable to send yourself money.");
         }
 
         // Adding the sender and recipient account infos into the updated accounts list to return
-        updatedAccounts.add(approverAccountInfo);
-        updatedAccounts.add(recipientAccountInfo);
-
-        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType + " - New Balance: " + approverBalance);
+        updatedAccounts.add(responderAccountInfo);
+        updatedAccounts.add(requesterAccountInfo);
 
         return updatedAccounts;
     }
 
-    public List<AccountInfo> denyTransaction(Transaction transaction,
-                                             AccountInfo denierAccountInfo,
-                                             AccountInfo recipientAccountInfo)
+    public List<AccountInfo> denyRequest(Request request,
+                                         AccountInfo responderAccountInfo,
+                                         AccountInfo requesterAccountInfo)
             throws InsufficientFundsException, InvalidTransactionException {
         List<AccountInfo> updatedAccounts = new ArrayList<>();
 
-        List<Transaction> denierTransactions = denierAccountInfo.getTransactionHistory();
-        List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
+        List<Request> responderRequests = responderAccountInfo.getRequestHistory();
+        List<Request> requesterRequests = requesterAccountInfo.getRequestHistory();
 
+        // We check if the person denying is equal to the original responder of the request
+        if (responderAccountInfo.getDocumentId().substring(5).equals(request.getResponder())) {
+            responderRequests.remove(request);
+            requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
 
-        Transaction.TransactionType transactionType = transaction.getTransactionType();
+            // We updated the time and status for when the request was denied.
+            request.setDate(new Date());
+            request.setRequestStatus(Request.RequestStatus.DENIED);
 
-        // We check if the transaction status is REQUEST and if the person denying is equal to the original recipient of the request
-        if (transactionType == Transaction.TransactionType.REQUEST
-                && denierAccountInfo.getDocumentId().substring(5).equals(transaction.getRecipient())) {
-            denierTransactions.remove(transaction);
-            transaction.setTransactionStatus(Transaction.TransactionStatus.SENT);
-            recipientTransactions.remove(transaction);
+            // Adding the new request to requests list and updating the account info with the updated requests list
+            requesterRequests.add(request);
+            requesterAccountInfo.setRequestHistory(requesterRequests);
 
-            transaction.setDate(new Date());
-            transaction.setTransactionStatus(Transaction.TransactionStatus.DENIED);
-
-            recipientTransactions.add(transaction);
-            recipientAccountInfo.setTransactionHistory(recipientTransactions);
-
-            denierTransactions.add(transaction);
-            denierAccountInfo.setTransactionHistory(denierTransactions);
+            responderRequests.add(request);
+            responderAccountInfo.setRequestHistory(responderRequests);
         } else {
             throw new InvalidTransactionException("Invalid or missing transaction type");
         }
 
-        // Adding the requester and recipient account infos into the updated accounts list to return
-        updatedAccounts.add(denierAccountInfo);
-        updatedAccounts.add(recipientAccountInfo);
-
-        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType);
+        // Adding the requester and responder account infos into the updated accounts list to return
+        updatedAccounts.add(responderAccountInfo);
+        updatedAccounts.add(requesterAccountInfo);
 
         return updatedAccounts;
     }

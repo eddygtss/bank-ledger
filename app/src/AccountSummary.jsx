@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Button, Col, Container, Offcanvas, OffcanvasBody, OffcanvasHeader, Row, Table} from 'reactstrap';
+import {Alert, Button, Col, Container, Offcanvas, OffcanvasBody, OffcanvasHeader, Row} from 'reactstrap';
 import {callApi, formatCurrency} from "./utils";
 import {DepositFundsModal} from "./Components/Modal/DepositFundsModal";
 import {RequestFundsModal} from "./Components/Modal/RequestFundsModal";
@@ -72,7 +72,7 @@ const AccountSummary = ({ setLogin }) => {
       <>
         <Offcanvas toggle={() => toggle('offCanvas')} isOpen={offCanvas} direction="end">
           <OffcanvasHeader toggle={() => toggle('offCanvas')}>
-            Requests
+            <h1 className="text-center">Requests</h1>
           </OffcanvasHeader>
           <OffcanvasBody>
             {accountInfo.accountName &&

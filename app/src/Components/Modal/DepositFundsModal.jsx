@@ -10,7 +10,7 @@ import {
     Label,
     Modal
 } from "reactstrap";
-import "./MyModal.css";
+import "./Modal.css";
 import {callApi} from "../../utils";
 import cogoToast from "cogo-toast";
 import {XSquare} from "react-feather";
@@ -39,12 +39,10 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
 
         <Modal className="Modal" isOpen={depositModal}>
 
-                    <div className="titleCloseBtn" onClick={() => setDepositModal(!depositModal)}>
-                        <XSquare color="red" size={48}/>
-                    </div>
+            <Button className="btn-close align-self-end m-2" onClick={() => setDepositModal(!depositModal)} />
 
             <Container>
-                <h1>Deposit Funds</h1>
+                <h1 className="text-center">Deposit Funds</h1>
                 <br/>
                 <Form className="formText">
                     <FormGroup>

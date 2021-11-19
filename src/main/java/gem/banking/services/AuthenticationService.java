@@ -1,7 +1,10 @@
 package gem.banking.services;
 
+import gem.banking.exceptions.AccountExistsException;
 import gem.banking.models.Account;
 import gem.banking.models.AccountInfo;
+import gem.banking.models.Request;
+import gem.banking.models.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,31 +48,37 @@ public class AuthenticationService {
         return "user_" + username;
     }
 
-    public void createUser(Account account) throws ExecutionException, InterruptedException {
+    public void createUser(Account account) throws ExecutionException, InterruptedException, AccountExistsException {
         String documentId = "user_" + account.getUsername();
-        String username = account.getUsername();
-        String password = account.getPassword();
-        String firstName = account.getFirstName();
-        String lastName = account.getLastName();
-        String ssn = account.getSsn();
-        String address = account.getAddress();
-        String accountName = firstName + "'s Checking";
 
-        accountService.createAccount(
-                new Account(
-                        documentId,
-                        username,
-                        passwordEncoder.encode(password),
-                        firstName,
-                        lastName,
-                        address,
-                        ssn
-                ),
-                new AccountInfo(
-                        documentId,
-                        accountName,
-                        100.00,
-                        new ArrayList<>()));
+        if (accountService.getAccount(documentId) == null) {
+            String username = account.getUsername();
+            String password = account.getPassword();
+            String firstName = account.getFirstName();
+            String lastName = account.getLastName();
+            String ssn = account.getSsn();
+            String address = account.getAddress();
+            String accountName = firstName + "'s Checking";
+
+            accountService.createAccount(
+                    new Account(
+                            documentId,
+                            username,
+                            passwordEncoder.encode(password),
+                            firstName,
+                            lastName,
+                            address,
+                            passwordEncoder.encode(ssn)
+                    ),
+                    new AccountInfo(
+                            documentId,
+                            accountName,
+                            100.00,
+                            new ArrayList<>(),
+                            new ArrayList<>()));
+        } else {
+            throw new AccountExistsException("An account with this email already exists!");
+        }
     }
 
     public void login(HttpServletRequest request, String username, String password) {

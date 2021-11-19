@@ -14,21 +14,12 @@ public class Account implements Serializable {
 
     @Id
     private String documentId;
-
     private String username;
-
     private String password;
-
     private String firstName;
-
     private String lastName;
-
     private String address;
-
     private String ssn;
-
-
-
 
     public Account(String documentId, String username, String password) {
         this.documentId = documentId;

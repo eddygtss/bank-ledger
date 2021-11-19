@@ -5,19 +5,11 @@
     font-family: Staatliches;
     src: url("./Staatliches-Regular.ttf");
 }
-.about-head-line{
+.home-head-line{
     text-align: center;
     align-self: center;
     justify-content: center;
     font-family: Staatliches, serif;
-}
-.home-cards {
-    display: flex;
-    justify-content: center;
-    width: initial;
-}
-.home-cards.col {
-    padding: 0;
 }
 .home-body{
     display: flex;
@@ -30,6 +22,7 @@
 .home-card{
     width: 318px;
     margin: 20px;
+    resize: both;
     overflow: auto;
 }
 .home-card-img{

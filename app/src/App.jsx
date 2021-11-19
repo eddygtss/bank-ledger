@@ -4,7 +4,6 @@ import { NavBar } from "./Components/Navbar/NavBar";
 
 const App = () => {
     const [isLoggedIn, setLogin] = useState(sessionStorage.getItem("isLoggedIn") === "true")
-    console.log(isLoggedIn)
 
     return (
         <>
