@@ -114,8 +114,8 @@ const AccountSummary = () => {
   }
 
   const getPendingRequests = () => {
-    return accountInfo.accountName && accountInfo.transactionHistory.filter(transaction => {
-      const status = transaction.transactionStatus.toLowerCase();
+    return accountInfo.accountName && accountInfo.requestHistory.filter(request => {
+      const status = request.requestStatus.toLowerCase();
       return status.includes('pending');
     }).length;
   }
