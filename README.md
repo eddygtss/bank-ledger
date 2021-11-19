@@ -11,11 +11,11 @@ This repo is a combination of 3 applications:
 - These applications have only been tested on Windows 10 and Google Chrome
 - The ReactJS client app is bundled with the REST API
 - The ReactJS build will install Node and Yarn in a subfolder during the first launch of the Maven spring-boot:run goal
-- Account information is stored in a temporary memory cache which will be wiped after restarting REST API
+- Account information is stored in a firebase datastore
 
 #### Prerequisites
 
-- Java 8 is installed
+- Java 11 is installed
 - Maven is installed
 
 #### Running REST API
@@ -26,11 +26,11 @@ This repo is a combination of 3 applications:
 
 #### Running Web Application
 
-- Navigate to "http://localhost:8080" in a web browser
+- Navigate to "http://localhost:8081" in a web browser
 
 #### Running Console Application
 
-- Ensure that REST API is running and listening on localhost:8080
+- Ensure that REST API is running and listening on localhost:8081
 - Open a new command window and navigate to project root
 - Run command:  run-console.cmd
 - Hit "Ctrl-C" to exit application
