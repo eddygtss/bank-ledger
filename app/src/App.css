@@ -63,13 +63,13 @@ body {  min-width: 500px; }
   justify-content: center;
 }
 .offcanvas-end {
-  width: 800px;
+  width: 575px;
 }
 .moneyTables {
   padding: 20px;
 }
 .bdr {
-  border-radius: 10px;
+  border-radius: 20px;
   overflow: hidden;
 }
 .requestBtn {
@@ -78,7 +78,7 @@ body {  min-width: 500px; }
 .root {
   font-family: "Circular Pro", sans-serif !important;
   color: rgb(51, 51, 51);
-  min-height: 100%;
+  min-height: 100vh;
 }
 .myBackGround {
   font-family: "Circular Pro", sans-serif !important;
@@ -91,6 +91,7 @@ body {  min-width: 500px; }
   ) !important;
   height: 100vh;
   padding-top: 32px;
+  padding-bottom: 32px;
 }
 
 @-webkit-keyframes Gradient {

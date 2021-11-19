@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import "./MyModal.css";
+import "./Modal.css";
 import {callApi} from "../../utils";
 import {
     Modal,
@@ -13,15 +13,14 @@ import {
     Label
 } from "reactstrap";
 import cogoToast from "cogo-toast";
-import {XSquare} from "react-feather";
 
 export const RequestFundsModal = ({requestModal, setRequestModal}) => {
-    const createRequestTransaction = (memo, recipient, amount, date, transactionType) => {
-        callApi('request', 'POST', JSON.stringify({memo, recipient, amount, date, transactionType})).then(result => {
+    const createRequestTransaction = (memo, responder, amount) => {
+        callApi('request', 'POST', JSON.stringify({memo, responder, amount})).then(result => {
             if (result.status === 201) {
-                cogoToast.success('Request successfully sent to ' + recipient);
+                cogoToast.success('Request successfully sent to ' + responder);
                 setRequestModal(!requestModal);
-                setForm({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'SEND'});
+                setForm({memo: '', responder: '', amount: 0.00});
             } else {
                 result.json().then(data => {
                     cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
@@ -30,7 +29,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
         });
     };
 
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
@@ -39,22 +38,24 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
 
         <Modal className="Modal" isOpen={requestModal}>
 
-            <div className="titleCloseBtn" onClick={() => setRequestModal(!requestModal)}>
-                <XSquare color="red" size={48}/>
-            </div>
+            <Button className="btn-close align-self-end m-2" onClick={() => setRequestModal(!requestModal)} />
 
             <Container>
-                <h1>Request Funds</h1>
+                <h1 className="text-center">Request Funds</h1>
                 <br/>
                 <Form className="formText">
                     <FormGroup>
-                        <Label for="memo">Memo</Label>
-                        <Input name="memo" bsSize="lg" onChange={e => onChange(e.target.name, e.target.value)}
-                               required/>
+                        <Label for="responder">Send Request To</Label>
+                        <Input name="responder"
+                               bsSize="lg"
+                               placeholder="GemBank Member Email"
+                               inputMode="email"
+                               onChange={e => onChange(e.target.name, e.target.value)} required/>
                     </FormGroup>
                     <FormGroup>
-                        <Label for="recipient">Recipient</Label>
-                        <Input name="recipient" onChange={e => onChange(e.target.name, e.target.value)} required/>
+                        <Label for="memo">Message</Label>
+                        <Input name="memo" bsSize="lg" onChange={e => onChange(e.target.name, e.target.value)}
+                               required/>
                     </FormGroup>
                     <FormGroup>
                         <Label for="amount">Amount</Label>
@@ -64,21 +65,13 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                         </InputGroup>
                     </FormGroup>
-                    <FormGroup>
-                        <Label for="date">Date</Label>
-                        <Input type="date" name="date" bsSize="lg"
-                               onChange={e => onChange(e.target.name, e.target.value)}
-                               required/>
-                    </FormGroup>
 
                 </Form>
                 <br/>
                 <Button className="createTransactionSubmitBtn" onClick={() => createRequestTransaction(
                     form.memo,
-                    form.recipient,
-                    form.amount,
-                    form.date,
-                    "REQUEST")}>Request Funds</Button>
+                    form.responder,
+                    form.amount)}>Request Funds</Button>
                 <br/>
 
             </Container>

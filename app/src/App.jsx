@@ -1,16 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Main from './Main';
-import { LoginContext } from './loginContext';
-import {NavBar} from "./Components/Navbar/NavBar";
+import { NavBar } from "./Components/Navbar/NavBar";
 
 const App = () => {
-    const [isLoggedIn, setLogin] = useState(false);
+    const [isLoggedIn, setLogin] = useState(sessionStorage.getItem("isLoggedIn") === "true")
 
     return (
-      <LoginContext.Provider value={{ isLoggedIn, setLogin }}>
-        <NavBar />
-        <Main />
-      </LoginContext.Provider>
+        <>
+            <NavBar isLoggedIn={isLoggedIn} setLogin={setLogin} />
+            <Main setLogin={setLogin} isLoggedIn={isLoggedIn} />
+        </>
     );
 };
 

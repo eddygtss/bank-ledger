@@ -10,18 +10,18 @@ import {
     Label,
     Modal
 } from "reactstrap";
-import "./MyModal.css";
+import "./Modal.css";
 import {callApi} from "../../utils";
 import cogoToast from "cogo-toast";
 import {XSquare} from "react-feather";
 
 export const DepositFundsModal = ({depositModal, setDepositModal}) => {
-    const createTransaction = (memo, amount, date, transactionType) => {
-        callApi('transactions', 'POST', JSON.stringify({memo, amount, date, transactionType})).then(result => {
+    const createTransaction = (memo, amount, transactionType) => {
+        callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType})).then(result => {
             if (result.status === 201) {
                 cogoToast.success('Transaction created.');
                 setDepositModal(!depositModal);
-                setForm({memo: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+                setForm({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
             } else {
                 result.json().then(data => {
                     cogoToast.error(`Error creating account${data.message ? `: ${data.message}` : ''}`);
@@ -30,8 +30,7 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
         });
     };
 
-
-    const [form, setForm] = useState({memo: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+    const [form, setForm] = useState({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
@@ -40,12 +39,10 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
 
         <Modal className="Modal" isOpen={depositModal}>
 
-                    <div className="titleCloseBtn" onClick={() => setDepositModal(!depositModal)}>
-                        <XSquare color="red" size={48}/>
-                    </div>
+            <Button className="btn-close align-self-end m-2" onClick={() => setDepositModal(!depositModal)} />
 
             <Container>
-                <h1>Deposit Funds</h1>
+                <h1 className="text-center">Deposit Funds</h1>
                 <br/>
                 <Form className="formText">
                     <FormGroup>
@@ -60,18 +57,11 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                         </InputGroup>
                     </FormGroup>
-                    <FormGroup>
-                        <Label for="date">Date</Label>
-                        <Input type="date" name="date" bsSize="lg" onChange={e => onChange(e.target.name, e.target.value)}
-                               required/>
-                    </FormGroup>
-
                 </Form>
                 <br/>
                 <Button className="createTransactionSubmitBtn" onClick={() => createTransaction(
                     form.memo,
                     form.amount,
-                    form.date,
                     "DEPOSIT")}>Deposit Funds</Button>
                 <br/>
 
