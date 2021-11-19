@@ -53,6 +53,7 @@ const AccountCreate = ({ history, setLogin }) => {
             } else {
                 result.json().then((data) => {
                     cogoToast.error(`Error creating account${data.message ? `: ${data.message}` : ''}`);
+                    setFormStep(0);
                 });
             }
         });
@@ -166,7 +167,7 @@ const AccountCreate = ({ history, setLogin }) => {
                                     </Row>
                                     <FormGroup>
                                         <Input
-                                            type="text"
+                                            type="email"
                                             name="username"
                                             placeholder="Your Email"
                                             bsSize="lg"

@@ -1,5 +1,6 @@
 package gem.banking.controllers;
 
+import gem.banking.exceptions.AccountExistsException;
 import gem.banking.exceptions.AccountInvalidException;
 import gem.banking.models.Account;
 import gem.banking.models.AccountInfo;
@@ -30,7 +31,7 @@ public class AccountController {
 
     // Create new user account API endpoint (POST/Create)
     @PostMapping("/create")
-    public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException {
+    public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException, AccountExistsException {
         authenticationService.createUser(createAccountRequest);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
