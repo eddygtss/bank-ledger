@@ -80,6 +80,8 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
 
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setRequestModal(!requestModal);
+                setInvalidEmail(false);
+                setInvalidAmount(false);
                 setForm({memo: '', responder: '', amount: 0.00});
             }} />
 
@@ -114,7 +116,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
 
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || form.amount === 0 || form.memo === ""} onClick={() => createRequestTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""} onClick={() => createRequestTransaction(
                     form.memo,
                     form.responder,
                     form.amount)}>Request Funds</Button>

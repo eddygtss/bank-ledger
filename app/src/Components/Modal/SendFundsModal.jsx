@@ -80,6 +80,8 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
 
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setSendModal(!sendModal);
+                setInvalidAmount(false);
+                setInvalidEmail(false);
                 setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
             }} />
 
@@ -113,7 +115,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || form.amount === 0 || form.memo === ""} onClick={() => createSendTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""} onClick={() => createSendTransaction(
                     form.memo,
                     form.recipient,
                     form.amount,
