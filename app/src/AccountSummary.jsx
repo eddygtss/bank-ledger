@@ -100,7 +100,7 @@ const AccountSummary = ({ setLogin }) => {
           <Col className="border table-light moneyTables bdr pr-4 mb-2">
             <h4 className="text-center">Money In</h4>
             <Button className="modalGreenButton mb-3" onClick={() => toggle('requestModal')}>Request</Button>
-            <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal}/>
+            <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal} accountInfo={accountInfo}/>
 
             <Button className="modalGreenButton requestBtn mb-3" onClick={() => toggle('depositModal')}>Deposit</Button>
             <DepositFundsModal depositModal={depositModal} setDepositModal={setDepositModal}/>
@@ -112,7 +112,7 @@ const AccountSummary = ({ setLogin }) => {
           <Col className="border table-light moneyTables bdr pl-4 mb-2">
             <h4 className="text-center">Money Out</h4>
             <Button className="modalRedButton mb-3" onClick={() => toggle('sendModal')}>Send</Button>
-            <SendFundsModal sendModal={sendModal} setSendModal={setSendModal}/>
+            <SendFundsModal sendModal={sendModal} setSendModal={setSendModal} accountInfo={accountInfo}/>
 
             <Button className="modalRedButton requestBtn mb-3" onClick={() => toggle('withdrawModal')}>Withdraw</Button>
             <WithdrawFundsModal withdrawModal={withdrawModal} setWithdrawModal={setWithdrawModal}/>
