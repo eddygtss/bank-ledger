@@ -76,13 +76,11 @@ const AccountSummary = ({ setLogin }) => {
           </OffcanvasHeader>
           <OffcanvasBody>
             {accountInfo.accountName &&
-            <div>
               <TransactionEntries accountInfo={accountInfo} transType={'request'} setMessage={setMessage}/>
-            </div>
             }
           </OffcanvasBody>
         </Offcanvas>
-        <Container fluid className="px-4 myBackGround">
+        <Container fluid className="px-4 myBackGround" style={{height: "fit-content"}}>
           {accountInfo.accountName &&
           <div>
             <h3>Account Name: {accountInfo.accountName}</h3>
@@ -97,7 +95,7 @@ const AccountSummary = ({ setLogin }) => {
           <Row lg="2" md="1" sm="1" xs="1" className="gx-2" style={{
             alignContent: "space-evenly"
           }}>
-          <Col className="border table-light moneyTables bdr pr-4 mb-2">
+          <Col className="border table-light moneyTables bdr p-3 mb-2">
             <h4 className="text-center">Money In</h4>
             <Button className="modalGreenButton mb-3" onClick={() => toggle('requestModal')}>Request</Button>
             <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal} accountInfo={accountInfo}/>
@@ -109,7 +107,7 @@ const AccountSummary = ({ setLogin }) => {
               <TransactionEntries accountInfo={accountInfo} transType={'moneyIn'} setMessage={setMessage}/>
             }
           </Col>
-          <Col className="border table-light moneyTables bdr pl-4 mb-2">
+          <Col className="border table-light moneyTables bdr p-3 mb-2">
             <h4 className="text-center">Money Out</h4>
             <Button className="modalRedButton mb-3" onClick={() => toggle('sendModal')}>Send</Button>
             <SendFundsModal sendModal={sendModal} setSendModal={setSendModal} accountInfo={accountInfo}/>

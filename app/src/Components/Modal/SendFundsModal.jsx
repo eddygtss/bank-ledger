@@ -22,9 +22,8 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
                 setSendModal(!sendModal)
                 setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
             } else {
-                result.json().then(data => {
-                    cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
-                });
+                console.log(result)
+                cogoToast.error(result);
             }
         });
     };
