@@ -7,7 +7,7 @@ const TableRows = (transactions, request, accountInfo, {setMessage}) => {
     const approveRequest = (request) => {
         callApi('approve-request', 'POST', request).then(result => {
             if (result.status === 200) {
-                setMessage('Request approved.');
+                setMessage(request.toString() + ' request approved.');
                 cogoToast.success('Request approved.');
             } else {
                 result.json().then(data => {
@@ -21,7 +21,7 @@ const TableRows = (transactions, request, accountInfo, {setMessage}) => {
     const denyRequest = (request) => {
         callApi('deny-request', 'POST', request).then(result => {
             if (result.status === 200) {
-                setMessage('Request denied.');
+                setMessage(request.toString() + ' request denied.');
                 cogoToast.success('Request denied.');
             } else {
                 result.json().then(data => {
@@ -48,7 +48,6 @@ const TableRows = (transactions, request, accountInfo, {setMessage}) => {
     }
 
     let currentUser = accountInfo.documentId.substring(5);
-
     let prevDate = null;
 
     if (request === false) {
