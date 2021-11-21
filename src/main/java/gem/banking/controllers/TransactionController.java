@@ -1,11 +1,11 @@
 package gem.banking.controllers;
 
-import gem.banking.exceptions.RequestNotFoundException;
 import gem.banking.models.AccountInfo;
 import gem.banking.models.Request;
 import gem.banking.models.Transaction;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
+import gem.banking.services.RequestService;
 import gem.banking.services.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,8 @@ public class TransactionController {
     public AccountService accountService;
     @Autowired
     public TransactionService transactionService;
+    @Autowired
+    public RequestService requestService;
     @Autowired
     public AuthenticationService authenticationService;
 
@@ -53,6 +55,10 @@ public class TransactionController {
     @PostMapping("/send")
     public ResponseEntity<String> sendFunds(@RequestBody Transaction sendFundsTransaction) throws Exception {
         String sender = authenticationService.getCurrentUser();
+
+        if (sender.substring(5).equals(sendFundsTransaction.getRecipient())){
+            return ResponseEntity.badRequest().body("You cannot send money to yourself.");
+        }
 
         AccountInfo currentUserAccount = accountService.getAccountInfo(sender);
         sendFundsTransaction.setSender(sender.substring(5));
@@ -91,7 +97,7 @@ public class TransactionController {
             AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + requestFundsTransaction.getResponder());
 
             List<AccountInfo> updatedAccounts =
-                    transactionService.requestTransaction(requestFundsTransaction, requesterUserAccount, recipientUserAccount);
+                    requestService.Request(requestFundsTransaction, requesterUserAccount, recipientUserAccount);
 
             // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
             for (AccountInfo account: updatedAccounts) {
@@ -118,7 +124,7 @@ public class TransactionController {
                 AccountInfo requesterAccountInfo = accountService.getAccountInfo(requester);
 
                 List<AccountInfo> updatedAccounts =
-                        transactionService.approveTransaction(request, responderAccountInfo, requesterAccountInfo);
+                        requestService.approveRequest(request, responderAccountInfo, requesterAccountInfo);
 
                 // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
                 for (AccountInfo account: updatedAccounts) {
@@ -145,7 +151,7 @@ public class TransactionController {
                 AccountInfo requesterAccountInfo = accountService.getAccountInfo(requester);
 
                 List<AccountInfo> updatedAccounts =
-                        transactionService.denyRequest(request, responderAccountInfo, requesterAccountInfo);
+                        requestService.denyRequest(request, responderAccountInfo, requesterAccountInfo);
 
                 // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
                 for (AccountInfo account: updatedAccounts) {

@@ -1,65 +1,101 @@
-import {NavLink as RRNavLink, withRouter} from 'react-router-dom';
-import React, { useState, useContext } from 'react';
+import { withRouter } from 'react-router-dom';
+import React, {useState} from 'react';
 
 import "animate.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import "./AboutUs.css";
 import {
-    Card, CardImg, CardText, CardBody,
-    CardTitle, CardSubtitle, Button
+    Carousel,
+    CarouselIndicators,
+    CarouselItem,
+    CarouselCaption,
+    CarouselControl
 } from 'reactstrap';
 
 const AboutUs = () => {
 
+    // State for Active index
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    // State for Animation
+    const [animating, setAnimating] = useState(false);
+
+    // Sample items for Carousel
+    const items = [
+        {
+            caption: 'Sample Caption One',src:
+                'https://media.geeksforgeeks.org/wp-content/uploads/20210425122739/2-300x115.png',
+            altText: 'Slide One'
+        },
+        {
+            caption: 'Sample Caption Two',src:
+                'https://media.geeksforgeeks.org/wp-content/uploads/20210425122716/1-300x115.png',
+            altText: 'Slide Two'
+        }
+    ];
+
+    // Items array length
+    const itemLength = items.length - 1
+
+    // Previous button for Carousel
+    const previousButton = () => {
+        if (animating) return;
+        const nextIndex = activeIndex === 0 ?
+            itemLength : activeIndex - 1;
+        setActiveIndex(nextIndex);
+    }
+
+    // Next button for Carousel
+    const nextButton = () => {
+        if (animating) return;
+        const nextIndex = activeIndex === itemLength ?
+            0 : activeIndex + 1;
+        setActiveIndex(nextIndex);
+    }
+
+    // Carousel Item Data
+    const carouselItemData = items.map((item) => {
+        return (
+            <CarouselItem
+                className="text-center"
+                style={{maxWidth: "100%"}}
+                key={item.src}
+                onExited={() => setAnimating(false)}
+                onExiting={() => setAnimating(true)}
+            >
+                <img src={item.src} alt={item.altText} />
+            </CarouselItem>
+        );
+    });
 
     return (
-    <div className="about-wrapper">
-        <h1 className="about-head-line">The Right Banking Solution For All Ages</h1>
-        <br/>
+        <div className="about-wrapper myBackGround">
+            <h1 className="about-head-line">Our Mission</h1>
+            <br/>
 
-    <div className="about-body">
+            <Carousel previous={previousButton} next={nextButton}
+                      activeIndex={activeIndex}>
+                <CarouselIndicators items={items}
+                                    activeIndex={activeIndex}
+                                    onClickHandler={(newIndex) => {
+                                        if (animating) return;
+                                        setActiveIndex(newIndex);
+                                    }} />
+                {carouselItemData}
+                <CarouselControl directionText="Prev"
+                                 direction="prev" onClickHandler={previousButton} />
+                <CarouselControl directionText="Next"
+                                 direction="next" onClickHandler={nextButton} />
+            </Carousel>
+            <div className="about-bottom-text">
+                <h3 className="about-head-line">Gem Bankers United</h3>
+                <p>
+                    Our banking system was designed for online banking with ease of use for children in mind. We offer banking that is easy to use, reliable, and secure.
+                    Our service is constantly growing so, stay tuned for new features and functionality.
 
-        <Card className="about-card">
-            <CardImg className="about-card-img" top width="100%" src="https://newsela.imgix.net/article_media/2019/01/kids-saving-money-92afc088.jpg?auto=compress%2C%20enhance&fit=crop&crop=focalpoint&fp-x=0.5&fp-y=0.5&fp-z=1&ar=16%3A9&q=50" alt="Card image cap" />
-            <CardBody className="about-card-body">
-                <CardTitle className="about-card-tittle" tag="h5">Save</CardTitle>
-                {/*<CardSubtitle tag="h6" className="mb-2 text-muted">Card subtitle</CardSubtitle>*/}
-                <CardText className="about-card-text">Banking made simple. Gem Bankers United makes it easy for anyone to start saving now.</CardText>
-                <Button className="about-card-btn" tag={RRNavLink} exact to="/account-create" activeClassName="active">Get Started</Button>
-            </CardBody>
-        </Card>
-
-        <Card className="about-card">
-            <CardImg className="about-card-img" top width="100%" src="https://reviewed-com-res.cloudinary.com/image/fetch/s--pAFIN1Do--/b_white,c_limit,cs_srgb,f_auto,fl_progressive.strip_profile,g_center,q_auto,w_1200/https://reviewed-production.s3.amazonaws.com/1564514045138/M.png" alt="Card image cap" />
-            <CardBody className="about-card-body">
-                <CardTitle className="about-card-tittle" tag="h5">Spend</CardTitle>
-                {/*<CardSubtitle tag="h6" className="mb-2 text-muted">Card subtitle</CardSubtitle>*/}
-                <CardText className="about-card-text">Your money will be there when you need it. Easily transfer funds from Gem Bankers United to outside accounts.</CardText>
-                <Button className="about-card-btn" tag={RRNavLink} exact to="/account-create" activeClassName="active">Get Started</Button>
-            </CardBody>
-        </Card>
-
-        <Card className="about-card">
-            <CardImg className="about-card-img" top width="100%" src="https://kajabi-storefronts-production.kajabi-cdn.com/kajabi-storefronts-production/blogs/16418/images/W4qE9ZeQbuie2YI5d6PU_July_MMM_Blog_1_Banner_1.png" alt="Card image cap" />
-            <CardBody className="about-card-body">
-                <CardTitle className="about-card-tittle" tag="h5">Track</CardTitle>
-                {/*<CardSubtitle tag="h6" className="mb-2 text-muted">Card subtitle</CardSubtitle>*/}
-                <CardText className="about-card-text">Track of your financial growth or catch bad spending habits early on wit Gem Bankers United.</CardText>
-                <Button className="about-card-btn" tag={RRNavLink} exact to="/account-create" activeClassName="active">Get Started</Button>
-            </CardBody>
-        </Card>
-
-    </div>
-        <div className="about-bottom-text">
-            <h3 className="about-head-line">Gem Bankers United</h3>
-            <p>
-                Our banking system was designed for online banking with ease of use for children in mind. We offer banking that is easy to use, reliable, and secure.
-                Our service is constantly growing so, stay tuned for new features and functionality.
-
-            </p>
+                </p>
+            </div>
         </div>
-
-</div>
-
-
-    )
+    );
 };
 export default withRouter(AboutUs);
