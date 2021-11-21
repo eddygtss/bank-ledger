@@ -1,4 +1,3 @@
-
 .contact-wrapper{
     vertical-align: center;
 }
@@ -13,6 +12,14 @@
     font-family: Staatliches;
 
 }
+.col {
+    padding: 5px;
+}
+.contact-card{
+    min-width: 315px;
+    max-width: 400px;
+    margin: auto;
+}
 .contact-body{
     display: flex;
     align-content: space-evenly;
@@ -20,20 +27,12 @@
     position: center;
     background-color: #0062cc;
     height: 100%;
-
-
-}
-.contact-card{
-    width: 318px;
-    margin: 20px;
-    resize: both;
-    overflow: auto;
 }
 .contact-card-img{
     height: auto;
     width: auto;
 }
-.contact-card-tittle{
+.contact-card-title{
     color: black;
     font-family: Staatliches;
 }
@@ -48,9 +47,8 @@
     background-color: #ffffff;
     color: #87ceeb;
 }
-.contact-bottom-text{
+.contact-bottom-text {
     padding-top: 20px;
-    padding-right: 75px;
-    padding-left: 75px;
-
+    padding-right: 25px;
+    padding-left: 25px;
 }
