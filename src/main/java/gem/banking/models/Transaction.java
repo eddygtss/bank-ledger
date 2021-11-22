@@ -1,20 +1,20 @@
 package gem.banking.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.Date;
+
+import java.util.UUID;
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class Transaction {
+    private String id = UUID.randomUUID().toString();
     private String memo = "";
     private String sender = "";
     private String recipient = "";
     private double  amount;
-    @JsonFormat(pattern="MM-dd-yyyy")
-    private Date date;
+    private String date;
     private TransactionType transactionType;
     private TransactionStatus transactionStatus;
 
@@ -27,6 +27,7 @@ public class Transaction {
     }
 
     public Transaction(Transaction copy) {
+        this.id = copy.id;
         this.memo = copy.memo;
         this.sender = copy.sender;
         this.recipient = copy.recipient;
