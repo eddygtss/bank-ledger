@@ -1,16 +1,17 @@
 package gem.banking.services;
 
 import gem.banking.exceptions.InsufficientFundsException;
-import gem.banking.exceptions.InvalidRequesteeException;
 import gem.banking.exceptions.InvalidTransactionException;
 import gem.banking.models.AccountInfo;
-import gem.banking.models.Request;
 import gem.banking.models.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Slf4j
@@ -24,8 +25,10 @@ public class TransactionService {
         if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
 
 
-        if (transaction.getDate() == null) {
-            transaction.setDate(new Date());
+        if (transaction.getDate() == null || transaction.getDate().equals("")) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            String currentTime = LocalDateTime.now().format(formatter);
+            transaction.setDate(currentTime);
         }
 
         if (transactionType == Transaction.TransactionType.DEPOSIT) {
@@ -67,7 +70,10 @@ public class TransactionService {
         Transaction.TransactionType transactionType = transaction.getTransactionType();
 
         if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
-        transaction.setDate(new Date());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        String currentTime = LocalDateTime.now().format(formatter);
+        transaction.setDate(currentTime);
 
         // We check if the transaction type is SEND because we are subtracting money from the account balance
         if (transactionType == Transaction.TransactionType.SEND) {

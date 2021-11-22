@@ -85,7 +85,7 @@ const TableRows = (transactions, request, accountInfo, {setMessage}) => {
                                             textAlign: 'center'
                                         }}>
                                             <td>{transaction.sender
-                                                ? '[' + transaction.transactionType + ' FROM ' + transaction.recipient.toUpperCase() + ']\n' + transaction.memo
+                                                ? '[' + transaction.transactionStatus + ' TO ' + transaction.recipient.toUpperCase() + ']\n' + transaction.memo
                                                 : '[' + transaction.transactionType + ']\n' + transaction.memo}</td>
                                             <td className="align-middle">{formatCurrency(transaction.amount)}</td>
                                         </tr>
@@ -112,7 +112,7 @@ const TableRows = (transactions, request, accountInfo, {setMessage}) => {
                                         textAlign: 'center'
                                     }}>
                                         <td>{transaction.sender
-                                            ? '[' + transaction.transactionType + ' FROM ' + transaction.recipient.toUpperCase() + ']\n' + transaction.memo
+                                            ? '[' + transaction.transactionStatus + ' TO ' + transaction.recipient.toUpperCase() + ']\n' + transaction.memo
                                             : '[' + transaction.transactionType + ']\n' + transaction.memo}</td>
                                         <td className="align-middle">{formatCurrency(transaction.amount)}</td>
                                     </tr>

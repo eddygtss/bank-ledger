@@ -22,8 +22,10 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
                 setSendModal(!sendModal)
                 setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
             } else {
-                console.log(result)
-                cogoToast.error(result);
+                result.text().then(data => {
+                    cogoToast.error('Error: ' + data);
+                    }
+                )
             }
         });
     };
@@ -46,7 +48,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
         if (invalidAmount){
             return (
                 <FormFeedback className="position-relative">
-                    Your amount must be more than $0.
+                    Your amount must be more than $0 and less than $100,000.
                 </FormFeedback>
             )
         }
@@ -64,7 +66,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
             }
         }
         if (name === "amount"){
-            if (value <= 0){
+            if (value <= 0 || value[0] === "-" || value > 100000){
                 setInvalidAmount(!invalidAmount);
             } else {
                 if (invalidAmount === true) {

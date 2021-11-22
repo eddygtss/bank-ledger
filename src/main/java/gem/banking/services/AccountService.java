@@ -69,7 +69,7 @@ public class AccountService {
             accountInfo = bankAccDocument.toObject(AccountInfo.class);
             return accountInfo;
         } else {
-            throw new AccountInvalidException(documentId.substring(5) + " account not valid.");
+            throw new AccountInvalidException("The account " + documentId.substring(5) + " is not valid.");
         }
     }
 }

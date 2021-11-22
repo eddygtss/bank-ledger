@@ -9,9 +9,11 @@ import gem.banking.models.Transaction;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -26,7 +28,11 @@ public class RequestService {
         List<Request> responderRequests = responderAccountInfo.getRequestHistory();
 
         if (request.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
-        request.setDate(new Date());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+        String currentTime = LocalDateTime.now().format(formatter);
+        request.setDate(currentTime);
+
 
         // RequestStatus for the responder so they see PENDING for a request in their requests list
         request.setRequestStatus(Request.RequestStatus.PENDING);
@@ -73,10 +79,14 @@ public class RequestService {
             requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
 
             request.setRequestStatus(Request.RequestStatus.APPROVED);
-            request.setDate(new Date());
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            String currentTime = LocalDateTime.now().format(formatter);
+            request.setDate(currentTime);
 
             Transaction approvedTransaction =
                     new Transaction(
+                            UUID.randomUUID().toString(),
                             request.getMemo(),
                             request.getResponder(),
                             request.getRequester(),
@@ -133,7 +143,9 @@ public class RequestService {
             requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
 
             // We updated the time and status for when the request was denied.
-            request.setDate(new Date());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            String currentTime = LocalDateTime.now().format(formatter);
+            request.setDate(currentTime);
             request.setRequestStatus(Request.RequestStatus.DENIED);
 
             // Adding the new request to requests list and updating the account info with the updated requests list

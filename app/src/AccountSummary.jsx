@@ -80,7 +80,7 @@ const AccountSummary = ({ setLogin }) => {
             }
           </OffcanvasBody>
         </Offcanvas>
-        <Container fluid className="px-4 myBackGround" style={{height: "fit-content"}}>
+        <Container fluid className="px-4 myBackGround">
           {accountInfo.accountName &&
           <div>
             <h3>Account Name: {accountInfo.accountName}</h3>

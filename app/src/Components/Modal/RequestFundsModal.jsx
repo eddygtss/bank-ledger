@@ -22,8 +22,8 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 setRequestModal(!requestModal);
                 setForm({memo: '', responder: '', amount: 0.00});
             } else {
-                result.json().then(data => {
-                    cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
+                result.text().then(data => {
+                    cogoToast.error(`Error ${data ? `: ${data}` : ''}`);
                 });
             }
         });
@@ -32,6 +32,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
     const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
     const [invalidEmail, setInvalidEmail] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
+    const [invalidButton, setInvalidButton] = useState(true);
 
     const showInvalidEmailLabel = () => {
         if (invalidEmail){
@@ -47,9 +48,17 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
         if (invalidAmount){
             return (
                 <FormFeedback className="position-relative">
-                    Your amount must be more than $0.
+                    Your amount must be more than $0 and less than $100,000.
                 </FormFeedback>
             )
+        }
+    }
+
+    const validateButton = () => {
+        if (form.amount && form.responder){
+            setInvalidButton(false)
+        } else {
+            setInvalidButton(true);
         }
     }
 
@@ -65,7 +74,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
             }
         }
         if (name === "amount"){
-            if (value <= 0 || value[0] === "-"){
+            if (value <= 0 || value[0] === "-" || value > 100000){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
@@ -73,6 +82,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 }
             }
         }
+        validateButton();
     };
     return (
 
@@ -116,7 +126,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
 
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""} onClick={() => createRequestTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton} onClick={() => createRequestTransaction(
                     form.memo,
                     form.responder,
                     form.amount)}>Request Funds</Button>
