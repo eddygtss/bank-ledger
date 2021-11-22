@@ -1,4 +1,7 @@
-body{min-height: 100vh}
+html > body > #root {
+  height: 100vh;
+  height: calc(100%);
+}
 .modalGreenButton{
   min-width: 100px;
   height: 48px;
@@ -90,6 +93,8 @@ body{min-height: 100vh}
           rgb(238, 240, 240)
   ) !important;
   height: 100vh;
+  height: calc(100%);
+  min-height: 100vh;
   padding-top: 32px;
   padding-bottom: 32px;
 }
