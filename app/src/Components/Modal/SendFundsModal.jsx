@@ -8,14 +8,13 @@ import {
     Input,
     InputGroup,
     InputGroupText,
-    Label
+    Label, FormFeedback
 } from "reactstrap";
 import "./Modal.css";
 import {callApi} from "../../utils";
 import cogoToast from "cogo-toast";
-import {XSquare} from "react-feather";
 
-export const SendFundsModal = ({sendModal, setSendModal}) => {
+export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
     const createSendTransaction = (memo, recipient, amount, transactionType) => {
         callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType})).then(result => {
             if (result.status === 201) {
@@ -23,24 +22,69 @@ export const SendFundsModal = ({sendModal, setSendModal}) => {
                 setSendModal(!sendModal)
                 setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
             } else {
-                result.json().then(data => {
-                    cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
-                });
+                result.text().then(data => {
+                    cogoToast.error('Error: ' + data);
+                    }
+                )
             }
         });
     };
 
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'DEPOSIT'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+    const [invalidEmail, setInvalidEmail] = useState(false);
+    const [invalidAmount, setInvalidAmount] = useState(false);
 
+    const showInvalidEmailFeedback = () => {
+        if (invalidEmail){
+            return (
+                <FormFeedback className="position-relative">
+                    You cannot send money to yourself.
+                </FormFeedback>
+            )
+        }
+    }
+
+    const showInvalidAmountFeedback = () => {
+        if (invalidAmount){
+            return (
+                <FormFeedback className="position-relative">
+                    Your amount must be more than $0 and less than $100,000.
+                </FormFeedback>
+            )
+        }
+    }
 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
+        if (name === "recipient"){
+            if (value === accountInfo.documentId.substring(5)){
+                setInvalidEmail(!invalidEmail);
+            } else {
+                if (invalidEmail === true) {
+                    setInvalidEmail(!invalidEmail);
+                }
+            }
+        }
+        if (name === "amount"){
+            if (value <= 0 || value[0] === "-" || value > 100000){
+                setInvalidAmount(!invalidAmount);
+            } else {
+                if (invalidAmount === true) {
+                    setInvalidAmount(!invalidAmount);
+                }
+            }
+        }
     };
     return (
 
         <Modal className="Modal" isOpen={sendModal}>
 
-            <Button className="btn-close align-self-end m-2" onClick={() => setSendModal(!sendModal)} />
+            <Button className="btn-close align-self-end m-2" onClick={() => {
+                setSendModal(!sendModal);
+                setInvalidAmount(false);
+                setInvalidEmail(false);
+                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+            }} />
 
             <Container>
                 <h1 className="text-center">Send Funds</h1>
@@ -51,8 +95,10 @@ export const SendFundsModal = ({sendModal, setSendModal}) => {
                         <Input name="recipient"
                                placeholder="GemBank Member Email"
                                bsSize="lg"
+                               invalid={invalidEmail}
                                type="email"
                                onChange={e => onChange(e.target.name, e.target.value)} required/>
+                        {showInvalidEmailFeedback()}
                     </FormGroup>
                     <FormGroup>
                         <Label for="memo">Message</Label>
@@ -63,13 +109,14 @@ export const SendFundsModal = ({sendModal, setSendModal}) => {
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" value={form.amount} bsSize="lg"
+                            <Input type="number" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
+                            {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" onClick={() => createSendTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""} onClick={() => createSendTransaction(
                     form.memo,
                     form.recipient,
                     form.amount,

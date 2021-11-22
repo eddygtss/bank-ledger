@@ -48,7 +48,7 @@ const TransactionEntries = ({accountInfo, transType, setMessage}) => {
     } else if (transType === 'request') {
         return (
             <Table
-                className="bdr table-info">
+                className="bdr table-info m-auto">
                 <tbody className="text-center">
                     {TableRows(getRequestTransactions(), true, accountInfo, {setMessage})}
                     {!accountInfo.requestHistory.length && 'No requests recorded.'}

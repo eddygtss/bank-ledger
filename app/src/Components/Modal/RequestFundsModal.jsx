@@ -10,11 +10,11 @@ import {
     Input,
     InputGroup,
     InputGroupText,
-    Label
+    Label, FormFeedback
 } from "reactstrap";
 import cogoToast from "cogo-toast";
 
-export const RequestFundsModal = ({requestModal, setRequestModal}) => {
+export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) => {
     const createRequestTransaction = (memo, responder, amount) => {
         callApi('request', 'POST', JSON.stringify({memo, responder, amount})).then(result => {
             if (result.status === 201) {
@@ -22,23 +22,78 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
                 setRequestModal(!requestModal);
                 setForm({memo: '', responder: '', amount: 0.00});
             } else {
-                result.json().then(data => {
-                    cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
+                result.text().then(data => {
+                    cogoToast.error(`Error ${data ? `: ${data}` : ''}`);
                 });
             }
         });
     };
 
     const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
+    const [invalidEmail, setInvalidEmail] = useState(false);
+    const [invalidAmount, setInvalidAmount] = useState(false);
+    const [invalidButton, setInvalidButton] = useState(true);
+
+    const showInvalidEmailLabel = () => {
+        if (invalidEmail){
+            return (
+                <FormFeedback className="position-relative">
+                    You cannot request money from yourself.
+                </FormFeedback>
+            )
+        }
+    }
+
+    const showInvalidAmountFeedback = () => {
+        if (invalidAmount){
+            return (
+                <FormFeedback className="position-relative">
+                    Your amount must be more than $0 and less than $100,000.
+                </FormFeedback>
+            )
+        }
+    }
+
+    const validateButton = () => {
+        if (form.amount && form.responder){
+            setInvalidButton(false)
+        } else {
+            setInvalidButton(true);
+        }
+    }
 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
+        if (name === "responder"){
+            if (value === accountInfo.documentId.substring(5)){
+                setInvalidEmail(true);
+            } else {
+                if (invalidEmail === true) {
+                    setInvalidEmail(false);
+                }
+            }
+        }
+        if (name === "amount"){
+            if (value <= 0 || value[0] === "-" || value > 100000){
+                setInvalidAmount(true);
+            } else {
+                if (invalidAmount === true) {
+                    setInvalidAmount(false);
+                }
+            }
+        }
+        validateButton();
     };
     return (
 
         <Modal className="Modal" isOpen={requestModal}>
 
-            <Button className="btn-close align-self-end m-2" onClick={() => setRequestModal(!requestModal)} />
+            <Button className="btn-close align-self-end m-2" onClick={() => {
+                setRequestModal(!requestModal);
+                setInvalidEmail(false);
+                setInvalidAmount(false);
+                setForm({memo: '', responder: '', amount: 0.00});
+            }} />
 
             <Container>
                 <h1 className="text-center">Request Funds</h1>
@@ -49,8 +104,10 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
                         <Input name="responder"
                                bsSize="lg"
                                placeholder="GemBank Member Email"
+                               invalid={invalidEmail}
                                inputMode="email"
                                onChange={e => onChange(e.target.name, e.target.value)} required/>
+                        {showInvalidEmailLabel()}
                     </FormGroup>
                     <FormGroup>
                         <Label for="memo">Message</Label>
@@ -61,14 +118,15 @@ export const RequestFundsModal = ({requestModal, setRequestModal}) => {
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" value={form.amount} bsSize="lg"
+                            <Input type="number" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
+                            {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
 
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" onClick={() => createRequestTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton} onClick={() => createRequestTransaction(
                     form.memo,
                     form.responder,
                     form.amount)}>Request Funds</Button>

@@ -52,8 +52,8 @@ const AccountSummary = ({ setLogin }) => {
   }, [message, depositModal, requestModal, sendModal, withdrawModal]);
 
   const getPendingRequests = () => {
-    return accountInfo.accountName && accountInfo.transactionHistory.filter(transaction => {
-      const status = transaction.transactionStatus.toLowerCase();
+    return accountInfo.accountName && accountInfo.requestHistory.filter(request => {
+      const status = request.requestStatus.toLowerCase();
       return status.includes('pending');
     }).length;
   }
@@ -76,9 +76,7 @@ const AccountSummary = ({ setLogin }) => {
           </OffcanvasHeader>
           <OffcanvasBody>
             {accountInfo.accountName &&
-            <div>
               <TransactionEntries accountInfo={accountInfo} transType={'request'} setMessage={setMessage}/>
-            </div>
             }
           </OffcanvasBody>
         </Offcanvas>
@@ -97,10 +95,10 @@ const AccountSummary = ({ setLogin }) => {
           <Row lg="2" md="1" sm="1" xs="1" className="gx-2" style={{
             alignContent: "space-evenly"
           }}>
-          <Col className="border table-light moneyTables bdr pr-4 mb-2">
+          <Col className="border table-light moneyTables bdr p-3 mb-2">
             <h4 className="text-center">Money In</h4>
             <Button className="modalGreenButton mb-3" onClick={() => toggle('requestModal')}>Request</Button>
-            <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal}/>
+            <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal} accountInfo={accountInfo}/>
 
             <Button className="modalGreenButton requestBtn mb-3" onClick={() => toggle('depositModal')}>Deposit</Button>
             <DepositFundsModal depositModal={depositModal} setDepositModal={setDepositModal}/>
@@ -109,10 +107,10 @@ const AccountSummary = ({ setLogin }) => {
               <TransactionEntries accountInfo={accountInfo} transType={'moneyIn'} setMessage={setMessage}/>
             }
           </Col>
-          <Col className="border table-light moneyTables bdr pl-4 mb-2">
+          <Col className="border table-light moneyTables bdr p-3 mb-2">
             <h4 className="text-center">Money Out</h4>
             <Button className="modalRedButton mb-3" onClick={() => toggle('sendModal')}>Send</Button>
-            <SendFundsModal sendModal={sendModal} setSendModal={setSendModal}/>
+            <SendFundsModal sendModal={sendModal} setSendModal={setSendModal} accountInfo={accountInfo}/>
 
             <Button className="modalRedButton requestBtn mb-3" onClick={() => toggle('withdrawModal')}>Withdraw</Button>
             <WithdrawFundsModal withdrawModal={withdrawModal} setWithdrawModal={setWithdrawModal}/>
