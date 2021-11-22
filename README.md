@@ -26,7 +26,7 @@ This repo is a combination of 3 applications:
 
 #### Running Web Application
 
-- Navigate to "http://localhost:8081" in a web browser
+- Navigate to "http://localhost:7474" in a web browser
 
 #### Running Console Application
 
