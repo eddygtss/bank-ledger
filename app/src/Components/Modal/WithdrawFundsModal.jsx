@@ -1,5 +1,4 @@
-import React, {useState} from "react";
-
+import React, { useState } from 'react';
 import {
     Button,
     Container,
@@ -10,12 +9,15 @@ import {
     InputGroupText,
     Label,
     Modal
-} from "reactstrap";
-import "./Modal.css";
-import {callApi} from "../../utils";
-import cogoToast from "cogo-toast";
+} from 'reactstrap';
+import './Modal.css';
+import cogoToast from 'cogo-toast';
+import { callApi } from '../../utils';
 
 export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
+    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
+    const [invalidAmount, setInvalidAmount] = useState(false);
+
     const createTransaction = (memo, amount, transactionType) => {
         callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType})).then(result => {
             if (result.status === 201) {
@@ -30,9 +32,6 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
         });
     };
 
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
-    const [invalidAmount, setInvalidAmount] = useState(false);
-
     const showInvalidAmountFeedback = () => {
         if (invalidAmount){
             return (
@@ -42,7 +41,6 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
             )
         }
     }
-
 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
@@ -56,8 +54,8 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
             }
         }
     };
-    return (
 
+    return (
         <Modal className="Modal" isOpen={withdrawModal}>
 
             <Button className="btn-close align-self-end m-2" onClick={() => {
@@ -91,11 +89,8 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
                     form.amount,
                     "WITHDRAWAL")}>Withdraw Funds</Button>
                 <br/>
-
             </Container>
 
-
         </Modal>
-
     )
 };

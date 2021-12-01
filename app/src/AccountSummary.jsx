@@ -1,14 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {Alert, Button, Col, Container, Offcanvas, OffcanvasBody, OffcanvasHeader, Row} from 'reactstrap';
-import {callApi, formatCurrency} from "./utils";
-import {DepositFundsModal} from "./Components/Modal/DepositFundsModal";
-import {RequestFundsModal} from "./Components/Modal/RequestFundsModal";
-import {WithdrawFundsModal} from "./Components/Modal/WithdrawFundsModal";
-import {SendFundsModal} from "./Components/Modal/SendFundsModal";
-import TransactionEntries from "./Components/Transactions/TransactionEntries";
-import cogoToast from "cogo-toast";
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Col,
+  Offcanvas,
+  OffcanvasBody,
+  OffcanvasHeader,
+  Row
+} from 'reactstrap';
+import { DepositFundsModal } from './Components/Modal/DepositFundsModal';
+import { RequestFundsModal } from './Components/Modal/RequestFundsModal';
+import { WithdrawFundsModal } from './Components/Modal/WithdrawFundsModal';
+import { SendFundsModal } from './Components/Modal/SendFundsModal';
+import TransactionEntries from './Components/Transactions/TransactionEntries';
+import cogoToast from 'cogo-toast';
+import { callApi, formatCurrency } from './utils';
 
-const AccountSummary = ({ setLogin }) => {
+export const AccountSummary = ({ setLogin }) => {
   const [accountInfo, setInfo] = useState({});
   const [message, setMessage] = useState('');
   const [sendModal, setSendModal] = useState(false);
@@ -80,10 +88,9 @@ const AccountSummary = ({ setLogin }) => {
             }
           </OffcanvasBody>
         </Offcanvas>
-        <Container fluid className="px-4 myBackGround">
           {accountInfo.accountName &&
           <div>
-            <h3>Account Name: {accountInfo.accountName}</h3>
+            <h3>{accountInfo.accountName}</h3>
             <Button className="requestBtn btn-info" onClick={() => toggle('offCanvas')}>View Requests</Button>
             <h4>Balance: {formatCurrency(accountInfo.balance)}</h4>
 
@@ -119,9 +126,6 @@ const AccountSummary = ({ setLogin }) => {
             }
           </Col>
           </Row>
-        </Container>
       </>
   );
 };
-
-export default AccountSummary;

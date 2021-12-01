@@ -5,15 +5,15 @@ const formatCurrency = amount => {
   return `$${amount.toFixed(2)}`;
 };
 
-const callApi = (endPoint, method = 'GET', body) => {
+const callApi = async (endPoint, method = 'GET', body) => {
 
   const options = {
     method,
     body,
-    headers: { "Content-Type": "application/json" },
+    headers: { 'Content-Type': 'application/json' },
   };
 
-  return fetch(`${apiUrl}/${endPoint}`, options);
+  return await fetch(`${apiUrl}/${endPoint}`, options)
 };
 
 export {

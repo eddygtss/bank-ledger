@@ -1,6 +1,5 @@
-import React, {useState} from "react";
-import "./Modal.css";
-import {callApi} from "../../utils";
+import React, { useState } from 'react';
+import './Modal.css';
 import {
     Modal,
     Button,
@@ -11,10 +10,16 @@ import {
     InputGroup,
     InputGroupText,
     Label, FormFeedback
-} from "reactstrap";
-import cogoToast from "cogo-toast";
+} from 'reactstrap';
+import cogoToast from 'cogo-toast';
+import { callApi } from '../../utils';
 
 export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) => {
+    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
+    const [invalidEmail, setInvalidEmail] = useState(false);
+    const [invalidAmount, setInvalidAmount] = useState(false);
+    const [invalidButton, setInvalidButton] = useState(true);
+
     const createRequestTransaction = (memo, responder, amount) => {
         callApi('request', 'POST', JSON.stringify({memo, responder, amount})).then(result => {
             if (result.status === 201) {
@@ -28,11 +33,6 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
             }
         });
     };
-
-    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
-    const [invalidEmail, setInvalidEmail] = useState(false);
-    const [invalidAmount, setInvalidAmount] = useState(false);
-    const [invalidButton, setInvalidButton] = useState(true);
 
     const showInvalidEmailLabel = () => {
         if (invalidEmail){
@@ -48,7 +48,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
         if (invalidAmount){
             return (
                 <FormFeedback className="position-relative">
-                    Your amount must be more than $0 and less than $100,000.
+                    Your amount must be more than $0 and less than $10,000.
                 </FormFeedback>
             )
         }
@@ -74,7 +74,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
             }
         }
         if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 100000){
+            if (value <= 0 || value[0] === "-" || value > 10000){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {

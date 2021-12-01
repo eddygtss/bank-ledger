@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from 'react';
 import {
     Modal,
     Button,
@@ -9,12 +9,16 @@ import {
     InputGroup,
     InputGroupText,
     Label, FormFeedback
-} from "reactstrap";
-import "./Modal.css";
-import {callApi} from "../../utils";
-import cogoToast from "cogo-toast";
+} from 'reactstrap';
+import './Modal.css';
+import cogoToast from 'cogo-toast';
+import { callApi } from '../../utils';
 
 export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
+    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+    const [invalidEmail, setInvalidEmail] = useState(false);
+    const [invalidAmount, setInvalidAmount] = useState(false);
+
     const createSendTransaction = (memo, recipient, amount, transactionType) => {
         callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType})).then(result => {
             if (result.status === 201) {
@@ -29,10 +33,6 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
             }
         });
     };
-
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
-    const [invalidEmail, setInvalidEmail] = useState(false);
-    const [invalidAmount, setInvalidAmount] = useState(false);
 
     const showInvalidEmailFeedback = () => {
         if (invalidEmail){
@@ -75,10 +75,9 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
             }
         }
     };
+
     return (
-
         <Modal className="Modal" isOpen={sendModal}>
-
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setSendModal(!sendModal);
                 setInvalidAmount(false);
@@ -122,11 +121,8 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
                     form.amount,
                     "SEND")}>Send Funds</Button>
                 <br/>
-
             </Container>
 
-
         </Modal>
-
     )
 };

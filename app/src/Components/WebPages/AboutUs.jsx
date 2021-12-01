@@ -1,7 +1,5 @@
-import { withRouter } from 'react-router-dom';
 import React, {useState} from 'react';
-
-import "animate.css";
+import { withRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./AboutUs.css";
 import {
@@ -13,7 +11,6 @@ import {
 } from 'reactstrap';
 
 const AboutUs = () => {
-
     // State for Active index
     const [activeIndex, setActiveIndex] = useState(0);
 

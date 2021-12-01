@@ -1,5 +1,5 @@
-import { withRouter } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import {
     Container,
     Button,
@@ -7,21 +7,25 @@ import {
     FormGroup,
     Input,
     Row
-} from "reactstrap";
-import { callApi } from "./utils";
-import "./App.css";
-
+} from 'reactstrap';
+import './App.css';
 import cogoToast from 'cogo-toast';
-import "animate.css";
+import { callApi } from './utils';
 
 const Login = ({ history, setLogin }) => {
+    const [form, setForm] = useState({ username: '', password: '' });
+
+    const onChange = (name, value) => {
+        setForm({ ...form, [name]: value });
+    };
+
     const checkCredentials = (username, password) => {
-        callApi("login", "POST", JSON.stringify({ username, password })).then(
+        callApi('login', 'POST', JSON.stringify({ username, password })).then(
             result => {
                 if (result.status === 200) {
                     sessionStorage.setItem("isLoggedIn", "true")
                     setLogin(true);
-                    history.replace("/account-summary");
+                    history.replace("/account-home");
                     cogoToast.success('Login Successful')
                 } else {
                     setLogin(false);
@@ -30,12 +34,6 @@ const Login = ({ history, setLogin }) => {
                 }
             }
         );
-    };
-
-    const [form, setForm] = useState({ username: '', password: '' });
-
-    const onChange = (name, value) => {
-        setForm({ ...form, [name]: value });
     };
 
     return (
