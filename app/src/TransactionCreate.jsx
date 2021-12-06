@@ -12,10 +12,20 @@ import {
   InputGroup,
   InputGroupText
 } from 'reactstrap';
-import { callApi } from "./utils";
 import cogoToast from 'cogo-toast';
+import { callApi } from './utils';
 
 const TransactionCreate = ({ history }) => {
+  const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
+
+  const redirectToHistory = () => {
+    history.replace('/transaction-history')
+  }
+
+  const onChange = (name, value) => {
+    setForm({...form, [name]: value});
+  };
+
   const createTransaction = (memo, amount, date, transactionType) => {
     callApi('transactions', 'POST', JSON.stringify({memo, amount, date, transactionType})).then(result => {
       if (result.status === 201) {
@@ -58,8 +68,6 @@ const TransactionCreate = ({ history }) => {
     });
   };
 
-  const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, date: '', transactionType: 'DEPOSIT'});
-
   const recipientField = () => {
     if(form.transactionType === 'SEND' || form.transactionType === 'REQUEST') {
       return (
@@ -69,10 +77,6 @@ const TransactionCreate = ({ history }) => {
           </FormGroup>
       )
     }
-  }
-
-  const redirectToHistory = () => {
-    history.replace('/transaction-history')
   }
 
   const submitButton = () => {
@@ -112,10 +116,6 @@ const TransactionCreate = ({ history }) => {
       )
     }
   }
-
-  const onChange = (name, value) => {
-    setForm({...form, [name]: value});
-  };
 
   return (
     <Container>

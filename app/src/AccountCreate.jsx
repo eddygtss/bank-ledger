@@ -1,5 +1,5 @@
-import { withRouter } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import {
     Container,
     Button,
@@ -8,15 +8,28 @@ import {
     Input,
     Row,
     Col,
-} from "reactstrap";
-import { callApi } from "./utils";
-import "./App.css";
-import "animate.css";
-import StepWizard from "react-step-wizard";
-import cogoToast from "cogo-toast";
-import { FolderPlus } from "react-feather";
+} from 'reactstrap';
+import './App.css';
+import StepWizard from 'react-step-wizard';
+import cogoToast from 'cogo-toast';
+import { callApi } from './utils';
 
 const AccountCreate = ({ history, setLogin }) => {
+    const [form, setForm] = useState({
+        username: '',
+        password: '',
+        confirmPass: '',
+        firstName: '',
+        lastName: '',
+        address: '',
+        ssn: '',
+        confirmSsn: ''
+    });
+
+    const onChange = (name, value) => {
+        setForm({ ...form, [name]: value });
+    };
+
     const createAccount = (
         username,
         password,
@@ -26,8 +39,8 @@ const AccountCreate = ({ history, setLogin }) => {
         ssn
     ) => {
         callApi(
-            "create",
-            "POST",
+            'create',
+            'POST',
             JSON.stringify({
                 username,
                 password,
@@ -39,12 +52,12 @@ const AccountCreate = ({ history, setLogin }) => {
         ).then((result) => {
             if (result.status === 201) {
                 cogoToast.success('Successfully created account.');
-                callApi("login", "POST", JSON.stringify({ username, password })).then(
+                callApi('login', 'POST', JSON.stringify({ username, password })).then(
                     result => {
                         if (result.status === 200) {
                             sessionStorage.setItem("isLoggedIn", "true");
                             setLogin(true);
-                            history.replace("/account-summary");
+                            history.replace("/account-home");
                         } else {
                             cogoToast.error('Something went wrong while authenticating.')
                         }
@@ -59,24 +72,10 @@ const AccountCreate = ({ history, setLogin }) => {
         });
     };
 
-    const [form, setForm] = useState({
-        username: "",
-        password: "",
-        confirm_password: "",
-        firstName: "",
-        lastName: "",
-        address: "",
-        ssn: "",
-    });
-
-    const onChange = (name, value) => {
-        setForm({ ...form, [name]: value });
-    };
-
     const isStep0Valid = (firstName, lastName, email) => {
         const regexName = /^[a-zA-Z ]{2,30}$/;
         const regexEmail =
-            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (
             regexName.test(firstName) === false ||
             regexName.test(lastName) === false
@@ -90,31 +89,31 @@ const AccountCreate = ({ history, setLogin }) => {
         }
     };
 
-    const isStep1Valid = (pass, c_pass) => {
+    const isStep1Valid = (pass, confirmPass) => {
         const regexPass = /^[0-9a-zA-Z]{8,}$/;
-        if (pass !== c_pass) {
-            cogoToast.error('Password doesn\'t Match');
+        if (pass !== confirmPass) {
+            cogoToast.error('Passwords don\'t match');
         } else if (
             regexPass.test(pass) === false ||
-            regexPass.test(c_pass) === false
+            regexPass.test(confirmPass) === false
         ) {
-            cogoToast.error('Invalid Contain at least 8 character');
+            cogoToast.error('Invalid password! Make sure your password contains at least 8 characters.');
         } else {
             cogoToast.success('Awesome! Tell us where you live!');
             setFormStep(2);
         }
     };
 
-    const isStep2Valid = (ssn, c_ssn) => {
-        const regSnn = /^[0-9]{9,9}$/;
-        if (ssn !== c_ssn) {
+    const isStep2Valid = (ssn, confirmSsn) => {
+        const regSnn = /^[0-9]{9}$/;
+        if (ssn !== confirmSsn) {
             cogoToast.error('SSN doesn\'t Match');
-        } else if (regSnn.test(ssn) === false || regSnn.test(c_ssn) === false) {
+        } else if (regSnn.test(ssn) === false || regSnn.test(confirmSsn) === false) {
             cogoToast.error('Please enter only the 9 digits of SSN');
         } else {
             cogoToast.loading('It will take few seconds!');
             createAccount(
-                form.username,
+                form.username.toLowerCase(),
                 form.password,
                 form.firstName,
                 form.lastName,
@@ -214,8 +213,8 @@ const AccountCreate = ({ history, setLogin }) => {
                                             <FormGroup>
                                                 <Input
                                                     type="password"
-                                                    name="confirm_password"
-                                                    placeholder="Confirm password"
+                                                    name="confirmPass"
+                                                    placeholder="Confirm Password"
                                                     bsSize="lg"
                                                     onChange={(e) =>
                                                         onChange(e.target.name, e.target.value)
@@ -228,9 +227,9 @@ const AccountCreate = ({ history, setLogin }) => {
                                         <Button
                                             className="SignUpButton"
                                             onClick={() =>
-                                                isStep1Valid(form.password, form.confirm_password)
+                                                isStep1Valid(form.password, form.confirmPass)
                                             }
-                                            disabled={!form.password || !form.confirm_password}
+                                            disabled={!form.password || !form.confirmPass}
                                         >
                                             Next
                                         </Button>
@@ -269,8 +268,8 @@ const AccountCreate = ({ history, setLogin }) => {
                                                 <Input
                                                     maxLength="9"
                                                     type="password"
-                                                    name="confirm_SSN"
-                                                    placeholder="Confirm ssn"
+                                                    name="confirmSsn"
+                                                    placeholder="Confirm SSN"
                                                     bsSize="lg"
                                                     onChange={(e) =>
                                                         onChange(e.target.name, e.target.value)
@@ -283,8 +282,8 @@ const AccountCreate = ({ history, setLogin }) => {
                                         <Button
                                             className="SignUpButton"
                                             value="Submit"
-                                            disabled={!form.address || !form.ssn || !form.confirm_SSN}
-                                            onClick={() => isStep2Valid(form.ssn, form.confirm_SSN)}
+                                            disabled={!form.address || !form.ssn || !form.confirmSsn}
+                                            onClick={() => isStep2Valid(form.ssn, form.confirmSsn)}
                                         >
                                             Create Account
                                         </Button>

@@ -1,10 +1,8 @@
 package gem.banking.services;
 
+import gem.banking.enums.PrivacyLevel;
 import gem.banking.exceptions.AccountExistsException;
-import gem.banking.models.Account;
-import gem.banking.models.AccountInfo;
-import gem.banking.models.Request;
-import gem.banking.models.Transaction;
+import gem.banking.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -75,7 +73,15 @@ public class AuthenticationService {
                             accountName,
                             100.00,
                             new ArrayList<>(),
-                            new ArrayList<>()));
+                            new ArrayList<>()),
+                    new Buddy(
+                            documentId,
+                            PrivacyLevel.PRIVATE,
+                            new ArrayList<>(),
+                            new ArrayList<>(),
+                            new ArrayList<>()
+                    )
+            );
         } else {
             throw new AccountExistsException("An account with this email already exists!");
         }

@@ -30,17 +30,18 @@ public class RequestController {
     @PostMapping("/request")
     public ResponseEntity<String> requestFunds(@RequestBody Request requestFundsTransaction) throws Exception {
         String requester = authenticationService.getCurrentUser();
+        String responder = requestFundsTransaction.getResponder().toLowerCase();
+        requestFundsTransaction.setResponder(responder);
 
-        if (requester.substring(5).equals(requestFundsTransaction.getResponder())){
+        if (requester.substring(5).equals(responder)){
             return ResponseEntity.badRequest().body("You cannot request money from yourself.");
         }
 
         AccountInfo requesterUserAccount = accountService.getAccountInfo(requester);
         requestFundsTransaction.setRequester(requester.substring(5));
 
-
         try {
-            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + requestFundsTransaction.getResponder());
+            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + responder);
 
             List<AccountInfo> updatedAccounts =
                     requestService.Request(requestFundsTransaction, requesterUserAccount, recipientUserAccount);
@@ -53,7 +54,7 @@ public class RequestController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return new ResponseEntity<>("Successfully sent " + requestFundsTransaction.getResponder() + " a request for $" + requestFundsTransaction.getAmount(), HttpStatus.CREATED);
+        return new ResponseEntity<>("Successfully sent " + responder + " a request for $" + requestFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 
     @PostMapping("/approve-request")
@@ -81,7 +82,7 @@ public class RequestController {
             }
         }
 
-        return ResponseEntity.badRequest().body("The request approved was not found in the database.");
+        return ResponseEntity.badRequest().body("There was an error approving this request.");
     }
 
     @PostMapping("/deny-request")
@@ -104,10 +105,10 @@ public class RequestController {
                     accountService.updateAccountInfo(account);
                 }
 
-                return ResponseEntity.ok("Sent " + requester.substring(5) + " $" + request.getAmount());
+                return ResponseEntity.ok("Denied request from " + requester.substring(5) + " for $" + request.getAmount());
             }
         }
 
-        return ResponseEntity.badRequest().body("The request denied was not found in the database.");
+        return ResponseEntity.badRequest().body("There was an error denying this request.");
     }
 }

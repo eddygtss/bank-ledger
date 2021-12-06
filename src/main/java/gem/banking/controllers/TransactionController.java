@@ -51,6 +51,8 @@ public class TransactionController {
     @PostMapping("/send")
     public ResponseEntity<String> sendFunds(@RequestBody Transaction sendFundsTransaction) throws Exception {
         String sender = authenticationService.getCurrentUser();
+        String recipient = sendFundsTransaction.getRecipient().toLowerCase();
+        sendFundsTransaction.setRecipient(recipient);
 
         if (sender.substring(5).equals(sendFundsTransaction.getRecipient())){
             return ResponseEntity.badRequest().body("You cannot send money to yourself.");
@@ -60,7 +62,7 @@ public class TransactionController {
         sendFundsTransaction.setSender(sender.substring(5));
 
         try {
-            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + sendFundsTransaction.getRecipient());
+            AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + recipient);
 
             List<AccountInfo> updatedAccounts =
                     transactionService.sendTransaction(sendFundsTransaction, currentUserAccount, recipientUserAccount);
@@ -74,6 +76,6 @@ public class TransactionController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
 
-        return new ResponseEntity<>("Successfully sent " + sendFundsTransaction.getRecipient() + " $" + sendFundsTransaction.getAmount(), HttpStatus.CREATED);
+        return new ResponseEntity<>("Successfully sent " + recipient + " $" + sendFundsTransaction.getAmount(), HttpStatus.CREATED);
     }
 }

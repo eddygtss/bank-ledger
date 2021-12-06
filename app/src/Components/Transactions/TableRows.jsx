@@ -1,7 +1,7 @@
-import {callApi, formatCurrency} from "../../utils";
-import React from "react";
-import cogoToast from "cogo-toast";
-import {CheckSquare, XSquare} from "react-feather";
+import React from 'react';
+import cogoToast from 'cogo-toast';
+import { CheckSquare, XSquare } from 'react-feather';
+import { callApi, formatCurrency } from '../../utils';
 
 const TableRows = (transactions, request, accountInfo, {setMessage}) => {
     const approveRequest = (request) => {
@@ -201,5 +201,4 @@ const TableRows = (transactions, request, accountInfo, {setMessage}) => {
         )
     }
 }
-
 export default TableRows;

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
     NavItem,
@@ -8,12 +9,11 @@ import {
     NavbarToggler,
     Collapse,
     NavLink, Row, Col
-} from "reactstrap";
-import "./NavBar.css";
-import GemLogo from "./GemLogo.png";
-import {withRouter} from "react-router-dom";
-import {callApi} from "../../utils";
-import cogoToast from "cogo-toast";
+} from 'reactstrap';
+import './NavBar.css';
+import GemLogo from './GemLogo.png';
+import cogoToast from 'cogo-toast';
+import { callApi } from '../../utils';
 
 export const NavBar = ({isLoggedIn, setLogin}) => {
     const [hamburger, setHamburger] = useState(false);
@@ -76,7 +76,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
             return (
                 <>
                     <NavItem>
-                        <NavLink href="/account-summary">
+                        <NavLink href="/account-home">
                             Account
                         </NavLink>
                     </NavItem>

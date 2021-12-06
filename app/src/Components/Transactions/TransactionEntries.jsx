@@ -1,6 +1,6 @@
-import { Table } from "reactstrap";
-import React from "react";
-import TableRows from "./TableRows";
+import React from 'react';
+import { Table } from 'reactstrap';
+import TableRows from './TableRows';
 
 const TransactionEntries = ({accountInfo, transType, setMessage}) => {
     const getRequestTransactions = () => {

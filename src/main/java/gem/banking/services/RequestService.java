@@ -1,5 +1,7 @@
 package gem.banking.services;
 
+import gem.banking.enums.Status;
+import gem.banking.enums.TransactionType;
 import gem.banking.exceptions.InsufficientFundsException;
 import gem.banking.exceptions.InvalidRequesteeException;
 import gem.banking.exceptions.InvalidTransactionException;
@@ -18,16 +20,20 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class RequestService {
-    public List<AccountInfo> Request(Request request,
-                                     AccountInfo requesterAccountInfo,
-                                     AccountInfo responderAccountInfo)
-            throws InsufficientFundsException, InvalidTransactionException {
+    public List<AccountInfo> Request(
+            Request request,
+            AccountInfo requesterAccountInfo,
+            AccountInfo responderAccountInfo
+    ) throws InsufficientFundsException, InvalidTransactionException {
+        if (request.getRequester().equals(responderAccountInfo.getDocumentId().substring(5))) {
+            throw new InvalidRequesteeException("Error: Unable to request money from yourself.");
+        }
+        if (request.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
+
         List<AccountInfo> updatedAccounts = new ArrayList<>();
 
         List<Request> requesterRequests = requesterAccountInfo.getRequestHistory();
         List<Request> responderRequests = responderAccountInfo.getRequestHistory();
-
-        if (request.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
         String currentTime = LocalDateTime.now().format(formatter);
@@ -35,14 +41,14 @@ public class RequestService {
 
 
         // RequestStatus for the responder so they see PENDING for a request in their requests list
-        request.setRequestStatus(Request.RequestStatus.PENDING);
+        request.setRequestStatus(Status.PENDING);
 
         responderRequests.add(request);
         responderAccountInfo.setRequestHistory(responderRequests);
 
         // RequestStatus for the requester so they see SENT for their request
         Request requesterRequest = new Request(request);
-        requesterRequest.setRequestStatus(Request.RequestStatus.SENT);
+        requesterRequest.setRequestStatus(Status.SENT);
 
         requesterRequests.add(requesterRequest);
         requesterAccountInfo.setRequestHistory(requesterRequests);
@@ -78,7 +84,7 @@ public class RequestService {
             responderRequests.remove(request);
             requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
 
-            request.setRequestStatus(Request.RequestStatus.APPROVED);
+            request.setRequestStatus(Status.APPROVED);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             String currentTime = LocalDateTime.now().format(formatter);
@@ -92,8 +98,9 @@ public class RequestService {
                             request.getRequester(),
                             request.getAmount(),
                             request.getDate(),
-                            Transaction.TransactionType.REQUEST,
-                            Transaction.TransactionStatus.SENT
+                            TransactionType.REQUEST,
+                            Status.SENT,
+                            request.getPrivacySetting()
                     );
 
             responderTransactions.add(approvedTransaction);
@@ -107,7 +114,7 @@ public class RequestService {
 
             // New Transaction object for the requester so we can change status.
             Transaction requesterTransaction = new Transaction(approvedTransaction);
-            requesterTransaction.setTransactionStatus(Transaction.TransactionStatus.RECEIVED);
+            requesterTransaction.setStatus(Status.RECEIVED);
 
             requesterTransactions.add(requesterTransaction);
             requesterRequests.add(request);
@@ -146,7 +153,7 @@ public class RequestService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
             String currentTime = LocalDateTime.now().format(formatter);
             request.setDate(currentTime);
-            request.setRequestStatus(Request.RequestStatus.DENIED);
+            request.setRequestStatus(Status.DENIED);
 
             // Adding the new request to requests list and updating the account info with the updated requests list
             requesterRequests.add(request);
