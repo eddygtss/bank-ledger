@@ -48,7 +48,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
         if (invalidAmount){
             return (
                 <FormFeedback className="position-relative">
-                    Your amount must be more than $0 and less than $100,000.
+                    Your amount must be more than $0 and less than $10,000.
                 </FormFeedback>
             )
         }
@@ -57,7 +57,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
         if (name === "recipient"){
-            if (value === accountInfo.documentId.substring(5)){
+            if (value.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
                 setInvalidEmail(!invalidEmail);
             } else {
                 if (invalidEmail === true) {
@@ -66,7 +66,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
             }
         }
         if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 100000){
+            if (value < 0.01 || value[0] === "-" || value > 10000){
                 setInvalidAmount(!invalidAmount);
             } else {
                 if (invalidAmount === true) {
@@ -117,7 +117,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
                 <br/>
                 <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""} onClick={() => createSendTransaction(
                     form.memo,
-                    form.recipient,
+                    form.recipient.toLowerCase(),
                     form.amount,
                     "SEND")}>Send Funds</Button>
                 <br/>

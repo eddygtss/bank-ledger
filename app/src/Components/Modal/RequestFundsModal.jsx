@@ -9,23 +9,23 @@ import {
     Input,
     InputGroup,
     InputGroupText,
-    Label, FormFeedback
+    Label, FormFeedback, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap';
 import cogoToast from 'cogo-toast';
 import { callApi } from '../../utils';
 
 export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) => {
-    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
+    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00, privacy: ''});
     const [invalidEmail, setInvalidEmail] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
     const [invalidButton, setInvalidButton] = useState(true);
 
-    const createRequestTransaction = (memo, responder, amount) => {
-        callApi('request', 'POST', JSON.stringify({memo, responder, amount})).then(result => {
+    const createRequestTransaction = (memo, responder, amount, privacy) => {
+        callApi('request', 'POST', JSON.stringify({memo, responder, amount, privacy})).then(result => {
             if (result.status === 201) {
                 cogoToast.success('Request successfully sent to ' + responder);
                 setRequestModal(!requestModal);
-                setForm({memo: '', responder: '', amount: 0.00});
+                setForm({memo: '', responder: '', amount: 0.00, privacy: ''});
             } else {
                 result.text().then(data => {
                     cogoToast.error(`Error ${data ? `: ${data}` : ''}`);
@@ -65,7 +65,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
     const onChange = (name, value) => {
         setForm({...form, [name]: value});
         if (name === "responder"){
-            if (value === accountInfo.documentId.substring(5)){
+            if (value.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
                 setInvalidEmail(true);
             } else {
                 if (invalidEmail === true) {
@@ -74,7 +74,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
             }
         }
         if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 10000){
+            if (value < 0.01 || value[0] === "-" || value > 10000){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
@@ -92,12 +92,29 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 setRequestModal(!requestModal);
                 setInvalidEmail(false);
                 setInvalidAmount(false);
-                setForm({memo: '', responder: '', amount: 0.00});
+                setForm({memo: '', responder: '', amount: 0.00, privacy: ''});
             }} />
 
             <Container>
                 <h1 className="text-center">Request Funds</h1>
                 <br/>
+                <Dropdown
+                    direction="end"
+                    toggle={}
+                    >
+                    <DropdownToggle caret>
+                        Privacy
+                    </DropdownToggle>
+                    <DropdownMenu
+                        dark>
+                        <DropdownItem header>
+                            Privacy Level for Request
+                        </DropdownItem>
+                        <DropdownItem onClick={setForm}>
+                            Private
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
                 <Form className="formText">
                     <FormGroup>
                         <Label for="responder">Send Request To</Label>
@@ -128,7 +145,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 <br/>
                 <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton} onClick={() => createRequestTransaction(
                     form.memo,
-                    form.responder,
+                    form.responder.toLowerCase(),
                     form.amount)}>Request Funds</Button>
                 <br/>
 

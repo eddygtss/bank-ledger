@@ -113,7 +113,7 @@ const AccountCreate = ({ history, setLogin }) => {
         } else {
             cogoToast.loading('It will take few seconds!');
             createAccount(
-                form.username,
+                form.username.toLowerCase(),
                 form.password,
                 form.firstName,
                 form.lastName,

@@ -1,5 +1,8 @@
 package gem.banking.models;
 
+import gem.banking.enums.PrivacyLevel;
+import gem.banking.enums.Status;
+import gem.banking.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,15 +19,8 @@ public class Transaction {
     private double  amount;
     private String date;
     private TransactionType transactionType;
-    private TransactionStatus transactionStatus;
-
-    public enum TransactionType {
-        WITHDRAWAL, DEPOSIT, SEND, REQUEST, TRANSFER;
-    }
-
-    public enum TransactionStatus {
-        PENDING, APPROVED, DENIED, SENT, RECEIVED, PROCESSED;
-    }
+    private Status status;
+    private PrivacyLevel privacySetting;
 
     public Transaction(Transaction copy) {
         this.id = copy.id;
@@ -34,6 +30,7 @@ public class Transaction {
         this.amount = copy.amount;
         this.date = copy.date;
         this.transactionType = copy.transactionType;
-        this.transactionStatus = copy.transactionStatus;
+        this.status = copy.status;
+        this.privacySetting = copy.privacySetting;
     }
 }

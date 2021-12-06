@@ -66,7 +66,7 @@ const Login = ({ history, setLogin }) => {
                         <Row className="rowCenter">
                             <Button
                                 className="SignUpButton"
-                                onClick={() => checkCredentials(form.username, form.password)}
+                                onClick={() => checkCredentials(form.username.toLowerCase(), form.password)}
                             >
                                 Login
                             </Button>
