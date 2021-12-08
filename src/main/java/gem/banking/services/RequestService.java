@@ -114,7 +114,7 @@ public class RequestService {
 
             // New Transaction object for the requester so we can change status.
             Transaction requesterTransaction = new Transaction(approvedTransaction);
-            requesterTransaction.setStatus(Status.RECEIVED);
+            requesterTransaction.setTransactionStatus(Status.RECEIVED);
 
             requesterTransactions.add(requesterTransaction);
             requesterRequests.add(request);

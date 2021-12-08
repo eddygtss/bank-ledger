@@ -14,16 +14,17 @@ import './Modal.css';
 import cogoToast from 'cogo-toast';
 import { callApi } from '../../utils';
 
-export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal}) => {
+export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, setReload}) => {
     const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
     const [invalidAmount, setInvalidAmount] = useState(false);
 
     const createTransaction = (memo, amount, transactionType) => {
         callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType})).then(result => {
             if (result.status === 201) {
-                cogoToast.success('Transaction created.');
+                setReload(!reload)
                 setWithdrawModal(!withdrawModal);
                 setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
+                cogoToast.success('Transaction created.');
             } else {
                 result.json().then(data => {
                     cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);

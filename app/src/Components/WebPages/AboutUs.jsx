@@ -69,7 +69,7 @@ const AboutUs = () => {
     });
 
     return (
-        <div className="about-wrapper myBackGround">
+        <div className="about-wrapper">
             <h1 className="about-head-line">Our Mission</h1>
             <br/>
 

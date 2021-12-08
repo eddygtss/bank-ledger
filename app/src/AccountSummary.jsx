@@ -16,9 +16,8 @@ import TransactionEntries from './Components/Transactions/TransactionEntries';
 import cogoToast from 'cogo-toast';
 import { callApi, formatCurrency } from './utils';
 
-export const AccountSummary = ({ setLogin }) => {
+export const AccountSummary = ({ setLogin, reload, setReload }) => {
   const [accountInfo, setInfo] = useState({});
-  const [message, setMessage] = useState('');
   const [sendModal, setSendModal] = useState(false);
   const [requestModal, setRequestModal] = useState(false);
   const [depositModal, setDepositModal] = useState(false);
@@ -57,7 +56,7 @@ export const AccountSummary = ({ setLogin }) => {
         cogoToast.error('You have been logged out.')
       }
     });
-  }, [message, depositModal, requestModal, sendModal, withdrawModal]);
+  }, [reload]);
 
   const getPendingRequests = () => {
     return accountInfo.accountName && accountInfo.requestHistory.filter(request => {
@@ -82,9 +81,14 @@ export const AccountSummary = ({ setLogin }) => {
           <OffcanvasHeader toggle={() => toggle('offCanvas')}>
             <h1 className="text-center">Requests</h1>
           </OffcanvasHeader>
-          <OffcanvasBody>
+          <OffcanvasBody className='p-1'>
             {accountInfo.accountName &&
-              <TransactionEntries accountInfo={accountInfo} transType={'request'} setMessage={setMessage}/>
+              <TransactionEntries
+                  accountInfo={accountInfo}
+                  transType={'request'}
+                  reload={reload}
+                  setReload={setReload}
+              />
             }
           </OffcanvasBody>
         </Offcanvas>
@@ -105,24 +109,56 @@ export const AccountSummary = ({ setLogin }) => {
           <Col className="border table-light moneyTables bdr p-3 mb-2">
             <h4 className="text-center">Money In</h4>
             <Button className="modalGreenButton mb-3" onClick={() => toggle('requestModal')}>Request</Button>
-            <RequestFundsModal requestModal={requestModal} setRequestModal={setRequestModal} accountInfo={accountInfo}/>
+            <RequestFundsModal
+                requestModal={requestModal}
+                setRequestModal={setRequestModal}
+                accountInfo={accountInfo}
+                reload={reload}
+                setReload={setReload}
+            />
 
             <Button className="modalGreenButton requestBtn mb-3" onClick={() => toggle('depositModal')}>Deposit</Button>
-            <DepositFundsModal depositModal={depositModal} setDepositModal={setDepositModal}/>
+            <DepositFundsModal
+                depositModal={depositModal}
+                setDepositModal={setDepositModal}
+                reload={reload}
+                setReload={setReload}
+            />
             <br />
             {accountInfo.accountName &&
-              <TransactionEntries accountInfo={accountInfo} transType={'moneyIn'} setMessage={setMessage}/>
+              <TransactionEntries
+                  accountInfo={accountInfo}
+                  transType={'moneyIn'}
+                  reload={reload}
+                  setReload={setReload}
+              />
             }
           </Col>
           <Col className="border table-light moneyTables bdr p-3 mb-2">
             <h4 className="text-center">Money Out</h4>
             <Button className="modalRedButton mb-3" onClick={() => toggle('sendModal')}>Send</Button>
-            <SendFundsModal sendModal={sendModal} setSendModal={setSendModal} accountInfo={accountInfo}/>
+            <SendFundsModal
+                sendModal={sendModal}
+                setSendModal={setSendModal}
+                accountInfo={accountInfo}
+                reload={reload}
+                setReload={setReload}
+            />
 
             <Button className="modalRedButton requestBtn mb-3" onClick={() => toggle('withdrawModal')}>Withdraw</Button>
-            <WithdrawFundsModal withdrawModal={withdrawModal} setWithdrawModal={setWithdrawModal}/>
+            <WithdrawFundsModal
+                withdrawModal={withdrawModal}
+                setWithdrawModal={setWithdrawModal}
+                reload={reload}
+                setReload={setReload}
+            />
             {accountInfo.accountName &&
-              <TransactionEntries accountInfo={accountInfo} transType={'moneyOut'} setMessage={setMessage}/>
+              <TransactionEntries
+                  accountInfo={accountInfo}
+                  transType={'moneyOut'}
+                  reload={reload}
+                  setReload={setReload}
+              />
             }
           </Col>
           </Row>

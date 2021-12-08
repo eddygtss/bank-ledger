@@ -1,16 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Staatliches&display=swap');
+
 .contact-wrapper{
     vertical-align: center;
-}
-@font-face {
-    font-family: Staatliches;
-    src: url("./Staatliches-Regular.ttf");
 }
 .contact-head-line{
     text-align: center;
     align-self: center;
     justify-content: center;
-    font-family: Staatliches;
-
+    font-family: 'Staatliches', cursive;
 }
 .col {
     padding: 5px;
@@ -34,7 +31,7 @@
 }
 .contact-card-title{
     color: black;
-    font-family: Staatliches;
+    font-family: 'Staatliches', cursive;
 }
 .contact-card-body{
     color: #ffffff;
@@ -42,7 +39,6 @@
     justify-content: center;
     text-align: center;
 }
-
 .contact-card-btn{
     background-color: #ffffff;
     color: #87ceeb;

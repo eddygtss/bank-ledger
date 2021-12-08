@@ -57,7 +57,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
             return (
                 <>
                     <NavItem>
-                        <NavLink href="/account-create">
+                        <NavLink href="/register">
                             Register
                         </NavLink>
                     </NavItem>
@@ -106,7 +106,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
                                 <img src={GemLogo}  alt={"GemBank Logo"}/>
                             </Col>
                             <Col style={{maxWidth: "fit-content"}}>
-                                <h1>Gem Bankers United</h1>
+                                <h1 className='website-title'>Gem Bankers United</h1>
                             </Col>
                         </Row>
                     </NavbarBrand>

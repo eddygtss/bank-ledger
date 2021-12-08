@@ -80,6 +80,14 @@ public class AuthenticationService {
                             new ArrayList<>(),
                             new ArrayList<>(),
                             new ArrayList<>()
+                    ),
+                    new Profile(
+                            documentId,
+                            username,
+                            firstName,
+                            lastName,
+                            PrivacyLevel.PRIVATE,
+                            ""
                     )
             );
         } else {

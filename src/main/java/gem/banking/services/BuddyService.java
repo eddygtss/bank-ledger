@@ -3,6 +3,7 @@ package gem.banking.services;
 import gem.banking.enums.Status;
 import gem.banking.exceptions.BuddyExistsException;
 import gem.banking.models.Buddy;
+import gem.banking.models.Profile;
 import gem.banking.models.Request;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,13 @@ public class BuddyService {
             Request buddyRequest
     ) throws BuddyExistsException {
         List<Buddy> updatedAccounts = new ArrayList<>();
-        List<String> buddyList = requesterBuddy.getBuddyList();
+        List<Profile> buddyList = requesterBuddy.getBuddyList();
         List<Request> requestersRequestList = requesterBuddy.getBuddyRequests();
         List<Request> respondersRequestList = responderBuddy.getBuddyRequests();
         String responder = buddyRequest.getResponder();
 
-        for (String buddy:buddyList) {
-            if (buddy.equals(responder)) {
+        for (Profile buddy:buddyList) {
+            if (buddy.getDocumentId().equals(responder)) {
                 throw new BuddyExistsException("You are already buddies with " + responder);
             }
         }
@@ -62,11 +63,13 @@ public class BuddyService {
     public List<Buddy> approveBuddyRequest(
             Buddy requesterBuddy,
             Buddy responderBuddy,
+            Profile requesterProfile,
+            Profile responderProfile,
             Request buddyRequest
     ) throws BuddyExistsException {
         List<Buddy> updatedBuddies = new ArrayList<>();
-        List<String> requesterBuddyList = requesterBuddy.getBuddyList();
-        List<String> responderBuddyList = responderBuddy.getBuddyList();
+        List<Profile> requesterBuddyList = requesterBuddy.getBuddyList();
+        List<Profile> responderBuddyList = responderBuddy.getBuddyList();
 
         List<Request> requestersRequestList = requesterBuddy.getBuddyRequests();
         List<Request> respondersRequestList = responderBuddy.getBuddyRequests();
@@ -83,10 +86,10 @@ public class BuddyService {
         requestersRequestList.add(buddyRequest);
         respondersRequestList.add(buddyRequest);
 
-        requesterBuddyList.add(buddyRequest.getResponder());
+        requesterBuddyList.add(responderProfile);
         requesterBuddy.setBuddyList(requesterBuddyList);
 
-        responderBuddyList.add(buddyRequest.getRequester());
+        responderBuddyList.add(requesterProfile);
         responderBuddy.setBuddyList(responderBuddyList);
 
         updatedBuddies.add(requesterBuddy);

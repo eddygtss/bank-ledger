@@ -37,43 +37,41 @@ const Login = ({ history, setLogin }) => {
     };
 
     return (
-        <div className="myBackGround">
-            <div className="rounded px-3 px-sm-4 py-3 py-sm-5">
-                <div className="logo"> GEM BANK</div>
-                <Container fluid>
-                    <h3>Welcome Back</h3>
-                    <p>Don't miss your next opportunity.</p>
-                    <Form>
-                        <FormGroup>
-                            <Input
-                                type="text"
-                                name="username"
-                                placeholder="Your Email"
-                                bsSize="lg"
-                                onChange={(e) => onChange(e.target.name, e.target.value)}
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <Input
-                                type="password"
-                                name="password"
-                                id="password"
-                                placeholder="Enter Password"
-                                bsSize="lg"
-                                onChange={(e) => onChange(e.target.name, e.target.value)}
-                            />
-                        </FormGroup>
-                        <Row className="rowCenter">
-                            <Button
-                                className="SignUpButton"
-                                onClick={() => checkCredentials(form.username.toLowerCase(), form.password)}
-                            >
-                                Login
-                            </Button>
-                        </Row>
-                    </Form>
-                </Container>
-            </div>
+        <div className="rounded px-3 px-sm-4 py-3 py-sm-5">
+            <div className="logo"> GEM BANK</div>
+            <Container fluid>
+                <h3>Welcome Back</h3>
+                <p>Don't miss your next opportunity.</p>
+                <Form>
+                    <FormGroup>
+                        <Input
+                            type="text"
+                            name="username"
+                            placeholder="Your Email"
+                            bsSize="lg"
+                            onChange={(e) => onChange(e.target.name, e.target.value)}
+                        />
+                    </FormGroup>
+                    <FormGroup>
+                        <Input
+                            type="password"
+                            name="password"
+                            id="password"
+                            placeholder="Enter Password"
+                            bsSize="lg"
+                            onChange={(e) => onChange(e.target.name, e.target.value)}
+                        />
+                    </FormGroup>
+                    <Row className="rowCenter">
+                        <Button
+                            className="SignUpButton"
+                            onClick={() => checkCredentials(form.username.toLowerCase(), form.password)}
+                        >
+                            Login
+                        </Button>
+                    </Row>
+                </Form>
+            </Container>
         </div>
     );
 };

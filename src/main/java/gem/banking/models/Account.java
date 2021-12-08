@@ -7,7 +7,8 @@ import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
 
-@Getter @Setter
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class Account implements Serializable {
     private static final long serialVersionUID = -1764970284520387975L;
@@ -20,12 +21,6 @@ public class Account implements Serializable {
     private String lastName;
     private String address;
     private String ssn;
-
-    public Account(String documentId, String username, String password) {
-        this.documentId = documentId;
-        this.username = username;
-        this.password = password;
-    }
 
     public Account(String documentId, String username, String password, String firstName, String lastName, String address, String ssn) {
         this.documentId = documentId;
