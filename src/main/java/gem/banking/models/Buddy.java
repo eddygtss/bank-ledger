@@ -15,11 +15,11 @@ import java.util.List;
 public class Buddy {
     private String documentId;
     private PrivacyLevel privacySetting;
-    private List<String> buddyList;
+    private List<Profile> buddyList;
     private List<Request> buddyRequests;
     private List<Transaction> buddyTransactions;
 
-    public Buddy(String documentId, PrivacyLevel privacySetting, List<String> buddyList, List<Request> buddyRequests, List<Transaction> buddyTransactions) {
+    public Buddy(String documentId, PrivacyLevel privacySetting, List<Profile> buddyList, List<Request> buddyRequests, List<Transaction> buddyTransactions) {
         this.documentId = documentId;
         this.privacySetting = privacySetting;
         this.buddyList = buddyList;
@@ -30,7 +30,7 @@ public class Buddy {
     public List<Transaction> getBuddyTransactions() {
         return buddyTransactions;
     }
-    public List<String> getBuddyList() {
+    public List<Profile> getBuddyList() {
         return buddyList;
     }
     public List<Request> getBuddyRequests() {

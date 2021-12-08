@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
 import {
-    Col,
     Container,
     Nav,
     NavItem,
     NavLink,
-    Row,
     TabContent,
     TabPane
 } from 'reactstrap';
 import { AccountSummary } from '../../AccountSummary';
 import './Home.scss';
+import Buddies from "./Buddies/Buddies";
 
 const AccountHome = ({ setLogin }) => {
     const [activeTab, setActiveTab] = useState('1');
+    const [reload, setReload] = useState(false);
+    const [reloadAccSum, setReloadAccSum] = useState(false);
 
     const toggle = (tab) => {
         if (activeTab !== tab) setActiveTab(tab);
     }
 
     return (
-        <Container fluid className='px-4 myBackGround'>
+        <Container fluid className='px-4'>
             <Nav
                 tabs
                 className='justify-content-evenly'
@@ -28,7 +29,10 @@ const AccountHome = ({ setLogin }) => {
                 <NavItem>
                     <NavLink
                         className={activeTab === '1' ? 'account-home-active' : 'account-home-inactive'}
-                        onClick={() => toggle('1')}
+                        onClick={() => {
+                            toggle('1');
+                            setReloadAccSum(!reloadAccSum);
+                        }}
                     >
                         Account Summary
                     </NavLink>
@@ -36,7 +40,10 @@ const AccountHome = ({ setLogin }) => {
                 <NavItem>
                     <NavLink
                         className={activeTab === '2' ? 'account-home-active' : 'account-home-inactive'}
-                        onClick={() => toggle('2')}
+                        onClick={() => {
+                            toggle('2');
+                            setReload(!reload);
+                        }}
                     >
                         Gem Buddies
                     </NavLink>
@@ -44,21 +51,10 @@ const AccountHome = ({ setLogin }) => {
             </Nav>
             <TabContent className='mt-4' activeTab={activeTab}>
                 <TabPane tabId='1'>
-                    <AccountSummary setLogin={setLogin} />
+                    <AccountSummary setLogin={setLogin} reload={reloadAccSum} setReload={setReloadAccSum} />
                 </TabPane>
                 <TabPane tabId='2'>
-                    <Row className='justify-content-between text-center'>
-                        <Col sm='4'>
-                            <h3>Your Buddies</h3>
-                            <br />
-                            Coming soon...
-                        </Col>
-                        <Col sm='8'>
-                            <h3>Buddy Feed</h3>
-                            <br />
-                            Coming soon...
-                        </Col>
-                    </Row>
+                    <Buddies reload={reload} setReload={setReload} />
                 </TabPane>
             </TabContent>
         </Container>

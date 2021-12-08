@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
 .navbar {
     background-color: #87ceeb;
     height: auto;
@@ -14,9 +16,8 @@
     display: flex;
     align-items: center;
 }
-@font-face {
-    font-family: Lobster;
-    src: url("./Lobster-Regular.ttf");
+.website-title {
+    font-family: 'Lobster', cursive;
 }
 .nav-logo {
     color: #ffffff;

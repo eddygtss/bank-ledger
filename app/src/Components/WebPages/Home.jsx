@@ -10,9 +10,17 @@ import {
     Button
 } from 'reactstrap';
 
-const Home = () => {
+const Home = ({ isLoggedIn }) => {
+    const showRegisterBtn = () => {
+        if (!isLoggedIn) {
+            return (
+                <Button className="home-card-btn" tag={RRNavLink} exact to="/register" activeClassName="active">Get Started</Button>
+            )
+        }
+    }
+
     return (
-        <div className="myBackGround">
+        <div>
             <h1 className="home-head-line">The Right Banking Solution For All Ages</h1>
             <br/>
 
@@ -24,7 +32,7 @@ const Home = () => {
                     <br /><br />
                     Open an account today and be rewarded with a $100 starting balance!
                     <br /><br />
-                    <Button className="home-card-btn" tag={RRNavLink} exact to="/account-create" activeClassName="active">Get Started</Button>
+                    {showRegisterBtn()}
                 </p>
             </div>
 

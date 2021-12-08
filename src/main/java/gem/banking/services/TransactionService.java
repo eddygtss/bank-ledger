@@ -31,14 +31,14 @@ public class TransactionService {
         }
 
         if (transactionType == TransactionType.DEPOSIT) {
-            transaction.setStatus(Status.PROCESSED);
+            transaction.setTransactionStatus(Status.PROCESSED);
             transactions.add(transaction);
             balance += transaction.getAmount();
         } else if (transactionType == TransactionType.WITHDRAWAL) {
             if (balance - transaction.getAmount() < 0.0) {
                 throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", balance));
             }
-            transaction.setStatus(Status.PROCESSED);
+            transaction.setTransactionStatus(Status.PROCESSED);
             transactions.add(transaction);
             balance -= transaction.getAmount();
         } else {
@@ -79,7 +79,7 @@ public class TransactionService {
             if (senderBalance - transaction.getAmount() < 0.0) {
                 throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", senderBalance));
             }
-            transaction.setStatus(Status.SENT);
+            transaction.setTransactionStatus(Status.SENT);
             senderTransactions.add(transaction);
             senderBalance -= transaction.getAmount();
 
@@ -89,7 +89,7 @@ public class TransactionService {
 
             // New Transaction object for the recipient so we can change status and type.
             Transaction recipient = new Transaction(transaction);
-            recipient.setStatus(Status.RECEIVED);
+            recipient.setTransactionStatus(Status.RECEIVED);
             recipient.setTransactionType(TransactionType.TRANSFER);
 
             recipientTransactions.add(recipient);

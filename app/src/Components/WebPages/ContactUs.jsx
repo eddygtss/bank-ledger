@@ -12,7 +12,7 @@ import {
 
 const ContactUs = () => {
     return (
-        <div className="contact-wrapper myBackGround">
+        <div className="contact-wrapper">
             <h1 className="contact-head-line">Our Team</h1>
             <br/>
 

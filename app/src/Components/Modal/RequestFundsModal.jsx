@@ -14,18 +14,22 @@ import {
 import cogoToast from 'cogo-toast';
 import { callApi } from '../../utils';
 
-export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) => {
-    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00, privacy: ''});
+export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, reload, setReload}) => {
+    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00, privacySetting: 'PRIVATE'});
+    const [privacyDropDown, setPrivacyDropDown] = useState(false);
     const [invalidEmail, setInvalidEmail] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
     const [invalidButton, setInvalidButton] = useState(true);
+    const [privateActive, setPrivateActive] = useState(false);
+    const [publicActive, setPublicActive] = useState(false);
 
-    const createRequestTransaction = (memo, responder, amount, privacy) => {
-        callApi('request', 'POST', JSON.stringify({memo, responder, amount, privacy})).then(result => {
+    const createRequestTransaction = (memo, responder, amount, privacySetting) => {
+        callApi('request', 'POST', JSON.stringify({memo, responder, amount, privacySetting})).then(result => {
             if (result.status === 201) {
-                cogoToast.success('Request successfully sent to ' + responder);
+                setReload(!reload)
                 setRequestModal(!requestModal);
-                setForm({memo: '', responder: '', amount: 0.00, privacy: ''});
+                setForm({memo: '', responder: '', amount: 0.00, privacySetting: 'PRIVATE'});
+                cogoToast.success('Request successfully sent to ' + responder);
             } else {
                 result.text().then(data => {
                     cogoToast.error(`Error ${data ? `: ${data}` : ''}`);
@@ -33,6 +37,24 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
             }
         });
     };
+
+    const toggle = () => {
+        setPrivacyDropDown(!privacyDropDown);
+        privacySetting();
+    }
+
+    const privacySetting = () => {
+        if (form.privacySetting === 'PRIVATE') {
+            setPrivateActive(true);
+        } else {
+            setPrivateActive(false);
+        }
+        if (form.privacySetting === 'PUBLIC') {
+            setPublicActive(true);
+        } else {
+            setPublicActive(false);
+        }
+    }
 
     const showInvalidEmailLabel = () => {
         if (invalidEmail){
@@ -92,7 +114,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 setRequestModal(!requestModal);
                 setInvalidEmail(false);
                 setInvalidAmount(false);
-                setForm({memo: '', responder: '', amount: 0.00, privacy: ''});
+                setForm({memo: '', responder: '', amount: 0.00, privacySetting: 'PRIVATE'});
             }} />
 
             <Container>
@@ -100,18 +122,22 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 <br/>
                 <Dropdown
                     direction="end"
-                    toggle={}
+                    toggle={() => toggle()}
+                    isOpen={privacyDropDown}
+                    className="text-end"
                     >
                     <DropdownToggle caret>
                         Privacy
                     </DropdownToggle>
-                    <DropdownMenu
-                        dark>
+                    <DropdownMenu>
                         <DropdownItem header>
                             Privacy Level for Request
                         </DropdownItem>
-                        <DropdownItem onClick={setForm}>
+                        <DropdownItem className="text-center" active={privateActive} onClick={() => setForm({...form, privacySetting: 'PRIVATE'})}>
                             Private
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={publicActive} onClick={() => setForm({...form, privacySetting: 'PUBLIC'})}>
+                            Public
                         </DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
@@ -135,8 +161,8 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg"
-                                   onChange={e => onChange(e.target.name, e.target.value)} required/>
+                            <Input type="number" name="amount" invalid={invalidAmount} value={Number(form.amount).toFixed(2)} bsSize="lg"
+                                   onChange={e => onChange(e.target.name, Number(e.target.value).toFixed(2))} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
@@ -146,7 +172,8 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton} onClick={() => createRequestTransaction(
                     form.memo,
                     form.responder.toLowerCase(),
-                    form.amount)}>Request Funds</Button>
+                    form.amount,
+                    form.privacySetting)}>Request Funds</Button>
                 <br/>
 
             </Container>

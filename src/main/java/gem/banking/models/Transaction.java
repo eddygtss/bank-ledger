@@ -19,7 +19,7 @@ public class Transaction {
     private double  amount;
     private String date;
     private TransactionType transactionType;
-    private Status status;
+    private Status transactionStatus;
     private PrivacyLevel privacySetting;
 
     public Transaction(Transaction copy) {
@@ -30,7 +30,7 @@ public class Transaction {
         this.amount = copy.amount;
         this.date = copy.date;
         this.transactionType = copy.transactionType;
-        this.status = copy.status;
+        this.transactionStatus = copy.transactionStatus;
         this.privacySetting = copy.privacySetting;
     }
 }

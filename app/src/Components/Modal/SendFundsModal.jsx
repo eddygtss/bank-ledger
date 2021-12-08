@@ -14,7 +14,7 @@ import './Modal.css';
 import cogoToast from 'cogo-toast';
 import { callApi } from '../../utils';
 
-export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
+export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, setReload}) => {
     const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
     const [invalidEmail, setInvalidEmail] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
@@ -22,9 +22,10 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
     const createSendTransaction = (memo, recipient, amount, transactionType) => {
         callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType})).then(result => {
             if (result.status === 201) {
-                cogoToast.success('Successfully sent $' + amount + ' to ' + recipient);
+                setReload(!reload)
                 setSendModal(!sendModal)
                 setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+                cogoToast.success('Successfully sent $' + amount + ' to ' + recipient);
             } else {
                 result.text().then(data => {
                     cogoToast.error('Error: ' + data);
@@ -115,10 +116,12 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo}) => {
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""} onClick={() => createSendTransaction(
-                    form.memo,
-                    form.recipient.toLowerCase(),
-                    form.amount,
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""}
+                        onClick={() =>
+                            createSendTransaction(
+                                form.memo,
+                                form.recipient.toLowerCase(),
+                                form.amount,
                     "SEND")}>Send Funds</Button>
                 <br/>
             </Container>
