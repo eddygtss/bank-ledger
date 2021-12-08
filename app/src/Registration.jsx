@@ -310,8 +310,8 @@ const Registration = ({ history, setLogin }) => {
                                                     onChange(e.target.name, e.target.value)
                                                 }
                                             />
+                                            <Label for="confirmSsn">Confirm SSN</Label>
                                         </FormGroup>
-                                        <Label for="confirmSsn">Confirm SSN</Label>
                                     </Col>
                                 </Row>
                                 <Row className="rowCenter">
