@@ -1,13 +1,12 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import Login from './Login';
-import Registration from './Registration';
-import TransactionCreate from './TransactionCreate';
-import Home from "./Components/WebPages/Home";
-import AboutUs from "./Components/WebPages/AboutUs";
-import ContactUs from "./Components/WebPages/ContactUs";
-import AccountHome from "./Components/WebPages/AccountHome";
-import Footer from "./Components/Footer/Footer";
+import Login from '../WebPages/Login';
+import Registration from '../WebPages/Registration';
+import Home from "../WebPages/Home/Home";
+import AboutUs from "../WebPages/AboutUs/AboutUs";
+import ContactUs from "../WebPages/ContactUs/ContactUs";
+import AccountHome from "../WebPages/Account/AccountHome";
+import Footer from "../Footer/Footer";
 
 // redirect user to login page if trying to access protected route and not logged in.
 const ProtectedRoute = ({ isAllowed, ...props }) => isAllowed ? <Route {...props}/> : <Redirect to="/login"/>;
@@ -33,7 +32,6 @@ const Main = ({ setLogin, isLoggedIn }) => {
                 <Route exact path='/login' render={() => <Login setLogin={setLogin} />}/>
                 <Route exact path='/register' render={() => <Registration setLogin={setLogin}/>}/>
                 <ProtectedRoute exact path='/account-home' isAllowed={isLoggedIn} render={() => <AccountHome setLogin={setLogin} />}/>
-                <ProtectedRoute exact path='/transaction-create' component={TransactionCreate} isAllowed={isLoggedIn} />
             </Switch>
             <Footer />
         </div>

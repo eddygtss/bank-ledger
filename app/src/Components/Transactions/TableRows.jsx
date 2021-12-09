@@ -2,7 +2,7 @@ import React from 'react';
 import cogoToast from 'cogo-toast';
 import { CheckSquare, XSquare } from 'react-feather';
 import './Table.scss';
-import { callApi, formatCurrency } from '../../utils';
+import { callApi, formatCurrency } from '../Utils/utils';
 
 const TableRows = (transactions, request, accountInfo, {reload, setReload}) => {
     const approveRequest = (request) => {
@@ -126,10 +126,10 @@ const TableRows = (transactions, request, accountInfo, {reload, setReload}) => {
                                             {request.date}
                                         </tr>
                                         <tr className='tableRows'>
-                                            <td>{'[REQUEST SENT TO ' + request.responder.toUpperCase() + ']\n' + request.memo}</td>
-                                            <td className="align-middle">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
-                                            <td className="align-middle">{approveButton(request)}</td>
-                                            <td className="align-middle">{denyButton(request)}</td>
+                                            <td className="p-1">{'[REQUEST SENT TO ' + request.responder.toUpperCase() + ']\n' + request.memo}</td>
+                                            <td className="align-middle p-1">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
+                                            <td className="align-middle p-1">{approveButton(request)}</td>
+                                            <td className="align-middle p-1">{denyButton(request)}</td>
                                         </tr>
                                     </>
                                 )
@@ -140,10 +140,10 @@ const TableRows = (transactions, request, accountInfo, {reload, setReload}) => {
                                             {request.date}
                                         </tr>
                                         <tr className='tableRows'>
-                                            <td>{'[REQUEST FROM ' + request.requester.toUpperCase() + ']\n' + request.memo}</td>
-                                            <td className="align-middle">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
-                                            <td className="align-middle">{approveButton(request)}</td>
-                                            <td className="align-middle">{denyButton(request)}</td>
+                                            <td className="p-1">{'[REQUEST FROM ' + request.requester.toUpperCase() + ']\n' + request.memo}</td>
+                                            <td className="align-middle p-1">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
+                                            <td className="align-middle p-1">{approveButton(request)}</td>
+                                            <td className="align-middle p-1">{denyButton(request)}</td>
                                         </tr>
                                     </>
                                 )
@@ -152,19 +152,19 @@ const TableRows = (transactions, request, accountInfo, {reload, setReload}) => {
                             if (request.requester === currentUser) {
                                 return (
                                     <tr className='tableRows'>
-                                        <td>{'[REQUEST SENT TO ' + request.responder.toUpperCase() + ']\n' + request.memo}</td>
-                                        <td className="align-middle">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
-                                        <td className="align-middle">{approveButton(request)}</td>
-                                        <td className="align-middle">{denyButton(request)}</td>
+                                        <td className="p-1">{'[REQUEST SENT TO ' + request.responder.toUpperCase() + ']\n' + request.memo}</td>
+                                        <td className="align-middle p-1">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
+                                        <td className="align-middle p-1">{approveButton(request)}</td>
+                                        <td className="align-middle p-1">{denyButton(request)}</td>
                                     </tr>
                                 )
                             } else {
                                 return (
                                     <tr className='tableRows'>
-                                        <td>{'[REQUEST FROM ' + request.requester.toUpperCase() + ']\n' + request.memo}</td>
-                                        <td className="align-middle">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
-                                        <td className="align-middle">{approveButton(request)}</td>
-                                        <td className="align-middle">{denyButton(request)}</td>
+                                        <td className="p-1">{'[REQUEST FROM ' + request.requester.toUpperCase() + ']\n' + request.memo}</td>
+                                        <td className="align-middle p-1">{formatCurrency(request.amount) + '\n' + request.requestStatus}</td>
+                                        <td className="align-middle p-1">{approveButton(request)}</td>
+                                        <td className="align-middle p-1">{denyButton(request)}</td>
                                     </tr>
                                 )
                             }

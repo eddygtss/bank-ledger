@@ -12,10 +12,10 @@ import {
 } from 'reactstrap';
 import './Modal.css';
 import cogoToast from 'cogo-toast';
-import { callApi } from '../../utils';
+import {callApi, regexAmount} from '../Utils/utils';
 
 export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, setReload}) => {
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
     const [invalidEmail, setInvalidEmail] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
 
@@ -24,7 +24,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
             if (result.status === 201) {
                 setReload(!reload)
                 setSendModal(!sendModal)
-                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
                 cogoToast.success('Successfully sent $' + amount + ' to ' + recipient);
             } else {
                 result.text().then(data => {
@@ -56,7 +56,14 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
     }
 
     const onChange = (name, value) => {
-        setForm({...form, [name]: value});
+        if (name === 'amount'){
+            const val = value;
+            if (val === '' || regexAmount.test(val)){
+                setForm({...form, amount: val})
+            }
+        } else {
+            setForm({...form, [name]: value});
+        }
         if (name === "recipient"){
             if (value.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
                 setInvalidEmail(!invalidEmail);
@@ -67,7 +74,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
             }
         }
         if (name === "amount"){
-            if (value < 0.01 || value[0] === "-" || value > 10000){
+            if (value <= 0 || value[0] === "-" || value > 10000){
                 setInvalidAmount(!invalidAmount);
             } else {
                 if (invalidAmount === true) {
@@ -83,7 +90,7 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
                 setSendModal(!sendModal);
                 setInvalidAmount(false);
                 setInvalidEmail(false);
-                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'SEND'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
             }} />
 
             <Container>
@@ -109,14 +116,14 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg"
+                            <Input type="text" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg" inputMode="numeric"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === ""}
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || form.memo === '' || form.amount === ''}
                         onClick={() =>
                             createSendTransaction(
                                 form.memo,

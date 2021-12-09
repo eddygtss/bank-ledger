@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -47,10 +48,10 @@ public class AuthenticationService {
     }
 
     public void createUser(Account account) throws ExecutionException, InterruptedException, AccountExistsException {
-        String documentId = "user_" + account.getUsername();
+        String documentId = "user_" + account.getUsername().toLowerCase(Locale.ROOT);
 
         if (accountService.getAccount(documentId) == null) {
-            String username = account.getUsername();
+            String username = account.getUsername().toLowerCase(Locale.ROOT);
             String password = account.getPassword();
             String firstName = account.getFirstName();
             String lastName = account.getLastName();
@@ -87,7 +88,7 @@ public class AuthenticationService {
                             firstName,
                             lastName,
                             PrivacyLevel.PRIVATE,
-                            ""
+                            "Hi, I'm new to Gem Banking!"
                     )
             );
         } else {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Main from './Main';
+import Main from './Components/Router/Main';
 import { NavBar } from "./Components/Navbar/NavBar";
 
 const App = () => {

@@ -12,10 +12,10 @@ import {
 } from 'reactstrap';
 import './Modal.css';
 import cogoToast from 'cogo-toast';
-import { callApi } from '../../utils';
+import { callApi, regexAmount } from '../Utils/utils';
 
 export const DepositFundsModal = ({depositModal, setDepositModal, reload, setReload}) => {
-    const [form, setForm] = useState({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
+    const [form, setForm] = useState({memo: '', amount: '', transactionType: 'DEPOSIT'});
     const [invalidAmount, setInvalidAmount] = useState(false);
 
     const createTransaction = (memo, amount, transactionType) => {
@@ -23,7 +23,7 @@ export const DepositFundsModal = ({depositModal, setDepositModal, reload, setRel
             if (result.status === 201) {
                 setReload(!reload)
                 setDepositModal(!depositModal);
-                setForm({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
+                setForm({memo: '', amount: '', transactionType: 'DEPOSIT'});
                 cogoToast.success('Transaction created.');
             } else {
                 result.json().then(data => {
@@ -44,7 +44,14 @@ export const DepositFundsModal = ({depositModal, setDepositModal, reload, setRel
     }
 
     const onChange = (name, value) => {
-        setForm({...form, [name]: value});
+        if (name === 'amount'){
+            const val = value;
+            if (val === '' || regexAmount.test(val)){
+                setForm({...form, amount: val})
+            }
+        } else {
+            setForm({...form, [name]: value});
+        }
         if (name === "amount"){
             if (value <= 0 || value[0] === "-" || value > 10000){
                 setInvalidAmount(true);
@@ -62,7 +69,7 @@ export const DepositFundsModal = ({depositModal, setDepositModal, reload, setRel
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setDepositModal(!depositModal)
                 setInvalidAmount(false);
-                setForm({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
+                setForm({memo: '', amount: '', transactionType: 'DEPOSIT'});
             }} />
 
             <Container>
@@ -77,17 +84,23 @@ export const DepositFundsModal = ({depositModal, setDepositModal, reload, setRel
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" value={form.amount} bsSize="lg" invalid={invalidAmount}
+                            <Input type="text" name="amount" value={form.amount} bsSize="lg" invalid={invalidAmount} inputMode="decimal"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidAmount || !form.amount} onClick={() => createTransaction(
-                    form.memo,
-                    form.amount,
-                    "DEPOSIT")}>Deposit Funds</Button>
+                <Button className="createTransactionSubmitBtn"
+                        disabled={invalidAmount || form.amount === '' || form.memo === ''}
+                        onClick={() =>
+                            createTransaction(
+                                form.memo,
+                                form.amount,
+                                "DEPOSIT")}
+                >
+                    Deposit Funds
+                </Button>
                 <br/>
 
             </Container>
