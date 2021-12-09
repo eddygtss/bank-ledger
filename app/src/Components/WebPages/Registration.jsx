@@ -9,10 +9,10 @@ import {
     Row,
     Col, FormFeedback, Label
 } from 'reactstrap';
-import './App.css';
+import '../../App.css';
 import StepWizard from 'react-step-wizard';
 import cogoToast from 'cogo-toast';
-import { callApi } from './utils';
+import { callApi } from '../Utils/utils';
 
 const Registration = ({ history, setLogin }) => {
     const [form, setForm] = useState({

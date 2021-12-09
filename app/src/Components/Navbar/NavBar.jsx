@@ -13,7 +13,7 @@ import {
 import './NavBar.css';
 import GemLogo from './GemLogo.png';
 import cogoToast from 'cogo-toast';
-import { callApi } from '../../utils';
+import { callApi } from '../Utils/utils';
 
 export const NavBar = ({isLoggedIn, setLogin}) => {
     const [hamburger, setHamburger] = useState(false);
@@ -81,7 +81,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink onClick={() => Logout()} href="/">
+                        <NavLink onClick={() => Logout()} href="/login">
                             Logout
                         </NavLink>
                     </NavItem>

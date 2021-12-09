@@ -4,12 +4,11 @@ import BuddyFeed from "./BuddyFeed";
 import cogoToast from "cogo-toast";
 import { AddBuddyModal } from "../../Modal/AddBuddyModal";
 import { Button, Row } from "reactstrap";
-import { callApi } from "../../../utils";
+import { callApi } from "../../Utils/utils";
 
 const Buddies = ({ reload, setReload }) => {
     const [buddyInfo, setBuddyInfo] = useState({});
     const [addBuddyModal, setAddBuddyModal] = useState(false);
-    const [message, setMessage] = useState('');
 
     const toggle = () => {
         setAddBuddyModal(!addBuddyModal);

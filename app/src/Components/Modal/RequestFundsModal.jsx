@@ -12,10 +12,10 @@ import {
     Label, FormFeedback, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap';
 import cogoToast from 'cogo-toast';
-import { callApi } from '../../utils';
+import { callApi, regexAmount } from '../Utils/utils';
 
 export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, reload, setReload}) => {
-    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00, privacySetting: 'PRIVATE'});
+    const [form, setForm] = useState({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
     const [privacyDropDown, setPrivacyDropDown] = useState(false);
     const [invalidEmail, setInvalidEmail] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
@@ -28,7 +28,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
             if (result.status === 201) {
                 setReload(!reload)
                 setRequestModal(!requestModal);
-                setForm({memo: '', responder: '', amount: 0.00, privacySetting: 'PRIVATE'});
+                setForm({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
                 cogoToast.success('Request successfully sent to ' + responder);
             } else {
                 result.text().then(data => {
@@ -85,7 +85,14 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
     }
 
     const onChange = (name, value) => {
-        setForm({...form, [name]: value});
+        if (name === 'amount'){
+            const val = value;
+            if (val === '' || regexAmount.test(val)){
+                setForm({...form, amount: val})
+            }
+        } else {
+            setForm({...form, [name]: value});
+        }
         if (name === "responder"){
             if (value.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
                 setInvalidEmail(true);
@@ -96,7 +103,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
             }
         }
         if (name === "amount"){
-            if (value < 0.01 || value[0] === "-" || value > 10000){
+            if (value <= 0 || value[0] === "-" || value > 10000){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
@@ -114,7 +121,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
                 setRequestModal(!requestModal);
                 setInvalidEmail(false);
                 setInvalidAmount(false);
-                setForm({memo: '', responder: '', amount: 0.00, privacySetting: 'PRIVATE'});
+                setForm({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
             }} />
 
             <Container>
@@ -161,15 +168,15 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" invalid={invalidAmount} value={Number(form.amount).toFixed(2)} bsSize="lg"
-                                   onChange={e => onChange(e.target.name, Number(e.target.value).toFixed(2))} required/>
+                            <Input type="text" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg" inputMode="numeric"
+                                   onChange={e => onChange(e.target.name, e.target.value)} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
 
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton} onClick={() => createRequestTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton || form.memo === '' || form.amount === ''} onClick={() => createRequestTransaction(
                     form.memo,
                     form.responder.toLowerCase(),
                     form.amount,

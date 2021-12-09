@@ -16,7 +16,10 @@ const callApi = async (endPoint, method = 'GET', body) => {
   return await fetch(`${apiUrl}/${endPoint}`, options)
 };
 
+const regexAmount = /^(\d+(\.\d{0,2})?|\.?\d{1,2})$/g;
+
 export {
-  formatCurrency,
-  callApi,
+    formatCurrency,
+    callApi,
+    regexAmount
 }

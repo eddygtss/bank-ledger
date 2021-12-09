@@ -33,3 +33,6 @@ HELP.md
 /app/.yarn/
 /app/.yarnrc.yml
 /build_latest_docker_img.bat
+src/main/.DS_Store
+src/.DS_Store
+.DS_Store

@@ -8,9 +8,9 @@ import {
     Input,
     Row
 } from 'reactstrap';
-import './App.css';
+import '../../App.css';
 import cogoToast from 'cogo-toast';
-import { callApi } from './utils';
+import { callApi } from '../Utils/utils';
 
 const Login = ({ history, setLogin }) => {
     const [form, setForm] = useState({ username: '', password: '' });

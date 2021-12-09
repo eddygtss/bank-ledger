@@ -12,10 +12,10 @@ import {
 } from 'reactstrap';
 import './Modal.css';
 import cogoToast from 'cogo-toast';
-import { callApi } from '../../utils';
+import { callApi, regexAmount } from '../Utils/utils';
 
 export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, setReload}) => {
-    const [form, setForm] = useState({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL'});
     const [invalidAmount, setInvalidAmount] = useState(false);
 
     const createTransaction = (memo, amount, transactionType) => {
@@ -23,7 +23,7 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
             if (result.status === 201) {
                 setReload(!reload)
                 setWithdrawModal(!withdrawModal);
-                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL'});
                 cogoToast.success('Transaction created.');
             } else {
                 result.json().then(data => {
@@ -44,7 +44,14 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
     }
 
     const onChange = (name, value) => {
-        setForm({...form, [name]: value});
+        if (name === 'amount'){
+            const val = value;
+            if (val === '' || regexAmount.test(val)){
+                setForm({...form, amount: val})
+            }
+        } else {
+            setForm({...form, [name]: value});
+        }
         if (name === "amount"){
             if (value <= 0 || value[0] === "-" || value > 100000){
                 setInvalidAmount(true);
@@ -62,7 +69,7 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setWithdrawModal(!withdrawModal);
                 setInvalidAmount(false);
-                setForm({memo: '', recipient: '', amount: 0.00, transactionType: 'WITHDRAWAL'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL'});
             }} />
 
             <Container>
@@ -78,17 +85,23 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" value={form.amount} bsSize="lg" invalid={invalidAmount}
+                            <Input type="text" name="amount" value={form.amount} bsSize="lg" invalid={invalidAmount} inputMode="numeric"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidAmount || !form.amount} onClick={() => createTransaction(
-                    form.memo,
-                    form.amount,
-                    "WITHDRAWAL")}>Withdraw Funds</Button>
+                <Button
+                    className="createTransactionSubmitBtn"
+                    disabled={invalidAmount || form.amount === '' || form.memo === ''}
+                    onClick={() => createTransaction(
+                        form.memo,
+                        form.amount,
+                        "WITHDRAWAL"
+                    )}>
+                    Withdraw Funds
+                </Button>
                 <br/>
             </Container>
 

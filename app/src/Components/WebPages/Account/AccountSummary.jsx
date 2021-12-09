@@ -8,27 +8,22 @@ import {
   OffcanvasHeader,
   Row
 } from 'reactstrap';
-import { DepositFundsModal } from './Components/Modal/DepositFundsModal';
-import { RequestFundsModal } from './Components/Modal/RequestFundsModal';
-import { WithdrawFundsModal } from './Components/Modal/WithdrawFundsModal';
-import { SendFundsModal } from './Components/Modal/SendFundsModal';
-import TransactionEntries from './Components/Transactions/TransactionEntries';
+import { DepositFundsModal } from '../../Modal/DepositFundsModal';
+import { RequestFundsModal } from '../../Modal/RequestFundsModal';
+import { WithdrawFundsModal } from '../../Modal/WithdrawFundsModal';
+import { SendFundsModal } from '../../Modal/SendFundsModal';
+import TransactionEntries from '../../Transactions/TransactionEntries';
 import cogoToast from 'cogo-toast';
-import { callApi, formatCurrency } from './utils';
+import { callApi, formatCurrency } from '../../Utils/utils';
 
-export const AccountSummary = ({ setLogin, reload, setReload }) => {
-  const [accountInfo, setInfo] = useState({});
+export const AccountSummary = ({ accountInfo, reload, setReload }) => {
   const [sendModal, setSendModal] = useState(false);
   const [requestModal, setRequestModal] = useState(false);
   const [depositModal, setDepositModal] = useState(false);
   const [withdrawModal, setWithdrawModal] = useState(false);
-  const [offCanvas, setOffCanvas] = useState(false);
 
   const toggle = (component) => {
     switch (component) {
-      case 'offCanvas':
-        setOffCanvas(!offCanvas);
-        break;
       case 'sendModal':
         setSendModal(!sendModal);
         break;
@@ -44,65 +39,8 @@ export const AccountSummary = ({ setLogin, reload, setReload }) => {
     }
   }
 
-  useEffect(() => {
-    callApi('account').then(result => {
-      if (result.status === 200) {
-        result.json().then(data => {
-          setInfo(data);
-        });
-      } else {
-        setLogin(false);
-        sessionStorage.setItem("isLoggedIn", "false");
-        cogoToast.error('You have been logged out.')
-      }
-    });
-  }, [reload]);
-
-  const getPendingRequests = () => {
-    return accountInfo.accountName && accountInfo.requestHistory.filter(request => {
-      const status = request.requestStatus.toLowerCase();
-      return status.includes('pending');
-    }).length;
-  }
-
-  const showPendingRequestAlert = () => {
-    if (getPendingRequests() > 0){
-      return (
-          <Alert color="primary">
-            You have {getPendingRequests()} pending request(s) waiting, click the View Requests button to see all current pending requests.
-          </Alert>
-      )
-    }
-  }
-
   return (
       <>
-        <Offcanvas toggle={() => toggle('offCanvas')} isOpen={offCanvas} direction="end">
-          <OffcanvasHeader toggle={() => toggle('offCanvas')}>
-            <h1 className="text-center">Requests</h1>
-          </OffcanvasHeader>
-          <OffcanvasBody className='p-1'>
-            {accountInfo.accountName &&
-              <TransactionEntries
-                  accountInfo={accountInfo}
-                  transType={'request'}
-                  reload={reload}
-                  setReload={setReload}
-              />
-            }
-          </OffcanvasBody>
-        </Offcanvas>
-          {accountInfo.accountName &&
-          <div>
-            <h3>{accountInfo.accountName}</h3>
-            <Button className="requestBtn btn-info" onClick={() => toggle('offCanvas')}>View Requests</Button>
-            <h4>Balance: {formatCurrency(accountInfo.balance)}</h4>
-
-            <br/>
-          </div>
-          }
-          {showPendingRequestAlert()}
-          <br/>
           <Row lg="2" md="1" sm="1" xs="1" className="gx-2" style={{
             alignContent: "space-evenly"
           }}>

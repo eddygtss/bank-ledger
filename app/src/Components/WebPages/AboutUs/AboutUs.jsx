@@ -9,8 +9,8 @@ import {
     CarouselCaption,
     CarouselControl
 } from 'reactstrap';
-import piggyBank from '../images/piggybank.png';
-import kids from '../images/kids.png';
+import piggyBank from '../../images/piggybank.png';
+import kids from '../../images/kids.png';
 
 const AboutUs = () => {
     // State for Active index

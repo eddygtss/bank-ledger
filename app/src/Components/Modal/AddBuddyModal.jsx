@@ -11,7 +11,7 @@ import {
 } from 'reactstrap';
 import './Modal.css';
 import cogoToast from 'cogo-toast';
-import { callApi } from '../../utils';
+import { callApi } from '../Utils/utils';
 
 export const AddBuddyModal = ({ addBuddyModal, setAddBuddyModal, buddyInfo }) => {
     const [form, setForm] = useState({memo: '', responder: '', privacySetting: 'PRIVATE'});

@@ -32,8 +32,6 @@ public class AccountController {
     // Create new user account API endpoint (POST/Create)
     @PostMapping("/register")
     public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException, AccountExistsException {
-        String username = createAccountRequest.getUsername().toLowerCase();
-        createAccountRequest.setUsername(username);
         authenticationService.createUser(createAccountRequest);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
