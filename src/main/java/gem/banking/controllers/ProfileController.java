@@ -45,6 +45,29 @@ public class ProfileController {
         return ResponseEntity.ok("Updated status successfully.");
     }
 
+    @PutMapping("/update-username")
+    public ResponseEntity<String> updateUsername(@RequestBody String username) throws Exception {
+        if (username.length() >= 16) {
+            return ResponseEntity.badRequest().body("Username must be less than 16 characters.");
+        }
+        List<String> usernames = accountService.getAllUsernames();
+
+        for (String user: usernames) {
+            if (user.equalsIgnoreCase(username)){
+                return ResponseEntity.badRequest().body("This username is already taken.");
+            }
+        }
+
+        Profile profile = accountService.getProfile(authenticationService.getCurrentUser());
+        Account account = accountService.getAccount(authenticationService.getCurrentUser());
+        account.setUsername(username);
+        profile.setUsername(username);
+
+        accountService.updateProfile(profile);
+
+        return ResponseEntity.ok("Updated status successfully.");
+    }
+
 //    @PutMapping("/update-profiles")
 //    public ResponseEntity<String> updateAccountsProfiles() throws Exception {
 //        List<Account> allAccounts = accountService.getAllAccounts();

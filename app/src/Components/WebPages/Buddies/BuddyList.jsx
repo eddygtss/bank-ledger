@@ -24,10 +24,10 @@ import {
     OffcanvasHeader,
     Table
 } from "reactstrap";
-import {CheckSquare, User, XSquare} from "react-feather";
+import { CheckSquare, User, XSquare } from "react-feather";
 import { regexAmount } from "../../Utils/utils";
 import cogoToast from "cogo-toast";
-import {callApi} from "../../Utils/utils";
+import { callApi } from "../../Utils/utils";
 
 const BuddyList = ({ buddyInfo, setReload, reload }) => {
     const [profileSidebarOpen, setProfileSidebarOpen] = useState(false);
@@ -362,39 +362,39 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                 </OffcanvasHeader>
                 <OffcanvasBody className='p-1 text-center'>
                     {profile.documentId &&
-                    <Card>
-                        <CardTitle>
-                            <h2>{profile.firstName} {profile.lastName}</h2>
-                        </CardTitle>
-                        <CardSubtitle>
-                            Username: {profile.username}
-                        </CardSubtitle>
-                        <CardBody>
-                            <p>Status: {profile.status ? profile.status : 'Hi, I\'m new to Gem Banking!'}</p>
-                            <br /><br />
-                            <Button color="danger" onClick={() => {
-                                toggle('send');
-                                setRequestCollapse(false);
-                            }}>
-                                Send Money
-                            </Button>
-                            <Button color="success" onClick={() => {
-                                toggle('request');
-                                setSendCollapse(false);
-                            }}>
-                                Request Money
-                            </Button>
-                            <br />
-                            <Collapse isOpen={sendCollapse || requestCollapse}>
-                                {sendCollapse &&
-                                sendCollapseForm(profile.documentId.substring(5))
-                                }
-                                {requestCollapse &&
-                                requestCollapseForm(profile.documentId.substring(5))
-                                }
-                            </Collapse>
-                        </CardBody>
-                    </Card>
+                        <Card>
+                            <CardTitle>
+                                <h2>{profile.firstName} {profile.lastName}</h2>
+                            </CardTitle>
+                            <CardSubtitle>
+                                Username: {profile.username}
+                            </CardSubtitle>
+                            <CardBody>
+                                <p>Status: {profile.status ? profile.status : 'Hi, I\'m new to Gem Banking!'}</p>
+                                <br /><br />
+                                <Button color="danger" onClick={() => {
+                                    toggle('send');
+                                    setRequestCollapse(false);
+                                }}>
+                                    Send Money
+                                </Button>
+                                <Button color="success" onClick={() => {
+                                    toggle('request');
+                                    setSendCollapse(false);
+                                }}>
+                                    Request Money
+                                </Button>
+                                <br />
+                                <Collapse isOpen={sendCollapse || requestCollapse}>
+                                    {sendCollapse &&
+                                    sendCollapseForm(profile.documentId.substring(5))
+                                    }
+                                    {requestCollapse &&
+                                    requestCollapseForm(profile.documentId.substring(5))
+                                    }
+                                </Collapse>
+                            </CardBody>
+                        </Card>
                     }
                 </OffcanvasBody>
             </Offcanvas>

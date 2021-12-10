@@ -22,6 +22,7 @@ const AccountHome = ({ setLogin }) => {
     const [reload, setReload] = useState(false);
     const [reloadAccSum, setReloadAccSum] = useState(false);
     const [bankInfo, setBankInfo] = useState({});
+    const [profile, setProfile] = useState({});
     const [offCanvas, setOffCanvas] = useState(false);
 
     useEffect(() => {
@@ -29,6 +30,13 @@ const AccountHome = ({ setLogin }) => {
             if (result.status === 200) {
                 result.json().then(data => {
                     setBankInfo(data);
+                    callApi('profile').then(result => {
+                        if (result.status === 200) {
+                            result.json().then(profileData => {
+                                setProfile(profileData);
+                            })
+                        }
+                    })
                 });
             } else {
                 setLogin(false);
@@ -141,7 +149,7 @@ const AccountHome = ({ setLogin }) => {
                         <Buddies reload={reload} setReload={setReload} />
                     </TabPane>
                     <TabPane tabId='3'>
-                        <MyProfile reload={reload} setReload={setReload} />
+                        <MyProfile profile={profile} reload={reload} setReload={setReload} />
                     </TabPane>
                 </TabContent>
             </Container>
