@@ -64,6 +64,23 @@ public class AccountService {
         return allAccounts;
     }
 
+    public List<String> getAllUsernames() throws ExecutionException, InterruptedException {
+        List<String> allUsernames = new ArrayList<>();
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        Iterable<DocumentReference> userDocumentReferences = dbFirestore.collection(COL_PROFILES).listDocuments();
+
+        for (DocumentReference documentReference: userDocumentReferences) {
+            ApiFuture<DocumentSnapshot> userFuture = documentReference.get();
+            DocumentSnapshot userDocument = userFuture.get();
+            Profile profile = userDocument.toObject(Profile.class);
+
+            assert profile != null;
+            allUsernames.add(profile.getUsername());
+        }
+
+        return allUsernames;
+    }
+
     public List<Account> getAllAccounts() throws ExecutionException, InterruptedException {
         List<Account> allAccounts = new ArrayList<>();
         Firestore dbFirestore = FirestoreClient.getFirestore();
@@ -108,11 +125,12 @@ public class AccountService {
             assert buddies != null;
             if (buddies.getBuddyList().size() > 0) {
                 List<Profile> profiles = buddies.getBuddyList();
+                ArrayList<Profile> updatedProfiles = new ArrayList<>();
                 for (Profile profile: profiles) {
                     Profile updated = getProfile(profile.getDocumentId());
-                    profile.setStatus(updated.getStatus());
+                    updatedProfiles.add(updated);
                 }
-                buddies.setBuddyList(profiles);
+                buddies.setBuddyList(updatedProfiles);
             }
 
             return buddies;
