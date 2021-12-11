@@ -24,7 +24,10 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
     const [publicActive, setPublicActive] = useState(false);
 
     const createRequestTransaction = (memo, responder, amount, privacySetting) => {
-        callApi('request', 'POST', JSON.stringify({memo, responder, amount, privacySetting})).then(result => {
+        callApi(
+            'request',
+            'POST',
+            JSON.stringify({memo, responder, amount, privacySetting})).then(result => {
             if (result.status === 201) {
                 setReload(!reload)
                 setRequestModal(!requestModal);

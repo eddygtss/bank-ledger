@@ -6,6 +6,7 @@ import gem.banking.exceptions.InsufficientFundsException;
 import gem.banking.exceptions.InvalidRequesteeException;
 import gem.banking.exceptions.InvalidTransactionException;
 import gem.banking.models.AccountInfo;
+import gem.banking.models.Buddy;
 import gem.banking.models.Request;
 import gem.banking.models.Transaction;
 import lombok.extern.slf4j.Slf4j;
@@ -60,79 +61,133 @@ public class RequestService {
         return updatedAccounts;
     }
 
-    public List<AccountInfo> approveRequest(Request request,
-                                            AccountInfo responderAccountInfo,
-                                            AccountInfo requesterAccountInfo)
+    public List<Object> approveRequest(Request request,
+                                       AccountInfo responderAccountInfo,
+                                       AccountInfo requesterAccountInfo,
+                                       Buddy responderBuddies,
+                                       Buddy requesterBuddies,
+                                       String type)
             throws InsufficientFundsException, InvalidRequesteeException {
-        List<AccountInfo> updatedAccounts = new ArrayList<>();
+        if (type.equals("account")){
+            List<Object> updatedAccounts = new ArrayList<>();
 
-        List<Transaction> responderTransactions = responderAccountInfo.getTransactionHistory();
-        List<Transaction> requesterTransactions = requesterAccountInfo.getTransactionHistory();
+            List<Transaction> responderTransactions = responderAccountInfo.getTransactionHistory();
+            List<Transaction> requesterTransactions = requesterAccountInfo.getTransactionHistory();
 
-        List<Request> responderRequests = responderAccountInfo.getRequestHistory();
-        List<Request> requesterRequests = requesterAccountInfo.getRequestHistory();
+            List<Request> responderRequests = responderAccountInfo.getRequestHistory();
+            List<Request> requesterRequests = requesterAccountInfo.getRequestHistory();
 
-        double responderBalance = responderAccountInfo.getBalance();
-        double requesterBalance = requesterAccountInfo.getBalance();
+            double responderBalance = responderAccountInfo.getBalance();
+            double requesterBalance = requesterAccountInfo.getBalance();
 
-        // We check if the person approving is equal to the responder of the request
-        if (responderAccountInfo.getDocumentId().substring(5).equals(request.getResponder())) {
-            if (responderBalance - request.getAmount() < 0.0) {
-                throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", responderBalance));
+            // We check if the person approving is equal to the responder of the request
+            if (responderAccountInfo.getDocumentId().substring(5).equals(request.getResponder())) {
+                if (responderBalance - request.getAmount() < 0.0) {
+                    throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", responderBalance));
+                }
+                // We want to delete the old request information from both the requester and the responder
+                responderRequests.remove(request);
+                requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
+
+                request.setRequestStatus(Status.APPROVED);
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                String currentTime = LocalDateTime.now().format(formatter);
+                request.setDate(currentTime);
+
+                Transaction approvedTransaction =
+                        new Transaction(
+                                UUID.randomUUID().toString(),
+                                request.getMemo(),
+                                request.getResponder(),
+                                request.getRequester(),
+                                request.getAmount(),
+                                request.getDate(),
+                                TransactionType.REQUEST,
+                                Status.SENT,
+                                request.getPrivacySetting()
+                        );
+
+                responderTransactions.add(approvedTransaction);
+                responderRequests.add(request);
+                responderBalance -= request.getAmount();
+
+                // Updating the senders account
+                responderAccountInfo.setTransactionHistory(responderTransactions);
+                responderAccountInfo.setRequestHistory(responderRequests);
+                responderAccountInfo.setBalance(responderBalance);
+
+                // New Transaction object for the requester so we can change status.
+                Transaction requesterTransaction = new Transaction(approvedTransaction);
+                requesterTransaction.setTransactionStatus(Status.RECEIVED);
+
+                requesterTransactions.add(requesterTransaction);
+                requesterRequests.add(request);
+                requesterBalance += request.getAmount();
+
+                // Updating the requesters account
+                requesterAccountInfo.setTransactionHistory(requesterTransactions);
+                requesterAccountInfo.setRequestHistory(requesterRequests);
+                requesterAccountInfo.setBalance(requesterBalance);
+            } else {
+                throw new InvalidRequesteeException("Error: Unable to send yourself money.");
             }
-            // We want to delete the old request information from both the requester and the responder
-            responderRequests.remove(request);
-            requesterRequests.removeIf(requesterRequest -> requesterRequest.getId().equals(request.getId()));
 
-            request.setRequestStatus(Status.APPROVED);
+            // Adding the sender and recipient account infos into the updated accounts list to return
+            updatedAccounts.add(responderAccountInfo);
+            updatedAccounts.add(requesterAccountInfo);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-            String currentTime = LocalDateTime.now().format(formatter);
-            request.setDate(currentTime);
-
-            Transaction approvedTransaction =
-                    new Transaction(
-                            UUID.randomUUID().toString(),
-                            request.getMemo(),
-                            request.getResponder(),
-                            request.getRequester(),
-                            request.getAmount(),
-                            request.getDate(),
-                            TransactionType.REQUEST,
-                            Status.SENT,
-                            request.getPrivacySetting()
-                    );
-
-            responderTransactions.add(approvedTransaction);
-            responderRequests.add(request);
-            responderBalance -= request.getAmount();
-
-            // Updating the senders account
-            responderAccountInfo.setTransactionHistory(responderTransactions);
-            responderAccountInfo.setRequestHistory(responderRequests);
-            responderAccountInfo.setBalance(responderBalance);
-
-            // New Transaction object for the requester so we can change status.
-            Transaction requesterTransaction = new Transaction(approvedTransaction);
-            requesterTransaction.setTransactionStatus(Status.RECEIVED);
-
-            requesterTransactions.add(requesterTransaction);
-            requesterRequests.add(request);
-            requesterBalance += request.getAmount();
-
-            // Updating the requesters account
-            requesterAccountInfo.setTransactionHistory(requesterTransactions);
-            requesterAccountInfo.setRequestHistory(requesterRequests);
-            requesterAccountInfo.setBalance(requesterBalance);
+            return updatedAccounts;
         } else {
-            throw new InvalidRequesteeException("Error: Unable to send yourself money.");
+            List<Object> updatedBuddies = new ArrayList<>();
+
+            List<Transaction> responderBuddyTransactions = responderBuddies.getBuddyTransactions();
+            List<Transaction> requesterBuddyTransactions = requesterBuddies.getBuddyTransactions();
+
+
+            // We check if the person approving is equal to the responder of the request
+            if (responderAccountInfo.getDocumentId().substring(5).equals(request.getResponder())) {
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+                String currentTime = LocalDateTime.now().format(formatter);
+                request.setDate(currentTime);
+
+                Transaction approvedTransaction =
+                        new Transaction(
+                                UUID.randomUUID().toString(),
+                                request.getMemo(),
+                                request.getResponder(),
+                                request.getRequester(),
+                                request.getAmount(),
+                                request.getDate(),
+                                TransactionType.REQUEST,
+                                Status.SENT,
+                                request.getPrivacySetting()
+                        );
+
+                responderBuddyTransactions.add(approvedTransaction);
+
+                // Updating the senders buddies
+                responderBuddies.setBuddyTransactions(responderBuddyTransactions);
+
+                // New Transaction object for the requester so we can change status.
+                Transaction requesterTransaction = new Transaction(approvedTransaction);
+                requesterTransaction.setTransactionStatus(Status.RECEIVED);
+
+                requesterBuddyTransactions.add(requesterTransaction);
+
+                // Updating the requesters account
+                requesterBuddies.setBuddyTransactions(requesterBuddyTransactions);
+            } else {
+                throw new InvalidRequesteeException("Error: Unable to send yourself money.");
+            }
+
+            // Adding the sender and recipient buddies into the updated accounts list to return
+            updatedBuddies.add(responderBuddies);
+            updatedBuddies.add(requesterBuddies);
+
+            return updatedBuddies;
         }
-
-        // Adding the sender and recipient account infos into the updated accounts list to return
-        updatedAccounts.add(responderAccountInfo);
-        updatedAccounts.add(requesterAccountInfo);
-
-        return updatedAccounts;
     }
 
     public List<AccountInfo> denyRequest(Request request,

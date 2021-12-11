@@ -2,13 +2,11 @@ package gem.banking.controllers;
 
 import gem.banking.enums.PrivacyLevel;
 import gem.banking.exceptions.AccountInvalidException;
-import gem.banking.models.Account;
-import gem.banking.models.Buddy;
-import gem.banking.models.Profile;
-import gem.banking.models.Request;
+import gem.banking.models.*;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
 import gem.banking.services.BuddyService;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +32,11 @@ public class BuddyController {
     @GetMapping("/buddies")
     public Buddy getBuddyInfo() throws InterruptedException, ExecutionException, AccountInvalidException {
         return accountService.getBuddy(authenticationService.getCurrentUser());
+    }
+
+    @GetMapping("/buddy-feed")
+    public List<Transaction> getBuddyFeed() throws ExecutionException, AccountInvalidException, InterruptedException {
+        return accountService.getBuddyTransactions(getBuddyInfo());
     }
 
 //    @PutMapping("/update-buddies")

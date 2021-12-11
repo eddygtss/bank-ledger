@@ -27,6 +27,7 @@ import {
 import { CheckSquare, User, XSquare } from "react-feather";
 import { regexAmount } from "../../Utils/utils";
 import cogoToast from "cogo-toast";
+import '../../../App.css';
 import { callApi } from "../../Utils/utils";
 
 const BuddyList = ({ buddyInfo, setReload, reload }) => {
@@ -41,12 +42,12 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
     const [publicActive, setPublicActive] = useState(false);
     const [privacyDropDown, setPrivacyDropDown] = useState(false);
 
-    const createSendTransaction = (memo, recipient, amount, transactionType) => {
-        callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType})).then(result => {
+    const createSendTransaction = (memo, recipient, amount, transactionType, privacySetting) => {
+        callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType, privacySetting})).then(result => {
             if (result.status === 201) {
                 setReload(!reload);
                 setSendCollapse(!sendCollapse);
-                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND', privacySetting: 'PRIVATE'});
                 cogoToast.success('Successfully sent $' + amount + ' to ' + recipient);
             } else {
                 result.text().then(data => {
@@ -191,7 +192,8 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                         display: "block",
                         paddingLeft: "12px",
                         whiteSpace: "break-spaces",
-                        cursor: "pointer"
+                        cursor: "pointer",
+                        borderTop: "1px solid #87ceeb"
                     }}
                     onClick={() => {
                         toggle('profile');
@@ -229,43 +231,47 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
     const getBuddyRequests = () => {
         if (buddyInfo.documentId && getPendingBuddyRequests().length > 0) {
             return (
-                <>
-                    {buddyInfo.documentId &&
-                    <td colSpan="2" className="p-0 fw-bold">
-                        Buddy Requests
-                    </td>
-                    }
-                    {
-                        buddyInfo.documentId && getPendingBuddyRequests().map((request) => {
-                                if (request.requester === buddyInfo.documentId.substring(5)) {
-                                    return (
-                                        <>
-                                            <tr style={{
-                                                whiteSpace: 'break-spaces',
-                                                textAlign: 'center'
-                                            }}>
-                                                <td className="p-1">{request.responder.toUpperCase() + '\n' + request.memo}</td>
-                                                <td className="align-middle p-1">{request.requestStatus + '\n'}{approveButton(request)} {denyButton(request)}</td>
-                                            </tr>
-                                        </>
-                                    )
-                                } else {
-                                    return (
-                                        <>
-                                            <tr className="p-0" style={{
-                                                whiteSpace: 'break-spaces',
-                                                textAlign: 'center'
-                                            }}>
-                                                <td className="p-1">{request.requester.toUpperCase() + '\n' + request.memo}</td>
-                                                <td className="align-middle p-1">{request.requestStatus + '\n'}{approveButton(request)} {denyButton(request)}</td>
-                                            </tr>
-                                        </>
-                                    )
-                                }
+                    <Table
+                        className="p-3" style={{backgroundColor: "#edf0f0", borderRadius: "10px"}}
+                    >
+                        <tbody className="text-center">
+                        {buddyInfo.documentId &&
+                            <td colSpan="2" className="p-0 fw-bold">
+                                Buddy Requests
+                            </td>
                             }
-                        )
-                    }
-                </>
+                            {
+                                buddyInfo.documentId && getPendingBuddyRequests().map((request) => {
+                                        if (request.requester === buddyInfo.documentId.substring(5)) {
+                                            return (
+                                                <>
+                                                    <tr style={{
+                                                        whiteSpace: 'break-spaces',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <td className="p-1">{request.responder.toUpperCase() + '\n' + request.memo}</td>
+                                                        <td className="align-middle p-1">{request.requestStatus + '\n'}{approveButton(request)} {denyButton(request)}</td>
+                                                    </tr>
+                                                </>
+                                            )
+                                        } else {
+                                            return (
+                                                <>
+                                                    <tr className="p-0" style={{
+                                                        whiteSpace: 'break-spaces',
+                                                        textAlign: 'center'
+                                                    }}>
+                                                        <td className="p-1">{request.requester.toUpperCase() + '\n' + request.memo}</td>
+                                                        <td className="align-middle p-1">{request.requestStatus + '\n'}{approveButton(request)} {denyButton(request)}</td>
+                                                    </tr>
+                                                </>
+                                            )
+                                        }
+                                    }
+                                )
+                            }
+                        </tbody>
+                    </Table>
             )
         }
     }
@@ -273,6 +279,27 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
     const sendCollapseForm = (user) => {
         return (
             <Container>
+                <Dropdown
+                    direction="down"
+                    toggle={() => toggle('privacy')}
+                    isOpen={privacyDropDown}
+                    className="text-center mt-2"
+                >
+                    <DropdownToggle caret>
+                        Privacy
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem header>
+                            Privacy Level for Request
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={privateActive} onClick={() => setForm({...form, privacySetting: 'PRIVATE'})}>
+                            Private
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={publicActive} onClick={() => setForm({...form, privacySetting: 'PUBLIC'})}>
+                            Public
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
                 <Form className="formText">
                     <FormGroup>
                         <Label for="memo">Message</Label>
@@ -296,7 +323,8 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                                 form.memo,
                                 user.toLowerCase(),
                                 form.amount,
-                                "SEND")}>Send Funds</Button>
+                                "SEND",
+                                form.privacySetting)}>Send Funds</Button>
             </Container>
         )
     }
@@ -408,24 +436,16 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                 body
                 inverse
                 style={{
-                    backgroundColor: '#333',
-                    borderColor: '#333',
                     height: '700px'
                 }}
-                className="pl-1 pr-1"
+                className="roundedBuddies pl-1 pr-1"
             >
                 <CardTitle tag="h5">
                     Your Buddies
                 </CardTitle>
+                {getBuddyRequests()}
                 <Table
-                    className="bdr table-warning p-3"
-                >
-                    <tbody className="text-center">
-                    {getBuddyRequests()}
-                    </tbody>
-                </Table>
-                <Table
-                    className="table-info p-3">
+                    className="p-3" style={{backgroundColor: "#edf0f0", borderRadius: "10px"}}>
                     <tbody className="text-center">
                     {showBuddies()}
                     {profileSidebar(selectedProfile)}

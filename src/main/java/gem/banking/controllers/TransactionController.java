@@ -1,6 +1,8 @@
 package gem.banking.controllers;
 
 import gem.banking.models.AccountInfo;
+import gem.banking.models.Buddy;
+import gem.banking.models.Profile;
 import gem.banking.models.Transaction;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
@@ -59,17 +61,39 @@ public class TransactionController {
         }
 
         AccountInfo currentUserAccount = accountService.getAccountInfo(sender);
+        Buddy currentUserBuddies = accountService.getBuddy(sender);
         sendFundsTransaction.setSender(sender.substring(5));
 
         try {
             AccountInfo recipientUserAccount = accountService.getAccountInfo("user_" + recipient);
+            Buddy recipientUserBuddies = accountService.getBuddy("user_" + recipient);
 
-            List<AccountInfo> updatedAccounts =
-                    transactionService.sendTransaction(sendFundsTransaction, currentUserAccount, recipientUserAccount);
+            List<Object> updatedAccounts =
+                    transactionService.sendTransaction(
+                            sendFundsTransaction,
+                            currentUserAccount,
+                            recipientUserAccount,
+                            currentUserBuddies,
+                            recipientUserBuddies,
+                            "account"
+                    );
+
+            List<Object> updatedBuddies =
+                    transactionService.sendTransaction(
+                            sendFundsTransaction,
+                            currentUserAccount,
+                            recipientUserAccount,
+                            currentUserBuddies,
+                            recipientUserBuddies,
+                            "buddy"
+                    );
 
             // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
-            for (AccountInfo account: updatedAccounts) {
-                accountService.updateAccountInfo(account);
+            for (Object account: updatedAccounts) {
+                accountService.updateAccountInfo((AccountInfo) account);
+            }
+            for (Object buddies: updatedBuddies) {
+                accountService.updateBuddy((Buddy) buddies);
             }
 
         } catch (Exception ex) {

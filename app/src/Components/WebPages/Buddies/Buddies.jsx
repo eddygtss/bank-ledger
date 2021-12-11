@@ -9,6 +9,7 @@ import { callApi } from "../../Utils/utils";
 const Buddies = ({ reload, setReload }) => {
     const [buddyInfo, setBuddyInfo] = useState({});
     const [addBuddyModal, setAddBuddyModal] = useState(false);
+    const [feedTransactions, setFeedTransactions] = useState({});
 
     const toggle = () => {
         setAddBuddyModal(!addBuddyModal);
@@ -20,6 +21,14 @@ const Buddies = ({ reload, setReload }) => {
                 result.json().then(data => {
                     setBuddyInfo(data);
                 });
+                callApi('buddy-feed').then(result => {
+                        if (result.status === 200){
+                            result.json().then(data => {
+                                setFeedTransactions(data);
+                            })
+                        }
+                    }
+                )
             } else {
                 cogoToast.error('There was an error retrieving your buddies.')
             }
@@ -45,7 +54,7 @@ const Buddies = ({ reload, setReload }) => {
             <Row className='justify-content-between text-center' sm="1" lg="2">
                 <BuddyList buddyInfo={buddyInfo} setReload={setReload} reload={reload} />
                 <br />
-                <BuddyFeed buddyInfo={buddyInfo} />
+                <BuddyFeed buddyInfo={buddyInfo} feedTransactions={feedTransactions} />
             </Row>
         </>
     )
