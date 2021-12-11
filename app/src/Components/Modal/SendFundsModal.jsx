@@ -8,23 +8,29 @@ import {
     Input,
     InputGroup,
     InputGroupText,
-    Label, FormFeedback
+    Label, FormFeedback, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap';
 import './Modal.css';
 import cogoToast from 'cogo-toast';
 import {callApi, regexAmount} from '../Utils/utils';
 
 export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, setReload}) => {
-    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'SEND', privacySetting: 'PRIVATE'});
     const [invalidEmail, setInvalidEmail] = useState(false);
+    const [privacyDropDown, setPrivacyDropDown] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
+    const [privateActive, setPrivateActive] = useState(false);
+    const [publicActive, setPublicActive] = useState(false);
 
-    const createSendTransaction = (memo, recipient, amount, transactionType) => {
-        callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType})).then(result => {
+    const createSendTransaction = (memo, recipient, amount, transactionType, privacySetting) => {
+        callApi(
+            'send',
+            'POST',
+            JSON.stringify({memo, recipient, amount, transactionType, privacySetting})).then(result => {
             if (result.status === 201) {
                 setReload(!reload)
                 setSendModal(!sendModal)
-                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND', privacySetting: 'PRIVATE'});
                 cogoToast.success('Successfully sent $' + amount + ' to ' + recipient);
             } else {
                 result.text().then(data => {
@@ -34,6 +40,24 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
             }
         });
     };
+
+    const toggle = () => {
+        setPrivacyDropDown(!privacyDropDown);
+        privacySetting();
+    }
+
+    const privacySetting = () => {
+        if (form.privacySetting === 'PRIVATE') {
+            setPrivateActive(true);
+        } else {
+            setPrivateActive(false);
+        }
+        if (form.privacySetting === 'PUBLIC') {
+            setPublicActive(true);
+        } else {
+            setPublicActive(false);
+        }
+    }
 
     const showInvalidEmailFeedback = () => {
         if (invalidEmail){
@@ -90,12 +114,33 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
                 setSendModal(!sendModal);
                 setInvalidAmount(false);
                 setInvalidEmail(false);
-                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'SEND', privateSetting: 'PRIVATE'});
             }} />
 
             <Container>
                 <h1 className="text-center">Send Funds</h1>
                 <br/>
+                <Dropdown
+                    direction="end"
+                    toggle={() => toggle()}
+                    isOpen={privacyDropDown}
+                    className="text-end"
+                >
+                    <DropdownToggle caret>
+                        Privacy
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem header>
+                            Privacy Level for Request
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={privateActive} onClick={() => setForm({...form, privacySetting: 'PRIVATE'})}>
+                            Private
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={publicActive} onClick={() => setForm({...form, privacySetting: 'PUBLIC'})}>
+                            Public
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
                 <Form className="formText">
                     <FormGroup>
                         <Label for="recipient">Recipient</Label>
@@ -129,7 +174,8 @@ export const SendFundsModal = ({sendModal, setSendModal, accountInfo, reload, se
                                 form.memo,
                                 form.recipient.toLowerCase(),
                                 form.amount,
-                    "SEND")}>Send Funds</Button>
+                    "SEND",
+                                form.privacySetting)}>Send Funds</Button>
                 <br/>
             </Container>
 

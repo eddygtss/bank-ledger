@@ -6,11 +6,9 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
+import gem.banking.enums.PrivacyLevel;
 import gem.banking.exceptions.AccountInvalidException;
-import gem.banking.models.Account;
-import gem.banking.models.AccountInfo;
-import gem.banking.models.Buddy;
-import gem.banking.models.Profile;
+import gem.banking.models.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -113,27 +111,67 @@ public class AccountService {
         }
     }
 
+    public List<String> getBuddyListDocumentIds(List<Profile> profiles) {
+        List<String> documentIds = new ArrayList<>();
+        for (Profile profile: profiles){
+            documentIds.add(profile.getDocumentId());
+        }
+
+        return documentIds;
+    }
+
+    public List<Transaction> getBuddyTransactions(Buddy buddy) throws ExecutionException, AccountInvalidException, InterruptedException {
+        List<Transaction> allTransactions = new ArrayList<>();
+        List<Transaction> publicTransactions = new ArrayList<>();
+        List<String> myBuddies = getBuddyListDocumentIds(buddy.getBuddyList());
+        List<Buddy> myBuddiesInfo = getListOfBuddyInfo(myBuddies);
+
+        for (Buddy buddyInfo: myBuddiesInfo){
+            allTransactions.addAll(buddyInfo.getBuddyTransactions());
+        }
+
+        for (Transaction transaction: allTransactions){
+            if (transaction.getPrivacySetting().equals(PrivacyLevel.PUBLIC)){
+                publicTransactions.add(transaction);
+            }
+        }
+
+        return publicTransactions;
+    }
+
+    public List<Buddy> getListOfBuddyInfo(List<String> documentIds) throws ExecutionException, InterruptedException, AccountInvalidException {
+        List<Buddy> allBuddies = new ArrayList<>();
+
+        for (String buddyDocumentIds: documentIds) {
+            allBuddies.add(getBuddy(buddyDocumentIds));
+        }
+
+        return allBuddies;
+    }
+
     public Buddy getBuddy(String documentId) throws ExecutionException, InterruptedException, AccountInvalidException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
+
         DocumentReference buddiesDocumentReference = dbFirestore.collection(COL_BUDDIES).document(documentId);
         ApiFuture<DocumentSnapshot> buddiesFuture = buddiesDocumentReference.get();
         DocumentSnapshot buddiesDocument = buddiesFuture.get();
-        Buddy buddies;
+        Buddy currentUsersBuddyInfo;
 
         if (buddiesDocument.exists()) {
-            buddies = buddiesDocument.toObject(Buddy.class);
-            assert buddies != null;
-            if (buddies.getBuddyList().size() > 0) {
-                List<Profile> profiles = buddies.getBuddyList();
+            currentUsersBuddyInfo = buddiesDocument.toObject(Buddy.class);
+            assert currentUsersBuddyInfo != null;
+            if (currentUsersBuddyInfo.getBuddyList().size() > 0) {
+                List<Profile> profiles = currentUsersBuddyInfo.getBuddyList();
                 ArrayList<Profile> updatedProfiles = new ArrayList<>();
                 for (Profile profile: profiles) {
                     Profile updated = getProfile(profile.getDocumentId());
+
                     updatedProfiles.add(updated);
                 }
-                buddies.setBuddyList(updatedProfiles);
+                currentUsersBuddyInfo.setBuddyList(updatedProfiles);
             }
 
-            return buddies;
+            return currentUsersBuddyInfo;
         } else {
             throw new AccountInvalidException("The account " + documentId.substring(5) + " is not valid.");
         }

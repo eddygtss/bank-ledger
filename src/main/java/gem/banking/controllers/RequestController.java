@@ -1,6 +1,7 @@
 package gem.banking.controllers;
 
 import gem.banking.models.AccountInfo;
+import gem.banking.models.Buddy;
 import gem.banking.models.Request;
 import gem.banking.services.AccountService;
 import gem.banking.services.AuthenticationService;
@@ -60,6 +61,7 @@ public class RequestController {
     @PostMapping("/approve-request")
     public ResponseEntity<String> approveRequestedFunds(@RequestBody String id) throws Exception {
         AccountInfo responderAccountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+        Buddy responderBuddies = accountService.getBuddy(authenticationService.getCurrentUser());
         List<Request> responderRequests = responderAccountInfo.getRequestHistory();
 
         Request parsed = new Request(id);
@@ -69,13 +71,34 @@ public class RequestController {
             if (request.getId().equals(parsed.getId())){
                 String requester = "user_" + request.getRequester();
                 AccountInfo requesterAccountInfo = accountService.getAccountInfo(requester);
+                Buddy requesterBuddies = accountService.getBuddy(requester);
 
-                List<AccountInfo> updatedAccounts =
-                        requestService.approveRequest(request, responderAccountInfo, requesterAccountInfo);
+                List<Object> updatedAccounts =
+                        requestService.approveRequest(
+                                request,
+                                responderAccountInfo,
+                                requesterAccountInfo,
+                                responderBuddies,
+                                requesterBuddies,
+                                "account"
+                        );
+
+                List<Object> updatedBuddies =
+                        requestService.approveRequest(
+                                request,
+                                responderAccountInfo,
+                                requesterAccountInfo,
+                                responderBuddies,
+                                requesterBuddies,
+                                "account"
+                        );
 
                 // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
-                for (AccountInfo account: updatedAccounts) {
-                    accountService.updateAccountInfo(account);
+                for (Object account: updatedAccounts) {
+                    accountService.updateAccountInfo((AccountInfo) account);
+                }
+                for (Object buddies: updatedBuddies) {
+                    accountService.updateBuddy((Buddy) buddies);
                 }
 
                 return ResponseEntity.ok("Sent " + requester.substring(5) + " $" + request.getAmount());

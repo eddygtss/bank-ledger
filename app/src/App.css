@@ -62,6 +62,12 @@ html > body > #root {
   padding-top: 65px !important;
   padding-bottom: 50px !important;
 }
+.roundedBuddies {
+  background-color: #87ceeb !important;
+  border-radius: 24px !important;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 8px 12px 0,
+  rgba(0, 0, 0, 0.04) 0 24px 32px 0;
+}
 .rowCenter {
   justify-content: center;
 }
