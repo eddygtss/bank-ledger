@@ -90,7 +90,7 @@ public class RequestController {
                                 requesterAccountInfo,
                                 responderBuddies,
                                 requesterBuddies,
-                                "account"
+                                "buddy"
                         );
 
                 // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
