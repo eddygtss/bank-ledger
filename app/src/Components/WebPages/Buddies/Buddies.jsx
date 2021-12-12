@@ -6,7 +6,7 @@ import { AddBuddyModal } from "../../Modal/AddBuddyModal";
 import { Button, Row } from "reactstrap";
 import { callApi } from "../../Utils/utils";
 
-const Buddies = ({ reload, setReload }) => {
+const Buddies = ({ reload, setReload, showBuddyError }) => {
     const [buddyInfo, setBuddyInfo] = useState({});
     const [addBuddyModal, setAddBuddyModal] = useState(false);
     const [feedTransactions, setFeedTransactions] = useState({});
@@ -30,7 +30,9 @@ const Buddies = ({ reload, setReload }) => {
                     }
                 )
             } else {
-                cogoToast.error('There was an error retrieving your buddies.')
+                if (showBuddyError){
+                    cogoToast.error('There was an error retrieving your buddies.')
+                }
             }
         });
     }, [reload]);

@@ -36,11 +36,12 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
     const [requestCollapse, setRequestCollapse] = useState(false);
     const [invalidAmount, setInvalidAmount] = useState(false);
     const [selectedProfile, setSelectedProfile] = useState('');
-    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'SEND'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'SEND', privacySetting: 'PRIVATE'});
     const [requestForm, setRequestForm] = useState({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
     const [privateActive, setPrivateActive] = useState(false);
     const [publicActive, setPublicActive] = useState(false);
     const [privacyDropDown, setPrivacyDropDown] = useState(false);
+    const [buddiesCollapse, setBuddiesCollapse] = useState(false);
 
     const createSendTransaction = (memo, recipient, amount, transactionType, privacySetting) => {
         callApi('send', 'POST', JSON.stringify({memo, recipient, amount, transactionType, privacySetting})).then(result => {
@@ -113,6 +114,9 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
             case 'privacy':
                 setPrivacyDropDown(!privacyDropDown);
                 privacySetting();
+                break;
+            case 'buddies':
+                setBuddiesCollapse(!buddiesCollapse);
                 break;
         }
     }
@@ -238,7 +242,7 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                     <Table
                         className="p-3" style={{backgroundColor: "#edf0f0", borderRadius: "10px"}}
                     >
-                        <tbody className="text-center">
+                        <tbody className="text-center d-block" style={{overflowY: "scroll", height: "125px"}}>
                         {buddyInfo.documentId &&
                             <td colSpan="2" className="p-0 fw-bold">
                                 Buddy Requests
@@ -328,7 +332,7 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                                 user.toLowerCase(),
                                 form.amount,
                                 "SEND",
-                                form.privacySetting)}>Send Funds</Button>
+                                form.privacySetting)}>Send</Button>
             </Container>
         )
     }
@@ -379,9 +383,7 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                     requestForm.memo,
                     user.toLowerCase(),
                     requestForm.amount,
-                    requestForm.privacySetting)}>Request Funds</Button>
-                <br/>
-
+                    requestForm.privacySetting)}>Request</Button>
             </Container>
         )
     }
@@ -394,7 +396,7 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                 </OffcanvasHeader>
                 <OffcanvasBody className='p-1 text-center'>
                     {profile.documentId &&
-                        <Card>
+                        <Card className="p-3">
                             <CardTitle>
                                 <h2>{profile.firstName} {profile.lastName}</h2>
                             </CardTitle>
@@ -410,13 +412,13 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
                                 }}>
                                     Send Money
                                 </Button>
+                                {' '}
                                 <Button color="success" onClick={() => {
                                     toggle('request');
                                     setSendCollapse(false);
                                 }}>
                                     Request Money
                                 </Button>
-                                <br />
                                 <Collapse isOpen={sendCollapse || requestCollapse}>
                                     {sendCollapse &&
                                     sendCollapseForm(profile.documentId.substring(5))
@@ -439,22 +441,21 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
             <Card
                 body
                 inverse
-                style={{
-                    height: '700px'
-                }}
-                className="roundedBuddies pl-1 pr-1"
+                className="roundedBuddies p-1"
             >
-                <CardTitle tag="h5">
-                    Your Buddies
+                <CardTitle tag="h5" onClick={() => toggle('buddies')} style={{cursor: "pointer"}}>
+                    Your Buddies ({buddyInfo.documentId ? getBuddyListEntries().length : 0})
                 </CardTitle>
-                {getBuddyRequests()}
-                <Table
-                    className="p-3" style={{backgroundColor: "#edf0f0", borderRadius: "10px"}}>
-                    <tbody className="text-center">
-                    {showBuddies()}
-                    {profileSidebar(selectedProfile)}
-                    </tbody>
-                </Table>
+                <Collapse isOpen={buddiesCollapse}>
+                    {getBuddyRequests()}
+                    <Table
+                        className="p-3" style={{backgroundColor: "#edf0f0", borderRadius: "10px"}}>
+                        <tbody className="text-center d-block" style={{overflowY: "scroll", height: "375px"}}>
+                        {showBuddies()}
+                        {profileSidebar(selectedProfile)}
+                        </tbody>
+                    </Table>
+                </Collapse>
             </Card>
         </Col>
     )
