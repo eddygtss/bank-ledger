@@ -28,7 +28,7 @@ const TransactionEntries = ({accountInfo, transType, reload, setReload}) => {
     if(transType === 'moneyOut') {
         return (
             <Table
-                className="bdr table-danger p-3">
+                className="bdr table-danger p-3" style={{backgroundColor: "#f5c6cb"}}>
                 <tbody className="text-center d-block" style={{height: "500px", overflowY: "scroll"}}>
                     {TableRows(getMoneyOutTransactions(), false, accountInfo, {reload, setReload})}
                     {!getMoneyOutTransactions().length && 'No transactions recorded.'}
@@ -38,7 +38,7 @@ const TransactionEntries = ({accountInfo, transType, reload, setReload}) => {
     } else if(transType === 'moneyIn') {
         return(
             <Table
-                className="bdr table-success p-3">
+                className="bdr table-success p-3" style={{backgroundColor: "#c3e6cb"}}>
                 <tbody className="text-center d-block" style={{height: "500px", overflowY: "scroll"}}>
                     {TableRows(getMoneyInTransactions(), false, accountInfo, {reload, setReload})}
                     {!getMoneyInTransactions().length && 'No transactions recorded.'}
