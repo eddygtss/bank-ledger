@@ -21,6 +21,8 @@ public class Transaction {
     private TransactionType transactionType;
     private Status transactionStatus;
     private PrivacyLevel privacySetting;
+    private String senderFullName = "";
+    private String recipientFullName = "";
 
     public Transaction(Transaction copy) {
         this.id = copy.id;
@@ -32,5 +34,7 @@ public class Transaction {
         this.transactionType = copy.transactionType;
         this.transactionStatus = copy.transactionStatus;
         this.privacySetting = copy.privacySetting;
+        this.senderFullName = copy.senderFullName;
+        this.recipientFullName = copy.recipientFullName;
     }
 }

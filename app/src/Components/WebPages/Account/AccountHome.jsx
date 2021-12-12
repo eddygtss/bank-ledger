@@ -44,7 +44,7 @@ const AccountHome = ({ setLogin }) => {
                 cogoToast.error('You have been logged out.')
             }
         });
-    }, [reload]);
+    }, [reload, reloadAccSum]);
 
     const toggle = (tab) => {
         if (activeTab !== tab && tab !== 'offCanvas') setActiveTab(tab);

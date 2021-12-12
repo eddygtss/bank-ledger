@@ -126,6 +126,12 @@ public class AccountService {
         List<String> myBuddies = getBuddyListDocumentIds(buddy.getBuddyList());
         List<Buddy> myBuddiesInfo = getListOfBuddyInfo(myBuddies);
 
+        for (Transaction transaction: buddy.getBuddyTransactions()){
+            if (transaction.getPrivacySetting().equals(PrivacyLevel.PRIVATE)){
+                publicTransactions.add(transaction);
+            }
+        }
+
         for (Buddy buddyInfo: myBuddiesInfo){
             allTransactions.addAll(buddyInfo.getBuddyTransactions());
         }

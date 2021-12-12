@@ -44,22 +44,20 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
     }
 
     const onChange = (name, value) => {
+        const val = value;
         if (name === 'amount'){
-            const val = value;
-            if (val === '' || regexAmount.test(val)){
+            if (val === '' || val.match(regexAmount)){
                 setForm({...form, amount: val})
             }
-        } else {
-            setForm({...form, [name]: value});
-        }
-        if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 100000){
+            if (val <= 0 || val[0] === "-" || val > 10000 || val === null){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
                     setInvalidAmount(false);
                 }
             }
+        } else {
+            setForm({...form, [name]: val});
         }
     };
 

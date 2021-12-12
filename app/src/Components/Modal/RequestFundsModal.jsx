@@ -88,29 +88,27 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
     }
 
     const onChange = (name, value) => {
+        const val = value;
         if (name === 'amount'){
-            const val = value;
-            if (val === '' || regexAmount.test(val)){
+            if (val === '' || val.match(regexAmount)){
                 setForm({...form, amount: val})
             }
-        } else {
-            setForm({...form, [name]: value});
-        }
-        if (name === "responder"){
-            if (value.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
-                setInvalidEmail(true);
-            } else {
-                if (invalidEmail === true) {
-                    setInvalidEmail(false);
-                }
-            }
-        }
-        if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 10000){
+            if (val <= 0 || val[0] === "-" || val > 10000 || val === null){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
                     setInvalidAmount(false);
+                }
+            }
+        } else {
+            setForm({...form, [name]: val});
+        }
+        if (name === "responder"){
+            if (val.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
+                setInvalidEmail(true);
+            } else {
+                if (invalidEmail === true) {
+                    setInvalidEmail(false);
                 }
             }
         }
