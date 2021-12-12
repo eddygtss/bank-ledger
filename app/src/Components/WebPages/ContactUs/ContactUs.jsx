@@ -1,19 +1,18 @@
-import { withRouter } from 'react-router-dom';
 import React from 'react';
-
-import "animate.css"
-import "./ContactUs.css"
+import { withRouter } from 'react-router-dom';
+import './ContactUs.css';
 import {
-    Card, CardText, CardBody,
-    CardTitle, Row, Col
+    Card,
+    CardText,
+    CardBody,
+    CardTitle,
+    Row,
+    Col
 } from 'reactstrap';
 
 const ContactUs = () => {
-
-
     return (
-
-        <div className="contact-wrapper myBackGround">
+        <div className="contact-wrapper">
             <h1 className="contact-head-line">Our Team</h1>
             <br/>
 
@@ -79,9 +78,6 @@ const ContactUs = () => {
                 </p>
             </div>
         </div>
-
-
-
     )
 };
 export default withRouter(ContactUs);

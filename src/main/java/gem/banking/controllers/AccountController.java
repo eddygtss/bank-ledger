@@ -30,7 +30,7 @@ public class AccountController {
     }
 
     // Create new user account API endpoint (POST/Create)
-    @PostMapping("/create")
+    @PostMapping("/register")
     public ResponseEntity<Void> createAccount(@RequestBody Account createAccountRequest) throws InterruptedException, ExecutionException, AccountExistsException {
         authenticationService.createUser(createAccountRequest);
 
@@ -57,7 +57,7 @@ public class AccountController {
 
     @PostMapping(value = "/login")
     public ResponseEntity<Void> login(@RequestBody Account loginAccountRequest, final HttpServletRequest request) {
-        authenticationService.login(request, loginAccountRequest.getUsername(), loginAccountRequest.getPassword());
+        authenticationService.login(request, loginAccountRequest.getUsername().toLowerCase(), loginAccountRequest.getPassword());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

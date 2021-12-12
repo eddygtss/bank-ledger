@@ -1,5 +1,7 @@
 package gem.banking.models;
 
+import gem.banking.enums.PrivacyLevel;
+import gem.banking.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +20,8 @@ public class Request {
     private String responder = "";
     private double amount;
     private String date;
-    private RequestStatus requestStatus;
-
-    public enum RequestStatus {
-        PENDING, APPROVED, DENIED, SENT, RECEIVED;
-    }
+    private Status requestStatus;
+    private PrivacyLevel privacySetting;
 
     public Request (String id) {
         this.id = id;
@@ -36,5 +35,6 @@ public class Request {
         this.amount = copy.amount;
         this.date = copy.date;
         this.requestStatus = copy.requestStatus;
+        this.privacySetting = copy.privacySetting;
     }
 }

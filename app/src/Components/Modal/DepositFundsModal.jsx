@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from 'react';
 import {
     Button,
     Container,
@@ -9,18 +9,22 @@ import {
     InputGroupText,
     Label,
     Modal
-} from "reactstrap";
-import "./Modal.css";
-import {callApi} from "../../utils";
-import cogoToast from "cogo-toast";
+} from 'reactstrap';
+import './Modal.css';
+import cogoToast from 'cogo-toast';
+import { callApi, regexAmount } from '../Utils/utils';
 
-export const DepositFundsModal = ({depositModal, setDepositModal}) => {
+export const DepositFundsModal = ({depositModal, setDepositModal, reload, setReload}) => {
+    const [form, setForm] = useState({memo: '', amount: '', transactionType: 'DEPOSIT'});
+    const [invalidAmount, setInvalidAmount] = useState(false);
+
     const createTransaction = (memo, amount, transactionType) => {
         callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType})).then(result => {
             if (result.status === 201) {
-                cogoToast.success('Transaction created.');
+                setReload(!reload)
                 setDepositModal(!depositModal);
-                setForm({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
+                setForm({memo: '', amount: '', transactionType: 'DEPOSIT'});
+                cogoToast.success('Transaction created.');
             } else {
                 result.json().then(data => {
                     cogoToast.error(`Error ${data.message ? `: ${data.message}` : ''}`);
@@ -29,29 +33,31 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
         });
     };
 
-    const [form, setForm] = useState({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
-    const [invalidAmount, setInvalidAmount] = useState(false);
-
     const showInvalidAmountFeedback = () => {
         if (invalidAmount){
             return (
                 <FormFeedback className="position-relative">
-                    Your amount must be more than $0 and less than $100,000.
+                    Your amount must be more than $0 and less than $10,000.
                 </FormFeedback>
             )
         }
     }
 
     const onChange = (name, value) => {
-        setForm({...form, [name]: value});
-        if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 100000){
+        const val = value;
+        if (name === 'amount'){
+            if (val === '' || val.match(regexAmount)){
+                setForm({...form, amount: val})
+            }
+            if (val <= 0 || val[0] === "-" || val > 10000 || val === null){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
                     setInvalidAmount(false);
                 }
             }
+        } else {
+            setForm({...form, [name]: val});
         }
     };
     return (
@@ -61,7 +67,7 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setDepositModal(!depositModal)
                 setInvalidAmount(false);
-                setForm({memo: '', amount: 0.00, transactionType: 'DEPOSIT'});
+                setForm({memo: '', amount: '', transactionType: 'DEPOSIT'});
             }} />
 
             <Container>
@@ -76,17 +82,23 @@ export const DepositFundsModal = ({depositModal, setDepositModal}) => {
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" value={form.amount} bsSize="lg" invalid={invalidAmount}
+                            <Input type="text" name="amount" value={form.amount} bsSize="lg" invalid={invalidAmount} inputMode="decimal"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
                     </FormGroup>
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidAmount || !form.amount} onClick={() => createTransaction(
-                    form.memo,
-                    form.amount,
-                    "DEPOSIT")}>Deposit Funds</Button>
+                <Button className="createTransactionSubmitBtn"
+                        disabled={invalidAmount || form.amount === '' || form.memo === ''}
+                        onClick={() =>
+                            createTransaction(
+                                form.memo,
+                                form.amount,
+                                "DEPOSIT")}
+                >
+                    Deposit Funds
+                </Button>
                 <br/>
 
             </Container>

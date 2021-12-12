@@ -1,15 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Staatliches&display=swap');
+
 .home-wrapper{
     vertical-align: center;
-}
-@font-face {
-    font-family: Staatliches;
-    src: url("./Staatliches-Regular.ttf");
 }
 .home-head-line{
     text-align: center;
     align-self: center;
     justify-content: center;
-    font-family: Staatliches, serif;
+    font-family: 'Staatliches', cursive;
 }
 .home-body{
     display: flex;
@@ -30,7 +28,7 @@
 }
 .home-card-title{
     color: black;
-    font-family: Staatliches;
+    font-family: 'Staatliches', cursive;
 }
 .home-card-body{
     color: #ffffff;
@@ -46,4 +44,14 @@
     padding-top: 20px;
     padding-right: 40px;
     padding-left: 40px;
+}
+.account-home-active {
+    background-color: #87ceeb!important;
+    color: white!important;
+    cursor: pointer!important;
+}
+.account-home-inactive {
+    background-color: #cccccc!important;
+    color: black!important;
+    cursor: pointer!important;
 }

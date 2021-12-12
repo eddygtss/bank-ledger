@@ -1,4 +1,7 @@
-body{min-height: 100vh}
+html > body > #root {
+  height: 100vh;
+  height: calc(100%);
+}
 .modalGreenButton{
   min-width: 100px;
   height: 48px;
@@ -59,6 +62,12 @@ body{min-height: 100vh}
   padding-top: 65px !important;
   padding-bottom: 50px !important;
 }
+.roundedBuddies {
+  background-color: #87ceeb !important;
+  border-radius: 24px !important;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 8px 12px 0,
+  rgba(0, 0, 0, 0.04) 0 24px 32px 0;
+}
 .rowCenter {
   justify-content: center;
 }
@@ -89,9 +98,10 @@ body{min-height: 100vh}
           rgb(206, 242, 255),
           rgb(238, 240, 240)
   ) !important;
-  height: 100vh;
+  min-height: 100vh;
   padding-top: 32px;
-  padding-bottom: 32px;
+  padding-bottom: 44px;
+  position: relative;
 }
 
 @-webkit-keyframes Gradient {
@@ -166,7 +176,7 @@ body{min-height: 100vh}
   justify-content: center;
 }
 .logo {
-  background: url(https://cliply.co/wp-content/uploads/2020/02/392002130_GEM_STONE_EMOJI_400px.gif)
+  background: url('./Components/images/GEM_STONE.gif')
     center / contain no-repeat;
   height: auto;
   width: auto;

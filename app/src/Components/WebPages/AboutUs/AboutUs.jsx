@@ -1,7 +1,5 @@
-import { withRouter } from 'react-router-dom';
 import React, {useState} from 'react';
-
-import "animate.css";
+import { withRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./AboutUs.css";
 import {
@@ -11,9 +9,10 @@ import {
     CarouselCaption,
     CarouselControl
 } from 'reactstrap';
+import piggyBank from '../../images/piggybank.png';
+import kids from '../../images/kids.png';
 
 const AboutUs = () => {
-
     // State for Active index
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -23,14 +22,14 @@ const AboutUs = () => {
     // Sample items for Carousel
     const items = [
         {
-            caption: 'Sample Caption One',src:
-                'https://media.geeksforgeeks.org/wp-content/uploads/20210425122739/2-300x115.png',
-            altText: 'Slide One'
+            caption: 'Banking Made Simple',src:
+                piggyBank,
+            altText: 'Banking Made Simple'
         },
         {
-            caption: 'Sample Caption Two',src:
-                'https://media.geeksforgeeks.org/wp-content/uploads/20210425122716/1-300x115.png',
-            altText: 'Slide Two'
+            caption: 'Our Mission',src:
+                kids,
+            altText: 'Our Mission'
         }
     ];
 
@@ -63,24 +62,27 @@ const AboutUs = () => {
                 onExited={() => setAnimating(false)}
                 onExiting={() => setAnimating(true)}
             >
-                <img src={item.src} alt={item.altText} />
+                <img src={item.src} alt={item.altText} style={{width: '100%'}}/>
+                <CarouselCaption captionText={item.caption} />
             </CarouselItem>
         );
     });
 
     return (
-        <div className="about-wrapper myBackGround">
+        <div className="about-wrapper">
             <h1 className="about-head-line">Our Mission</h1>
             <br/>
 
             <Carousel previous={previousButton} next={nextButton}
-                      activeIndex={activeIndex}>
+                      activeIndex={activeIndex} dark>
                 <CarouselIndicators items={items}
                                     activeIndex={activeIndex}
                                     onClickHandler={(newIndex) => {
                                         if (animating) return;
                                         setActiveIndex(newIndex);
-                                    }} />
+                                    }}
+                                    className=""
+                />
                 {carouselItemData}
                 <CarouselControl directionText="Prev"
                                  direction="prev" onClickHandler={previousButton} />

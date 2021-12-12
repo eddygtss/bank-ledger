@@ -1,6 +1,5 @@
-import React, {useState} from "react";
-import "./Modal.css";
-import {callApi} from "../../utils";
+import React, { useState } from 'react';
+import './Modal.css';
 import {
     Modal,
     Button,
@@ -10,17 +9,30 @@ import {
     Input,
     InputGroup,
     InputGroupText,
-    Label, FormFeedback
-} from "reactstrap";
-import cogoToast from "cogo-toast";
+    Label, FormFeedback, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
+} from 'reactstrap';
+import cogoToast from 'cogo-toast';
+import { callApi, regexAmount } from '../Utils/utils';
 
-export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) => {
-    const createRequestTransaction = (memo, responder, amount) => {
-        callApi('request', 'POST', JSON.stringify({memo, responder, amount})).then(result => {
+export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, reload, setReload}) => {
+    const [form, setForm] = useState({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
+    const [privacyDropDown, setPrivacyDropDown] = useState(false);
+    const [invalidEmail, setInvalidEmail] = useState(false);
+    const [invalidAmount, setInvalidAmount] = useState(false);
+    const [invalidButton, setInvalidButton] = useState(true);
+    const [privateActive, setPrivateActive] = useState(false);
+    const [publicActive, setPublicActive] = useState(false);
+
+    const createRequestTransaction = (memo, responder, amount, privacySetting) => {
+        callApi(
+            'request',
+            'POST',
+            JSON.stringify({memo, responder, amount, privacySetting})).then(result => {
             if (result.status === 201) {
-                cogoToast.success('Request successfully sent to ' + responder);
+                setReload(!reload)
                 setRequestModal(!requestModal);
-                setForm({memo: '', responder: '', amount: 0.00});
+                setForm({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
+                cogoToast.success('Request successfully sent to ' + responder);
             } else {
                 result.text().then(data => {
                     cogoToast.error(`Error ${data ? `: ${data}` : ''}`);
@@ -29,10 +41,23 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
         });
     };
 
-    const [form, setForm] = useState({memo: '', responder: '', amount: 0.00});
-    const [invalidEmail, setInvalidEmail] = useState(false);
-    const [invalidAmount, setInvalidAmount] = useState(false);
-    const [invalidButton, setInvalidButton] = useState(true);
+    const toggle = () => {
+        setPrivacyDropDown(!privacyDropDown);
+        privacySetting();
+    }
+
+    const privacySetting = () => {
+        if (form.privacySetting === 'PRIVATE') {
+            setPrivateActive(true);
+        } else {
+            setPrivateActive(false);
+        }
+        if (form.privacySetting === 'PUBLIC') {
+            setPublicActive(true);
+        } else {
+            setPublicActive(false);
+        }
+    }
 
     const showInvalidEmailLabel = () => {
         if (invalidEmail){
@@ -48,7 +73,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
         if (invalidAmount){
             return (
                 <FormFeedback className="position-relative">
-                    Your amount must be more than $0 and less than $100,000.
+                    Your amount must be more than $0 and less than $10,000.
                 </FormFeedback>
             )
         }
@@ -63,22 +88,27 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
     }
 
     const onChange = (name, value) => {
-        setForm({...form, [name]: value});
-        if (name === "responder"){
-            if (value === accountInfo.documentId.substring(5)){
-                setInvalidEmail(true);
-            } else {
-                if (invalidEmail === true) {
-                    setInvalidEmail(false);
-                }
+        const val = value;
+        if (name === 'amount'){
+            if (val === '' || val.match(regexAmount)){
+                setForm({...form, amount: val})
             }
-        }
-        if (name === "amount"){
-            if (value <= 0 || value[0] === "-" || value > 100000){
+            if (val <= 0 || val[0] === "-" || val > 10000 || val === null){
                 setInvalidAmount(true);
             } else {
                 if (invalidAmount === true) {
                     setInvalidAmount(false);
+                }
+            }
+        } else {
+            setForm({...form, [name]: val});
+        }
+        if (name === "responder"){
+            if (val.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
+                setInvalidEmail(true);
+            } else {
+                if (invalidEmail === true) {
+                    setInvalidEmail(false);
                 }
             }
         }
@@ -92,12 +122,33 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                 setRequestModal(!requestModal);
                 setInvalidEmail(false);
                 setInvalidAmount(false);
-                setForm({memo: '', responder: '', amount: 0.00});
+                setForm({memo: '', responder: '', amount: '', privacySetting: 'PRIVATE'});
             }} />
 
             <Container>
                 <h1 className="text-center">Request Funds</h1>
                 <br/>
+                <Dropdown
+                    direction="end"
+                    toggle={() => toggle()}
+                    isOpen={privacyDropDown}
+                    className="text-end"
+                    >
+                    <DropdownToggle caret>
+                        Privacy
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <DropdownItem header>
+                            Privacy Level for Request
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={privateActive} onClick={() => setForm({...form, privacySetting: 'PRIVATE'})}>
+                            Private
+                        </DropdownItem>
+                        <DropdownItem className="text-center" active={publicActive} onClick={() => setForm({...form, privacySetting: 'PUBLIC'})}>
+                            Public
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
                 <Form className="formText">
                     <FormGroup>
                         <Label for="responder">Send Request To</Label>
@@ -118,7 +169,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
                         <Label for="amount">Amount</Label>
                         <InputGroup>
                             <InputGroupText>$</InputGroupText>
-                            <Input type="number" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg"
+                            <Input type="text" name="amount" invalid={invalidAmount} value={form.amount} bsSize="lg" inputMode="numeric"
                                    onChange={e => onChange(e.target.name, e.target.value)} required/>
                             {showInvalidAmountFeedback()}
                         </InputGroup>
@@ -126,10 +177,11 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo}) 
 
                 </Form>
                 <br/>
-                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton} onClick={() => createRequestTransaction(
+                <Button className="createTransactionSubmitBtn" disabled={invalidEmail || invalidAmount || invalidButton || form.memo === '' || form.amount === ''} onClick={() => createRequestTransaction(
                     form.memo,
-                    form.responder,
-                    form.amount)}>Request Funds</Button>
+                    form.responder.toLowerCase(),
+                    form.amount,
+                    form.privacySetting)}>Request Funds</Button>
                 <br/>
 
             </Container>

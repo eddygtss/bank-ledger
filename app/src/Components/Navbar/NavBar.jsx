@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { withRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
     NavItem,
@@ -8,12 +9,11 @@ import {
     NavbarToggler,
     Collapse,
     NavLink, Row, Col
-} from "reactstrap";
-import "./NavBar.css";
-import GemLogo from "./GemLogo.png";
-import {withRouter} from "react-router-dom";
-import {callApi} from "../../utils";
-import cogoToast from "cogo-toast";
+} from 'reactstrap';
+import './NavBar.css';
+import GemLogo from './GemLogo.png';
+import cogoToast from 'cogo-toast';
+import { callApi } from '../Utils/utils';
 
 export const NavBar = ({isLoggedIn, setLogin}) => {
     const [hamburger, setHamburger] = useState(false);
@@ -57,7 +57,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
             return (
                 <>
                     <NavItem>
-                        <NavLink href="/account-create">
+                        <NavLink href="/register">
                             Register
                         </NavLink>
                     </NavItem>
@@ -76,12 +76,12 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
             return (
                 <>
                     <NavItem>
-                        <NavLink href="/account-summary">
+                        <NavLink href="/account-home">
                             Account
                         </NavLink>
                     </NavItem>
                     <NavItem>
-                        <NavLink onClick={() => Logout()} href="/">
+                        <NavLink onClick={() => Logout()} href="/login">
                             Logout
                         </NavLink>
                     </NavItem>
@@ -106,7 +106,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
                                 <img src={GemLogo}  alt={"GemBank Logo"}/>
                             </Col>
                             <Col style={{maxWidth: "fit-content"}}>
-                                <h1>Gem Bankers United</h1>
+                                <h1 className='website-title'>Gem Bankers United</h1>
                             </Col>
                         </Row>
                     </NavbarBrand>

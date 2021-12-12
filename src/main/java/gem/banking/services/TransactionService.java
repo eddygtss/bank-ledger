@@ -1,15 +1,16 @@
 package gem.banking.services;
 
+import gem.banking.enums.Status;
+import gem.banking.enums.TransactionType;
 import gem.banking.exceptions.InsufficientFundsException;
 import gem.banking.exceptions.InvalidTransactionException;
-import gem.banking.models.AccountInfo;
-import gem.banking.models.Transaction;
+import gem.banking.models.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,23 @@ import java.util.List;
 @Slf4j
 @Service
 public class TransactionService {
-    public AccountInfo recordTransaction(Transaction transaction, AccountInfo accountInfo) throws InsufficientFundsException, InvalidTransactionException {
+    @Autowired
+    public AccountService accountService;
+    @Autowired
+    public AuthenticationService authenticationService;
+
+    public List<Transaction> retrieveTransactions() throws Exception {
+        AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+
+        return accountInfo.getTransactionHistory();
+    }
+
+    public ResponseEntity<Void> recordTransaction(Transaction transaction) throws Exception {
+        AccountInfo accountInfo = accountService.getAccountInfo(authenticationService.getCurrentUser());
+
         List<Transaction> transactions = accountInfo.getTransactionHistory();
         double balance = accountInfo.getBalance();
-        Transaction.TransactionType transactionType = transaction.getTransactionType();
+        TransactionType transactionType = transaction.getTransactionType();
 
         if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
 
@@ -31,15 +45,15 @@ public class TransactionService {
             transaction.setDate(currentTime);
         }
 
-        if (transactionType == Transaction.TransactionType.DEPOSIT) {
-            transaction.setTransactionStatus(Transaction.TransactionStatus.PROCESSED);
+        if (transactionType == TransactionType.DEPOSIT) {
+            transaction.setTransactionStatus(Status.PROCESSED);
             transactions.add(transaction);
             balance += transaction.getAmount();
-        } else if (transactionType == Transaction.TransactionType.WITHDRAWAL) {
+        } else if (transactionType == TransactionType.WITHDRAWAL) {
             if (balance - transaction.getAmount() < 0.0) {
                 throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", balance));
             }
-            transaction.setTransactionStatus(Transaction.TransactionStatus.PROCESSED);
+            transaction.setTransactionStatus(Status.PROCESSED);
             transactions.add(transaction);
             balance -= transaction.getAmount();
         } else {
@@ -49,66 +63,122 @@ public class TransactionService {
         accountInfo.setTransactionHistory(transactions);
         accountInfo.setBalance(balance);
 
-        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType + " - New Balance: " + balance);
+        accountService.updateAccountInfo(accountInfo);
 
-        return accountInfo;
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    public List<AccountInfo> sendTransaction(Transaction transaction,
-                                             AccountInfo senderAccountInfo,
-                                             AccountInfo recipientAccountInfo)
-            throws InsufficientFundsException, InvalidTransactionException {
-        List<AccountInfo> updatedAccounts = new ArrayList<>();
+    public ResponseEntity<String> sendTransaction(Transaction transaction) throws Exception {
+        String sender = authenticationService.getCurrentUser();
+        String recipient = transaction.getRecipient().toLowerCase();
+        transaction.setRecipient(recipient);
+        Profile senderProfile = accountService.getProfile(authenticationService.getCurrentUser());
+        String senderFullName = senderProfile.getFirstName() + " " + senderProfile.getLastName();
+        transaction.setSenderFullName(senderFullName);
 
-        List<Transaction> senderTransactions = senderAccountInfo.getTransactionHistory();
-        List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
-
-        double senderBalance = senderAccountInfo.getBalance();
-        double recipientBalance = recipientAccountInfo.getBalance();
-
-        // TransactionType for the sender
-        Transaction.TransactionType transactionType = transaction.getTransactionType();
-
-        if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
-        String currentTime = LocalDateTime.now().format(formatter);
-        transaction.setDate(currentTime);
-
-        // We check if the transaction type is SEND because we are subtracting money from the account balance
-        if (transactionType == Transaction.TransactionType.SEND) {
-            if (senderBalance - transaction.getAmount() < 0.0) {
-                throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", senderBalance));
-            }
-            transaction.setTransactionStatus(Transaction.TransactionStatus.SENT);
-            senderTransactions.add(transaction);
-            senderBalance -= transaction.getAmount();
-
-            // Updating the sender's account
-            senderAccountInfo.setTransactionHistory(senderTransactions);
-            senderAccountInfo.setBalance(senderBalance);
-
-            // New Transaction object for the recipient so we can change status and type.
-            Transaction recipient = new Transaction(transaction);
-            recipient.setTransactionStatus(Transaction.TransactionStatus.RECEIVED);
-            recipient.setTransactionType(Transaction.TransactionType.TRANSFER);
-
-            recipientTransactions.add(recipient);
-            recipientBalance += transaction.getAmount();
-
-            // Updating the recipient's account
-            recipientAccountInfo.setTransactionHistory(recipientTransactions);
-            recipientAccountInfo.setBalance(recipientBalance);
-        } else {
-            throw new InvalidTransactionException("Invalid or missing transaction type");
+        if (sender.substring(5).equals(transaction.getRecipient())){
+            return ResponseEntity.badRequest().body("You cannot send money to yourself.");
         }
 
-        // Adding the sender and recipient account infos into the updated accounts list to return
-        updatedAccounts.add(senderAccountInfo);
-        updatedAccounts.add(recipientAccountInfo);
+        AccountInfo senderAccountInfo = accountService.getAccountInfo(sender);
+        Buddy senderBuddies = accountService.getBuddy(sender);
+        transaction.setSender(sender.substring(5));
 
-        log.debug("Transaction memo:" + transaction.getMemo() + " - Amount: " + transactionType + " - New Balance: " + senderBalance);
+        try {
+            AccountInfo recipientAccountInfo = accountService.getAccountInfo("user_" + recipient);
+            Buddy recipientBuddies = accountService.getBuddy("user_" + recipient);
+            Profile recipientProfile = accountService.getProfile("user_" + recipient);
+            String recipientFullName = recipientProfile.getFirstName() + " " + recipientProfile.getLastName();
+            transaction.setRecipientFullName(recipientFullName);
 
-        return updatedAccounts;
+            List<AccountInfo> updatedAccounts = new ArrayList<>();
+
+            List<Transaction> senderTransactions = senderAccountInfo.getTransactionHistory();
+            List<Transaction> recipientTransactions = recipientAccountInfo.getTransactionHistory();
+
+            double senderBalance = senderAccountInfo.getBalance();
+            double recipientBalance = recipientAccountInfo.getBalance();
+
+            // TransactionType for the sender
+            TransactionType transactionType = transaction.getTransactionType();
+
+            if (transaction.getAmount() <= 0.0) throw new InvalidTransactionException("Amount must be a positive value.");
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+            String currentTime = LocalDateTime.now().format(formatter);
+            transaction.setDate(currentTime);
+
+            // We check if the transaction type is SEND because we are subtracting money from the account balance
+            if (transactionType == TransactionType.SEND) {
+                if (senderBalance - transaction.getAmount() < 0.0) {
+                    throw new InsufficientFundsException(String.format("Insufficient funds. Current balance is $%.2f", senderBalance));
+                }
+                transaction.setTransactionStatus(Status.SENT);
+                senderTransactions.add(transaction);
+                senderBalance -= transaction.getAmount();
+
+                // Updating the sender's account
+                senderAccountInfo.setTransactionHistory(senderTransactions);
+                senderAccountInfo.setBalance(senderBalance);
+
+                // New Transaction object for the recipient so we can change status and type.
+                Transaction recipientTransaction = new Transaction(transaction);
+                recipientTransaction.setTransactionStatus(Status.RECEIVED);
+                recipientTransaction.setTransactionType(TransactionType.TRANSFER);
+
+                recipientTransactions.add(recipientTransaction);
+                recipientBalance += transaction.getAmount();
+
+                // Updating the recipient's account
+                recipientAccountInfo.setTransactionHistory(recipientTransactions);
+                recipientAccountInfo.setBalance(recipientBalance);
+            } else {
+                throw new InvalidTransactionException("Invalid or missing transaction type");
+            }
+
+            // Adding the sender and recipient account infos into the updated accounts list to return
+            updatedAccounts.add(senderAccountInfo);
+            updatedAccounts.add(recipientAccountInfo);
+
+            // Looping for each AccountInfo object in the updatedAccounts list and update the accounts on the database.
+            for (AccountInfo account: updatedAccounts) {
+                accountService.updateAccountInfo(account);
+            }
+
+            List<Buddy> updatedBuddies = new ArrayList<>();
+
+            List<Transaction> senderBuddyTransactions = senderBuddies.getBuddyTransactions();
+            List<Transaction> recipientBuddyTransactions = recipientBuddies.getBuddyTransactions();
+
+            // We check if the transaction type is SEND because we are subtracting money from the account balance
+            transaction.setTransactionStatus(Status.SENT);
+            senderBuddyTransactions.add(transaction);
+
+            // Updating the sender's account
+            senderBuddies.setBuddyTransactions(senderBuddyTransactions);
+
+            // New Transaction object for the recipient, so we can change status and type.
+            Transaction recipientTransaction = new Transaction(transaction);
+            recipientTransaction.setTransactionStatus(Status.RECEIVED);
+            recipientTransaction.setTransactionType(TransactionType.TRANSFER);
+
+            recipientBuddyTransactions.add(recipientTransaction);
+
+            // Updating the recipient's account
+            recipientBuddies.setBuddyTransactions(recipientBuddyTransactions);
+
+            // Adding the sender and recipient account infos into the updated accounts list to return
+            updatedBuddies.add(senderBuddies);
+            updatedBuddies.add(recipientBuddies);
+
+            for (Buddy buddy: updatedBuddies) {
+                accountService.updateBuddy(buddy);
+            }
+
+        } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+
+        return new ResponseEntity<>("Successfully sent " + recipient + " $" + transaction.getAmount(), HttpStatus.CREATED);
     }
 }
