@@ -1,29 +1,26 @@
-import React, {useState} from "react";
+import React from "react";
 import {Card, CardTitle, Col, Table} from "reactstrap";
 import '../../../App.css';
 
-const BuddyFeed = ({ buddyInfo, feedTransactions }) => {
+const BuddyFeed = ({ feedTransactions }) => {
     const getBuddyTransactionEntries = () => {
         return feedTransactions.length > 0 && feedTransactions.map((transaction) => {
-            if (transaction.privacySetting === 'PUBLIC'){
                 return (
                     <td
                         style={{
-                            textAlign: "initial",
+                            textAlign: "center",
                             display: "block",
                             paddingLeft: "12px",
                             whiteSpace: "break-spaces",
-                            cursor: "pointer",
                             borderTop: "1px solid #87ceeb"
                         }}
                     >
-                        <div className='p-0' style={{backgroundColor: 'unset'}}>{transaction.sender} sent {transaction.recipient} ${transaction.amount}</div>
+                        <div className='p-0' style={{backgroundColor: 'unset'}}>{transaction.senderFullName} sent {transaction.recipientFullName} ${transaction.amount}</div>
                         {'\n'}
                         {transaction.memo}
                     </td>
                 )
 
-            }
         })
     }
     const showBuddies = () => {

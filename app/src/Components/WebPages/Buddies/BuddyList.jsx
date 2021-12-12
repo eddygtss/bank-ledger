@@ -141,32 +141,36 @@ const BuddyList = ({ buddyInfo, setReload, reload }) => {
     }
 
     const onChange = (type, name, value) => {
+        const val = value;
         if (type === 'send'){
             if (name === 'amount'){
-                const val = value;
-                if (val === '' || regexAmount.test(val)){
+                if (val === '' || val.match(regexAmount)){
                     setForm({...form, amount: val})
                 }
+                if (val <= 0 || val[0] === "-" || val > 10000 || val === null){
+                    setInvalidAmount(true);
+                } else {
+                    if (invalidAmount === true) {
+                        setInvalidAmount(false);
+                    }
+                }
             } else {
-                setForm({...form, [name]: value});
+                setForm({...form, [name]: val});
             }
         } else if (type === 'request'){
             if (name === 'amount'){
-                const val = value;
-                if (val === '' || regexAmount.test(val)){
+                if (val === '' || val.match(regexAmount)){
                     setRequestForm({...requestForm, amount: val})
                 }
-            } else {
-                setRequestForm({...requestForm, [name]: value})
-            }
-        }
-        if (name === 'amount'){
-            if (value <= 0 || value[0] === "-" || value > 10000 || value === null){
-                setInvalidAmount(true);
-            } else {
-                if (invalidAmount === true) {
-                    setInvalidAmount(false);
+                if (val <= 0 || val[0] === "-" || val > 10000 || val === null){
+                    setInvalidAmount(true);
+                } else {
+                    if (invalidAmount === true) {
+                        setInvalidAmount(false);
+                    }
                 }
+            } else {
+                setRequestForm({...requestForm, [name]: val})
             }
         }
     };
