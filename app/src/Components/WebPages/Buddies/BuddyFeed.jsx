@@ -1,22 +1,39 @@
 import React from "react";
-import {Card, CardTitle, Col, Table} from "reactstrap";
+import {Badge, Card, CardTitle, Col, Table} from "reactstrap";
 import '../../../App.css';
 
 const BuddyFeed = ({ feedTransactions }) => {
+    const getFilteredTransactions = () => {
+        return feedTransactions.length > 0 && feedTransactions.filter(transaction => {
+            const type = transaction.transactionType.toLowerCase();
+            const status = transaction.transactionStatus.toLowerCase();
+            return (type.includes('send') && status.includes('sent')) || status.includes('received');
+        })
+    }
+
+    const sortedFeed = () => {
+        return getFilteredTransactions().sort((a,b) => {
+            return new Date(a.date).getDate() -
+                new Date(b.date).getDate()
+        }).reverse();
+    }
+
     const getBuddyTransactionEntries = () => {
-        return feedTransactions.length > 0 && feedTransactions.map((transaction) => {
+        return feedTransactions.length > 0 && sortedFeed().map((transaction) => {
                 return (
                     <td
+                        className="p-2"
                         style={{
                             textAlign: "center",
                             display: "block",
-                            paddingLeft: "12px",
                             whiteSpace: "break-spaces",
                             borderTop: "1px solid #87ceeb"
                         }}
                     >
-                        <div className='p-0' style={{backgroundColor: 'unset'}}>{transaction.senderFullName} sent {transaction.recipientFullName} ${transaction.amount}</div>
-                        {'\n'}
+                        <div className='p-0' style={{backgroundColor: 'unset'}}>
+                            {transaction.senderFullName} paid {transaction.recipientFullName}{'\n'}
+                            <div style={{fontSize: "10px"}}>{new Date(transaction.date).getMonth() + 1}/{new Date(transaction.date).getDate()} <Badge>{transaction.privacySetting}</Badge></div>
+                        </div>
                         {transaction.memo}
                     </td>
                 )
@@ -51,7 +68,7 @@ const BuddyFeed = ({ feedTransactions }) => {
                 </CardTitle>
                 <Table
                     className="p-3" style={{backgroundColor: "#edf0f0", borderRadius: "10px"}}>
-                    <tbody className="text-center">
+                    <tbody className="text-center d-block" style={{overflowY: "scroll", height: "630px"}}>
                     {showBuddies()}
                     </tbody>
                 </Table>

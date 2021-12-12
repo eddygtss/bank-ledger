@@ -24,6 +24,7 @@ const AccountHome = ({ setLogin }) => {
     const [bankInfo, setBankInfo] = useState({});
     const [profile, setProfile] = useState({});
     const [offCanvas, setOffCanvas] = useState(false);
+    const [showBuddyError, setShowBuddyError] = useState(false);
 
     useEffect(() => {
         callApi('account').then(result => {
@@ -118,6 +119,7 @@ const AccountHome = ({ setLogin }) => {
                         <NavLink
                             className={activeTab === '2' ? 'account-home-active' : 'account-home-inactive'}
                             onClick={() => {
+                                setShowBuddyError(true);
                                 toggle('2');
                                 setReload(!reload);
                             }}
@@ -146,7 +148,7 @@ const AccountHome = ({ setLogin }) => {
                         />
                     </TabPane>
                     <TabPane tabId='2'>
-                        <Buddies reload={reload} setReload={setReload} />
+                        <Buddies reload={reload} setReload={setReload} showBuddyError={showBuddyError} />
                     </TabPane>
                     <TabPane tabId='3'>
                         <MyProfile profile={profile} reload={reload} setReload={setReload} />

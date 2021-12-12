@@ -96,7 +96,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
                 expand="lg"
                 className="pl-0"
             >
-                <div className="container-fluid justify-content-center">
+                <div className="container-fluid justify-content-center text-center">
                     <NavbarBrand
                         className="me-auto"
                         href="/home"
@@ -113,7 +113,7 @@ export const NavBar = ({isLoggedIn, setLogin}) => {
                     <NavbarToggler
                         onClick={() => toggle('hamburger')}
                     />
-                    <Collapse navbar isOpen={hamburger} className="justify-content-end">
+                    <Collapse navbar isOpen={hamburger} className="justify-content-center">
                         <Nav
                             className="align-items-center"
                             navbar
