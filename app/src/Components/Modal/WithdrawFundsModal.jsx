@@ -15,15 +15,15 @@ import cogoToast from 'cogo-toast';
 import { callApi, regexAmount } from '../Utils/utils';
 
 export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, setReload}) => {
-    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL'});
+    const [form, setForm] = useState({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL', privacySetting: 'PRIVATE'});
     const [invalidAmount, setInvalidAmount] = useState(false);
 
-    const createTransaction = (memo, amount, transactionType) => {
-        callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType})).then(result => {
+    const createTransaction = (memo, amount, transactionType, privacySetting) => {
+        callApi('transactions', 'POST', JSON.stringify({memo, amount, transactionType, privacySetting})).then(result => {
             if (result.status === 201) {
                 setReload(!reload)
                 setWithdrawModal(!withdrawModal);
-                setForm({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL', privacySetting: 'PRIVATE'});
                 cogoToast.success('Transaction created.');
             } else {
                 result.json().then(data => {
@@ -67,7 +67,7 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
             <Button className="btn-close align-self-end m-2" onClick={() => {
                 setWithdrawModal(!withdrawModal);
                 setInvalidAmount(false);
-                setForm({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL'});
+                setForm({memo: '', recipient: '', amount: '', transactionType: 'WITHDRAWAL', privacySetting: 'PRIVATE'});
             }} />
 
             <Container>
@@ -96,7 +96,8 @@ export const WithdrawFundsModal = ({withdrawModal, setWithdrawModal, reload, set
                     onClick={() => createTransaction(
                         form.memo,
                         form.amount,
-                        "WITHDRAWAL"
+                        "WITHDRAWAL",
+                        form.privacySetting
                     )}>
                     Withdraw Funds
                 </Button>
