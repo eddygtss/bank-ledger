@@ -104,7 +104,7 @@ export const RequestFundsModal = ({requestModal, setRequestModal, accountInfo, r
             setForm({...form, [name]: val});
         }
         if (name === "responder"){
-            if (val.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
+            if (value.toLowerCase() === accountInfo.documentId.substring(5).toLowerCase()){
                 setInvalidEmail(true);
             } else {
                 if (invalidEmail === true) {
